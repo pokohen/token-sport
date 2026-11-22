@@ -130,12 +130,16 @@ extension Balance {
     /// 축구 평점의 포지션별 기준 보정. 시뮬레이션으로 맞춘다.
     public static func careerFootballBaseline(_ position: Position) -> Double {
         switch position {
-        case .goalkeeper: 0.18
+        case .goalkeeper: 0.45
         case .defender: 0.0
         case .midfielder: -0.1
         default: 0.2
         }
     }
+    /// 축구 골키퍼 평점: 실력이 비슷한 골키퍼를 상대로 유효 슈팅이 골이 되는 비율 (경기 엔진의 0.36).
+    public static let careerKeeperShotGoalRate = 0.36
+    /// 축구 골키퍼 평점: 막아 낸 골 하나의 값.
+    public static let careerKeeperPreventedWeight = 1.2
     /// 축구: 주전이 아닌 골키퍼는 이 경기 수마다 한 번 선발로 나온다.
     public static let careerKeeperRotation = 4
     /// 축구: 선발이 아닐 때 교체로 들어가는 시간(분). 감독 신뢰가 높을수록 일찍 들어간다 (신뢰 20이면 80분, 60이면 60분).

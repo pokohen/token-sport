@@ -288,6 +288,12 @@ public struct BasketballMatch: Codable, Equatable, Sendable {
 
     // MARK: 공격 한 번
 
+    /// 슛을 나눠 갖는 비중. 능력 30과 90이 1.5배쯤 차이 난다 (정비례면 세 배).
+    /// 잘하는 선수의 득점은 슛 수보다 성공률과 뛰는 시간에서 더 벌어진다.
+    static func shotShare(_ skill: Double) -> Double {
+        pow(max(5, skill), 0.4)
+    }
+
     mutating func resolvePossession(_ events: inout [MatchEvent]) {
         let offense = attacking, defense = defending
         let five = offense.onCourt, guards = defense.onCourt
@@ -328,7 +334,8 @@ public struct BasketballMatch: Codable, Equatable, Sendable {
             case .powerForward: role = 0.9
             default: role = 0.8
             }
-            return max(5, player.shooting * 0.6 + player.three * 0.4) * role * (player.style?.shotWeight ?? 1)
+            // 잘 던지는 선수에게 공이 더 가지만, 능력에 정비례하지는 않는다 (한 명이 슛을 독차지하지 않게).
+            return Self.shotShare(player.shooting * 0.6 + player.three * 0.4) * role * (player.style?.shotWeight ?? 1)
         })]
         let me = offense.players[shooter]
         // 맞은편 수비수: 같은 자리의 선수. 없으면 아무나.

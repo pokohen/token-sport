@@ -87,7 +87,10 @@ struct CareerOfferProbe {
         let spike = env["TB_SHAPE"] == "spike"
         var out = ""
         func f(_ v: Double) -> String { String(format: "%.2f", v) }
-        for position in [Position.forward, .midfielder, .goalkeeper, .shortstop, .starter, .shootingGuard] {
+        // `TB_POSITIONS=GK,SG`처럼 일부 포지션만 볼 수 있다.
+        let only = env["TB_POSITIONS"].map { Set($0.split(separator: ",").map(String.init)) }
+        let positions = [Position.forward, .midfielder, .goalkeeper, .shortstop, .starter, .shootingGuard]
+        for position in positions where only?.contains(position.rawValue) ?? true {
             out += "\n\(position.rawValue):"
             for level in levels {
                 var rating = 0.0, a = 0.0, b = 0.0, c = 0.0

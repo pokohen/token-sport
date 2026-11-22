@@ -351,6 +351,9 @@ public struct FootballMatch: Codable, Equatable, Sendable {
         return value + bonus(home: homeHasBall)
     }
 
+    /// 유효 슈팅이 골이 되는 확률이 슈팅과 골키핑의 차이에 얼마나 민감한지 (작을수록 민감).
+    static let keeperSpread = 60.0
+
     func keepingValue(penalty: Bool = false) -> Double {
         let side = defending
         guard let index = side.keeperIndex else { return 8 }
