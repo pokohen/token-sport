@@ -113,14 +113,17 @@ extension Game {
         } else {
             // 소속이 생긴 것으로 먼저 적어야, 구단에 들어갈 때 라이벌이 새 리그에 맞게 정해진다.
             let wasFreeAgent = career.isFreeAgent
+            // 시즌 도중에 옮기면 지금까지의 기록은 옛 구단의 몫으로 남기고, 새 리그에서는 0부터 센다.
+            let midSeason = phase == .regular && !career.seasonClosed
+            if midSeason, !wasFreeAgent { splitCareerSeason() }
             self.career?.isFreeAgent = false
             joinCareerClub(offer.teamID)
             // 새 구단에서는 처음부터 다시 눈에 띄어야 한다.
             clearCareerScouts()
             players[me.id]?.contract = Contract(salary: offer.salary, seasonsLeft: offer.years)
             self.career?.trust = Balance.careerStartTrust
-            // 무소속으로 시즌을 맞았으면 목표가 예전 구단 기준이다. 새 구단에 맞게 다시 받는다.
-            if wasFreeAgent, phase == .regular { assignCareerGoal(announce: true) }
+            // 시즌 목표는 새 구단 기준으로, 남은 경기만큼 다시 받는다.
+            if midSeason { assignCareerGoal(announce: true, remaining: remainingSeasonShare) }
             post("\(club.tier.displayName) \(club.name)(으)로 옮겼습니다. \(offer.years)시즌, 연봉 ₩\(offer.salary.formatted()). 예상 입지: \(offer.role.rawValue).")
         }
         self.career?.offers = []
