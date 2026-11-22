@@ -102,7 +102,8 @@ struct CareerTab: View {
             if !career.awards.isEmpty { Text("수상: " + career.awards.joined(separator: " · ")).note() }
             if !career.history.isEmpty {
                 Divider()
-                ForEach(career.history.reversed(), id: \.season) { item in
+                // 시즌 도중에 옮기면 한 시즌이 두 줄이라 시즌 번호를 id로 쓸 수 없다.
+                ForEach(Array(career.history.enumerated().reversed()), id: \.offset) { _, item in
                     VStack(alignment: .leading, spacing: 1) {
                         Text("\(item.season)시즌 · \(item.age)세 · \(item.teamName) (\(item.tier.rawValue)부)").font(.caption.weight(.semibold))
                         Text(CareerText.record(

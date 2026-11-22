@@ -112,7 +112,7 @@ import Testing
             }
         }
         let career = try #require(game.career)
-        #expect(career.history.count == 2)
+        #expect(Set(career.history.map(\.season)).count == 2)
         #expect(career.history.allSatisfy { ($0.basketball?.games ?? 0) > 0 })
         #expect(game.awards.contains { $0.title == "득점왕" })
         #expect(game.cup?.season == 3)

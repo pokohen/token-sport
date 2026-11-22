@@ -129,7 +129,7 @@ public struct CareerGoal: Codable, Equatable, Sendable {
     }
 }
 
-/// 끝난 시즌 하나의 기록.
+/// 커리어의 한 시즌 기록. 시즌 도중에 구단을 옮겼으면 구단마다 한 줄씩 남는다.
 public struct CareerSeason: Codable, Equatable, Sendable {
     public var season: Int
     public var age: Int

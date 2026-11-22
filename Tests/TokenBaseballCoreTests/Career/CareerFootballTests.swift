@@ -182,7 +182,7 @@ import Testing
         }
         let career = try #require(game.career)
         let me = try #require(game.myPlayer)
-        #expect(career.history.count == 3)
+        #expect(Set(career.history.map(\.season)).count == 3)
         #expect(career.history.allSatisfy { $0.football != nil && $0.ratedGames > 0 })
         #expect(me.ability > start + 10)
         #expect(me.ability <= me.potential + 0.001)
