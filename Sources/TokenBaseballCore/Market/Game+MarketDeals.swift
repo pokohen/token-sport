@@ -7,11 +7,12 @@ extension Game {
     /// 선수가 재계약 조건으로 요구하는 연봉과 기간.
     public func renewalDemand(_ player: Player) -> (salary: Int, years: Int) {
         let market = Balance.marketSalary(ability: player.ability)
-        let performance = player.position.sport == .football
-            ? Self.footballPerformance(player)
-            : player.isPitcher
+        let performance = switch player.position.sport {
+        case .football: Self.footballPerformance(player)
+        case .baseball, .basketball: player.isPitcher
             ? Double(player.pitching.wins + player.pitching.saves) / 20
             : max(0, player.batting.ops - 0.7) * 0.5
+        }
         let asked = max(Double(player.contract.salary) * 1.08, Double(market) * (1 + min(0.3, performance)))
         let years = player.age >= 32 ? 1 : player.age <= 25 ? 3 : 2
         return (Int(asked / 1_000) * 1_000, userTier.isCitizen ? min(years, 2) : years)
@@ -46,7 +47,11 @@ extension Game {
 
     public mutating func proposeFreeAgent(_ id: PlayerID, salary: Int, years: Int) throws {
         // 축구의 무소속 선수는 이적 기간 밖에도 계약할 수 있다.
-        guard phase == .offseason || sport == .football else {
+        let anytime = switch sport {
+        case .football: true
+        case .baseball, .basketball: false
+        }
+        guard phase == .offseason || anytime else {
             throw GameError("FA 영입은 오프시즌 이적 시장에서만 할 수 있습니다.")
         }
         guard let player = players[id], player.teamID == nil, freeAgents.contains(id) else {

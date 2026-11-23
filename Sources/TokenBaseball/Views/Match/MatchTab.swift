@@ -19,7 +19,7 @@ struct MatchTab: View {
                 if let result = game.lastResult { LastResultCard(result: result) }
                 NextMatchCard(game: game)
                 schedule
-                if game.sport != .baseball, game.isCareer {
+                if game.sport.hasPlayStyles, game.isCareer {
                     PlayStyleCard(game: game)
                 } else if game.sport == .football {
                     TacticCard(game: game)

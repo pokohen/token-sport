@@ -16,31 +16,25 @@ struct CareerForm: View {
     }
 
     private var basketball: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            TextField("선수 이름", text: $setup.name).textFieldStyle(.roundedBorder)
-            ChoiceGrid(items: CareerSetup.basketballPositions, selection: $setup.position, columns: 3) { $0.label }
-            Text(positionNote).note()
-            startPoints
-            Text("출신 (연고지)").font(.callout.weight(.medium))
-            ChoiceGrid(items: NameGenerator.userCities, selection: $setup.hometown, columns: 4) { $0 }
-        }
-        .font(.callout)
-        .onChange(of: setup.position) { setup.points = [:] }
-        .onAppear { if setup.position.sport != .basketball { setup.position = .shootingGuard } }
+        positionForm(CareerSetup.basketballPositions, columns: 3, fallback: .shootingGuard)
     }
 
     private var football: some View {
+        positionForm(CareerSetup.footballPositions, columns: 4, fallback: .forward)
+    }
+
+    /// 포지션만 고르면 되는 종목(축구, 농구)의 만들기 화면.
+    private func positionForm(_ positions: [Position], columns: Int, fallback: Position) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             TextField("선수 이름", text: $setup.name).textFieldStyle(.roundedBorder)
-            ChoiceGrid(items: CareerSetup.footballPositions, selection: $setup.position, columns: 4) { $0.label }
+            ChoiceGrid(items: positions, selection: $setup.position, columns: columns) { $0.label }
             Text(positionNote).note()
             startPoints
-            Text("출신 (연고지)").font(.callout.weight(.medium))
-            ChoiceGrid(items: NameGenerator.userCities, selection: $setup.hometown, columns: 4) { $0 }
+            HometownPicker(selection: $setup.hometown)
         }
         .font(.callout)
         .onChange(of: setup.position) { setup.points = [:] }
-        .onAppear { if setup.position.sport != .football { setup.position = .forward } }
+        .onAppear { if !positions.contains(setup.position) { setup.position = fallback } }
     }
 
     private var baseball: some View {
@@ -77,8 +71,7 @@ struct CareerForm: View {
             .pickerStyle(.segmented)
             .labelsHidden()
 
-            Text("출신 (연고지)").font(.callout.weight(.medium))
-            ChoiceGrid(items: NameGenerator.userCities, selection: $setup.hometown, columns: 4) { $0 }
+            HometownPicker(selection: $setup.hometown)
         }
         .font(.callout)
         .onChange(of: setup.position) { setup.points = [:] }

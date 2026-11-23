@@ -522,7 +522,7 @@
 그 뒤에 두 가지를 더 고쳤다. 농구는 능력 76이면 경기당 50점, 90이면 61점으로 너무 가팔라서, 슛을 나눠 갖는 몫을 능력에 정비례가 아니라 0.4제곱으로 줄였다 (득점은 슛 수보다 성공률과 뛰는 시간에서 벌어진다). 골키퍼는 능력 62부터 평점이 7.3에 붙어 있었다. 좋은 골키퍼가 막은 공이 "빗나감"으로 잡혀 선방 수가 오히려 줄었고, 평점이 운이 큰 무실점(+1.5)에 기대고 있었기 때문이다. 골키퍼의 실력이 막아내는 단계에만 들어가게 하고, 평점은 막아 낸 골로 매기게 바꿨다.
 
 
-📁 `Sources/TokenBaseballCore/Career/Game+Career.swift`(출전), `Game+CareerForm.swift`(컨디션, 기세, 라이벌), `Game/Game+Basketball.swift`(농구의 출전과 평점)
+📁 `Sources/TokenBaseballCore/Career/Game+Career.swift`(출전), `Game+CareerForm.swift`(컨디션, 기세, 라이벌), `Career/Game+CareerBasketball.swift`(농구의 출전과 평점)
 
 ---
 
@@ -771,7 +771,9 @@ swift build && TOKEN_BASEBALL_SELFTEST=/tmp/tb-selftest .build/debug/TokenBaseba
 ```
 Sources/TokenBaseballCore/
   Support/SeededRNG.swift          주사위 (2절)
+  Sport.swift                      종목, 종목마다 갈라지는 규칙
   Players/Player.swift             선수, 포지션, 능력치와 비중 (3절)
+  Players/SeasonLines.swift        종목별 시즌 기록
   Players/PlayerFactory.swift      선수 만들기
   Match/
     MatchState*.swift              야구 엔진 (5절)
@@ -782,8 +784,9 @@ Sources/TokenBaseballCore/
     Game.swift                     게임 상태 전체 (이 하나를 저장한다)
     Game+Match.swift               경기 시작·진행·정산 (야구)
     Game+Football.swift            같은 일 (축구)
-    Game+Basketball.swift          같은 일 (농구), 농구의 출전과 평점
-  Career/                          선수 모드: 출전, 평점, 훈련, 계약, 시즌 목표 (8~10절)
+    Game+Basketball.swift          같은 일 (농구)
+    Game+QuietMatch.swift          화면 없이 끝까지 치르는 경기 (플레이오프, 컵대회)
+  Career/                          선수 모드: 출전, 평점, 훈련, 계약, 시즌 목표 (8~10절). 농구는 Game+CareerBasketball.swift
   Season/                          시즌 흐름, 승강, 컵대회, 오프시즌, 세계의 틱 (9, 11절)
   Usage/                           토큰 로그 읽기
   Persistence/SaveStore.swift      저장 파일
@@ -791,6 +794,7 @@ Sources/TokenBaseballCore/
 
 Sources/TokenBaseball/
   Model/AppModel*.swift            앱 상태, 3초마다 틱을 부르는 반복문
+  Support/Sport+Display.swift      종목마다 다르게 보여 주는 것
   Views/                           화면
   Sprites/                         도트 그림
 ```
@@ -800,7 +804,7 @@ Sources/TokenBaseball/
 1. `SeededRNG.swift` (80줄): 주사위가 무엇인지.
 2. `BasketballMatch.swift`: 엔진 하나를 처음부터 끝까지. 파일 수가 가장 적다.
 3. `Player.swift`의 `Attributes`: 능력치와 비중.
-4. `Game+Basketball.swift`: 엔진을 게임에 어떻게 붙이는지 (경기 시작, 기록 옮기기, 평점).
+4. `Game+Basketball.swift`와 `Career/Game+CareerBasketball.swift`: 엔진을 게임에 어떻게 붙이는지 (경기 시작, 기록 옮기기, 평점).
 5. `Game+CareerMatch.swift`의 `settleCareer`: 평점이 신뢰와 명성이 되는 곳.
 6. `Game+World.swift`의 `tick`과 `grow`: 경기 뒤 세계가 움직이는 곳.
 

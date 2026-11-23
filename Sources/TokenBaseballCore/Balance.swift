@@ -8,7 +8,10 @@ public enum Balance {
     public static let roundsPerSeason = 36
     /// 종목별 리그 크기. 야구는 10팀이 네 번씩 만나 36라운드, 축구는 20팀이 두 번씩 만나 38라운드다.
     public static func teamsPerLeague(_ sport: Sport) -> Int {
-        sport == .football ? 20 : teamsPerLeague
+        switch sport {
+        case .football: 20
+        case .baseball, .basketball: teamsPerLeague
+        }
     }
     /// 축구: 한 리그 경계에서 플레이오프 없이 바로 승격하는 팀 수. 20팀 리그는 잉글랜드처럼 두 팀(그 아래 네 팀이
     /// 플레이오프로 한 팀 더, 아래 세 팀 강등), 그보다 작은 리그(예전 10팀 저장 파일의 남은 시즌)는 한 팀이다.
@@ -101,25 +104,26 @@ public enum Balance {
 
     // MARK: 로스터
 
-    public static func rosterLimit(_ tier: LeagueTier, sport: Sport = .baseball) -> Int {
-        if sport == .football {
+    public static func rosterLimit(_ tier: LeagueTier, sport: Sport) -> Int {
+        switch sport {
+        case .football:
             switch tier {
             case .pro: return 28
             case .semiPro, .amateur: return 24
             default: return 20
             }
-        }
-        if sport == .basketball {
+        case .basketball:
             switch tier {
             case .pro: return 16
             case .semiPro, .amateur: return 15
             default: return 13
             }
-        }
-        switch tier {
-        case .pro: return 28
-        case .semiPro, .amateur: return 22
-        default: return 18
+        case .baseball:
+            switch tier {
+            case .pro: return 28
+            case .semiPro, .amateur: return 22
+            default: return 18
+            }
         }
     }
 
@@ -189,10 +193,16 @@ public enum Balance {
         "조명탑 설치", "종합운동장", "전용 축구 경기장", "신축 경기장", "대형 전용 구장",
     ]
     public static func trainingNames(_ sport: Sport) -> [String] {
-        sport == .football ? footballTrainingNames : trainingNames
+        switch sport {
+        case .football: footballTrainingNames
+        case .baseball, .basketball: trainingNames
+        }
     }
     public static func stadiumNames(_ sport: Sport) -> [String] {
-        sport == .football ? footballStadiumNames : stadiumNames
+        switch sport {
+        case .football: footballStadiumNames
+        case .baseball, .basketball: stadiumNames
+        }
     }
 
     public static let stadiumCapacity = [100, 500, 2_000, 5_000, 8_000, 12_000, 15_000, 18_000, 22_000, 25_000]
@@ -329,7 +339,8 @@ public enum Balance {
 
     /// 포지션까지 본 성장 계수. 축구 필드 선수는 전성기가 조금 이르고, 골키퍼는 늦게까지 큰다.
     public static func ageGrowthFactor(_ age: Int, position: Position) -> Double {
-        if position.sport == .basketball {
+        switch position.sport {
+        case .basketball:
             // 농구: 20대 중반까지 크고 서른이면 멈춘다.
             switch age {
             case ...22: return 1.5
@@ -337,21 +348,22 @@ public enum Balance {
             case 27...29: return 0.4
             default: return 0
             }
-        }
-        guard position.sport == .football else { return ageGrowthFactor(age) }
-        if position == .goalkeeper {
+        case .baseball:
+            return ageGrowthFactor(age)
+        case .football where position == .goalkeeper:
             switch age {
             case ...23: return 1.5
             case 24...28: return 1.0
             case 29...31: return 0.4
             default: return 0
             }
-        }
-        switch age {
-        case ...21: return 1.5
-        case 22...25: return 1.0
-        case 26...28: return 0.4
-        default: return 0
+        case .football:
+            switch age {
+            case ...21: return 1.5
+            case 22...25: return 1.0
+            case 26...28: return 0.4
+            default: return 0
+            }
         }
     }
 

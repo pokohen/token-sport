@@ -66,7 +66,7 @@ public struct StandingRow: Codable, Equatable, Sendable {
 public enum Standings {
     /// KBO 방식: 승률 → 동률 팀끼리의 상대 전적 → 다득점.
     public static func ranked(_ rows: [StandingRow], sport: Sport) -> [StandingRow] {
-        sport == .football ? rankedByPoints(rows) : ranked(rows)
+        sport.ranksByPoints ? rankedByPoints(rows) : ranked(rows)
     }
 
     /// 축구: 승점 → 골득실 → 다득점 → 동률 팀끼리의 상대 전적.

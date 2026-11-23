@@ -14,7 +14,7 @@ struct SettingsTab: View {
                     }
                 }
                 Toggle("훈련 애니메이션", isOn: setting(\.animationEnabled))
-                Toggle(game.sport == .football ? "알림 (경기 가능, 골, 경기 종료)" : "알림 (경기 가능, 득점, 경기 종료)", isOn: setting(\.notificationsEnabled))
+                Toggle("알림 (경기 가능, \(game.sport.scoreWord), 경기 종료)", isOn: setting(\.notificationsEnabled))
                 if !Notifier.isAvailable {
                     Text("알림은 앱 번들(.app)로 실행할 때만 나옵니다.").note()
                 }
@@ -76,9 +76,7 @@ struct SettingsTab: View {
             }
 
             Card {
-                Text(game.sport == .football
-                    ? "Token Sports는 실제 리그·구단과 무관한 비공식 팬 프로젝트입니다. 등장하는 구단과 선수는 모두 가상입니다."
-                    : "Token Sports는 KBO 및 각 구단과 무관한 비공식 팬 프로젝트입니다. 등장하는 구단과 선수는 모두 가상입니다.").note()
+                Text("Token Sports는 \(game.sport.leagueDisclaimer) 비공식 팬 프로젝트입니다. 등장하는 구단과 선수는 모두 가상입니다.").note()
                 Button("앱 종료") {
                     model.save()
                     NSApplication.shared.terminate(nil)

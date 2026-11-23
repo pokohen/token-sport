@@ -7,7 +7,7 @@ extension Game {
     mutating func endRegularSeason() {
         for tier in LeagueTier.allCases {
             for row in standings[tier.index] {
-                lastWinRate[row.teamID] = sport == .football
+                lastWinRate[row.teamID] = sport.ranksByPoints
                     ? Double(row.points) / Double(max(1, row.games * 3)) : row.winRate
             }
         }
@@ -35,8 +35,8 @@ extension Game {
         // 승강: 리그 경계마다 자동 승격·강등과 플레이오프를 정한다.
         setUpPlayoffs()
 
-        if !isCareer, !isBankrupt, userTier != .pro, !canPromote(userTeamID), myRank <= (sport == .football ? Balance.footballAutoPromotions(teams: teams(in: userTier).count) + 4 : 3) {
-            post(sport == .football
+        if !isCareer, !isBankrupt, userTier != .pro, !canPromote(userTeamID), myRank <= (sport.usesEnglishPromotion ? Balance.footballAutoPromotions(teams: teams(in: userTier).count) + 4 : 3) {
+            post(sport.usesEnglishPromotion
                 ? "구장 등급이 모자라 승격 자격이 다음 순위 팀으로 넘어갔습니다. 경기장을 Lv\(Balance.promotionStadiumLevel(from: userTier))까지 올려야 합니다."
                 : "승강 플레이오프를 신청하지 않아 승격 자격이 다음 순위 팀으로 넘어갔습니다.")
         }
@@ -135,13 +135,15 @@ extension Game {
 
     mutating func giveAwards() {
         awards.removeAll { $0.season < season - 1 }
-        if sport == .football {
+        switch sport {
+        case .football:
             giveFootballAwards()
             return
-        }
-        if sport == .basketball {
+        case .basketball:
             giveBasketballAwards()
             return
+        case .baseball:
+            break
         }
         for tier in LeagueTier.allCases {
             let everyone = teams(in: tier).flatMap { roster(of: $0.id) }

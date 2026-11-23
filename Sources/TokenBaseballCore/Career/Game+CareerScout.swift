@@ -82,7 +82,7 @@ extension Game {
 
         if let performance {
             // 명성과 같은 기준을 쓴다: 야구는 6.5, 축구와 농구는 6.3. 그보다 조금 아래부터 관심이 오른다.
-            let baseline = (me.position.sport == .baseball ? 6.5 : 6.3) - Balance.careerScoutBaselineSlack
+            let baseline = me.position.sport.careerRatingBaseline - Balance.careerScoutBaselineSlack
             // 선발 투수는 나오는 경기가 적어서 한 경기가 더 크게 반영된다.
             let rarity = me.position == .starter ? Balance.careerScoutStarterPitcher : 1.0
             let weight = kind == .friendly ? 0.5 : 1.0

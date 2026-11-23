@@ -68,10 +68,14 @@ public enum NameGenerator {
         "길거리 농구 출신", "입단 테스트 출신", "지역 리그 득점왕 출신",
     ]
 
-    public static func playerName(_ rng: inout SeededRNG, sport: Sport = .baseball) -> String {
+    public static func playerName(_ rng: inout SeededRNG, sport: Sport) -> String {
         while true {
             let name = rng.pick(surnames) + rng.pick(givenFirst) + rng.pick(givenSecond)
-            let banned = sport == .baseball ? blocked : sport == .football ? blockedFootball : blockedBasketball
+            let banned = switch sport {
+            case .baseball: blocked
+            case .football: blockedFootball
+            case .basketball: blockedBasketball
+            }
             if !banned.contains(name) { return name }
         }
     }
@@ -80,7 +84,7 @@ public enum NameGenerator {
         rng.pick(foreignNames)
     }
 
-    public static func origin(tier: LeagueTier, sport: Sport = .baseball, _ rng: inout SeededRNG) -> String {
+    public static func origin(tier: LeagueTier, sport: Sport, _ rng: inout SeededRNG) -> String {
         if tier.isCitizen {
             return "\(rng.pick(neighborhoods)) \(rng.pick(jobs))"
         }
@@ -148,10 +152,11 @@ public enum NameGenerator {
 
     /// 하위 리그 AI 구단 이름. `taken`에 없는 이름이 나올 때까지 만든다.
     public static func cpuTeam(
-        tier: LeagueTier, taken: Set<String>, sport: Sport = .baseball, _ rng: inout SeededRNG
+        tier: LeagueTier, taken: Set<String>, sport: Sport, _ rng: inout SeededRNG
     ) -> (city: String, name: String) {
         let shortTaken = Set(taken.map(shortName))
-        if sport == .football {
+        switch sport {
+        case .football:
             for attempt in 0..<500 {
                 let city = rng.pick(cpuCities)
                 let name: String
@@ -174,8 +179,7 @@ public enum NameGenerator {
                 }
             }
             return ("", "제\(taken.count + 1) 시민 FC")
-        }
-        if sport == .basketball {
+        case .basketball:
             for attempt in 0..<500 {
                 let city = rng.pick(cpuCities)
                 let name: String
@@ -198,6 +202,8 @@ public enum NameGenerator {
                 }
             }
             return ("", "제\(taken.count + 1) 시민 농구단")
+        case .baseball:
+            break
         }
         for attempt in 0..<500 {
             let city = rng.pick(cpuCities)

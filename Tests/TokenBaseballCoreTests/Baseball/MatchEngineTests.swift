@@ -11,7 +11,7 @@ enum TestTeams {
         var rng = SeededRNG(seed: seed)
         var team = Team(id: id, name: "팀\(id) 테스트", city: "", tier: tier, isUser: false, season: 1)
         var players: [PlayerID: Player] = [:]
-        for (offset, position) in PlayerFactory.rosterPositions(tier).enumerated() {
+        for (offset, position) in PlayerFactory.rosterPositions(tier, sport: .baseball).enumerated() {
             var spec = PlayerFactory.Spec(position: position, tier: tier, season: 1)
             spec.ability = ability...ability
             var player = PlayerFactory.make(id: id * 1000 + offset, spec: spec, &rng)

@@ -15,13 +15,9 @@ struct FootballLiveView: View {
     var body: some View {
         VStack(spacing: 10) {
             Card(live.kind.label, trailing: "\(state.periodLabel) \(state.clockLabel)") {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(state.away.name).font(.callout.weight(.semibold)).lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                    Text("\(state.away.goals) : \(state.home.goals)").font(.title.bold().monospacedDigit())
-                    Text(state.home.name).font(.callout.weight(.semibold)).lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
+                LiveScoreLine(
+                    awayName: state.away.name, awayScore: state.away.goals,
+                    homeName: state.home.name, homeScore: state.home.goals)
                 HStack {
                     Text("원정 · \(state.away.shape.label)").frame(maxWidth: .infinity, alignment: .trailing)
                     Text(state.wentToShootout ? "승부차기 \(state.away.shootoutGoals) : \(state.home.shootoutGoals)" : " ")
@@ -35,14 +31,13 @@ struct FootballLiveView: View {
             Card {
                 pitch
                 let share = Int(((live.userIsHome ? state.homePossession : 1 - state.homePossession) * 100).rounded())
-                Grid(horizontalSpacing: 8, verticalSpacing: 3) {
-                    statRow("점유율", "\(share)%", "\(100 - share)%")
-                    statRow("슈팅 (유효)", "\(mine.shots) (\(mine.shotsOnTarget))", "\(theirs.shots) (\(theirs.shotsOnTarget))")
-                    statRow("코너킥", "\(mine.corners)", "\(theirs.corners)")
-                    statRow("반칙", "\(mine.fouls)", "\(theirs.fouls)")
-                    statRow("경고 · 퇴장", "\(mine.yellowCards) · \(mine.redCards)", "\(theirs.yellowCards) · \(theirs.redCards)")
-                }
-                .font(.caption.monospacedDigit())
+                MirrorStatGrid(rows: [
+                    .init("점유율", "\(share)%", "\(100 - share)%"),
+                    .init("슈팅 (유효)", "\(mine.shots) (\(mine.shotsOnTarget))", "\(theirs.shots) (\(theirs.shotsOnTarget))"),
+                    .init("코너킥", "\(mine.corners)", "\(theirs.corners)"),
+                    .init("반칙", "\(mine.fouls)", "\(theirs.fouls)"),
+                    .init("경고 · 퇴장", "\(mine.yellowCards) · \(mine.redCards)", "\(theirs.yellowCards) · \(theirs.redCards)"),
+                ])
             }
             CommentaryCard(log: state.log, myName: myName)
             OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.goals) : \($0.home.goals) \($0.home.shortName)", $0.isFinished ? "종료" : $0.clockLabel) })
@@ -72,19 +67,8 @@ struct FootballLiveView: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("공 위치: \(labels[fromMine])")
             if state.period != .shootout, !state.isFinished {
-                Text(myBall ? "\(mine.shortName) 공격 →" : "← \(theirs.shortName) 공격")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(myBall ? Theme.win : Theme.loss)
-                    .frame(maxWidth: .infinity, alignment: myBall ? .trailing : .leading)
+                AttackDirectionLabel(myBall: myBall, mine: mine.shortName, theirs: theirs.shortName)
             }
-        }
-    }
-
-    private func statRow(_ label: String, _ left: String, _ right: String) -> some View {
-        GridRow {
-            Text(left).frame(maxWidth: .infinity, alignment: .trailing)
-            Text(label).foregroundStyle(.secondary).frame(width: 84)
-            Text(right).frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

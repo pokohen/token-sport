@@ -19,13 +19,16 @@ extension Game {
             return
         }
         let chosen = ids.compactMap { players[$0] }
-        if sport == .football {
+        switch sport {
+        case .football:
             guard chosen.count == Balance.footballStarters, Set(ids).count == chosen.count,
                   chosen.allSatisfy({ $0.teamID == userTeamID }),
                   chosen.contains(where: { $0.position == .goalkeeper })
             else { throw GameError("골키퍼 1명을 포함해 내 팀 선수 11명을 골라야 합니다.") }
             teams[userTeamID].lineupOverride = ids
             return
+        case .baseball, .basketball:
+            break
         }
         guard chosen.count == 9, Set(ids).count == 9,
               chosen.allSatisfy({ $0.teamID == userTeamID && !$0.isPitcher })
@@ -84,8 +87,11 @@ extension Game {
     }
 
     public func leaders(_ tier: LeagueTier, count: Int = 5) -> [(title: String, rows: [Leader])] {
-        if sport == .football { return footballLeaders(tier, count: count) }
-        if sport == .basketball { return basketballLeaders(tier, count: count) }
+        switch sport {
+        case .football: return footballLeaders(tier, count: count)
+        case .basketball: return basketballLeaders(tier, count: count)
+        case .baseball: break
+        }
         let everyone = teams(in: tier).flatMap { roster(of: $0.id) }
         let minPA = max(1, round * 2)
         let minOuts = max(1, round * 2)

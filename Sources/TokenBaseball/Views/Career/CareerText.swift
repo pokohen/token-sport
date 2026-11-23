@@ -27,11 +27,11 @@ enum CareerText {
         _ me: Player, batting: BattingLine, pitching: PitchingLine, football: FootballLine?,
         basketball: BasketballLine? = nil
     ) -> String {
-        if me.position.sport == .basketball { return CareerText.basketball(basketball ?? BasketballLine()) }
-        if me.position.sport == .football {
-            return CareerText.football(football ?? FootballLine(), keeper: me.position == .goalkeeper)
+        switch me.position.sport {
+        case .basketball: return CareerText.basketball(basketball ?? BasketballLine())
+        case .football: return CareerText.football(football ?? FootballLine(), keeper: me.position == .goalkeeper)
+        case .baseball: return me.isPitcher ? CareerText.pitching(pitching) : CareerText.batting(batting)
         }
-        return me.isPitcher ? CareerText.pitching(pitching) : CareerText.batting(batting)
     }
 
     static func rating(_ value: Double?) -> String { value.map { String(format: "%.2f", $0) } ?? "—" }

@@ -60,15 +60,17 @@ extension Game {
     /// 내 구단은 야구에서는 승강 플레이오프를 신청해야 하고, 축구에서는 구장 등급(경기장 레벨)을 채워야 한다.
     func canPromote(_ id: TeamID) -> Bool {
         guard teams[id].isUser else { return true }
-        if sport == .football {
+        switch sport {
+        case .football:
             return teams[id].stadiumLevel >= Balance.promotionStadiumLevel(from: teams[id].tier)
+        case .baseball, .basketball:
+            return appliedForPromotion
         }
-        return appliedForPromotion
     }
 
     /// 축구: 승격에 필요한 경기장 레벨. 최상위 리그면 nil.
     public var promotionStadiumRequirement: Int? {
-        guard sport == .football, userTier != .pro else { return nil }
+        guard sport.usesEnglishPromotion, userTier != .pro else { return nil }
         return Balance.promotionStadiumLevel(from: userTier)
     }
 
@@ -88,7 +90,8 @@ extension Game {
             pendingMoves.append(TierMove(team: champion, to: upper))
 
             var contenders = Array(eligible.dropFirst())
-            if sport == .football {
+            switch sport {
+            case .football:
                 // 20팀 리그는 2위도 바로 올라가고, 그만큼 한 팀이 더 내려간다.
                 let direct = Balance.footballAutoPromotions(teams: upperRanked.count)
                 for extra in 1..<direct {
@@ -114,12 +117,14 @@ extension Game {
                 default:
                     pendingMoves.append(TierMove(team: four[0], to: upper))
                 }
-            } else if contenders.count >= 2 {
-                series.append(PlayoffSeries(
-                    upperTier: upper, upperTeam: contenders[0], lowerTeam: contenders[1],
-                    format: .wildcard, stage: .wildcard))
-            } else if let second = contenders.first {
-                series.append(PlayoffSeries(upperTier: upper, upperTeam: ninth, lowerTeam: second))
+            case .baseball, .basketball:
+                if contenders.count >= 2 {
+                    series.append(PlayoffSeries(
+                        upperTier: upper, upperTeam: contenders[0], lowerTeam: contenders[1],
+                        format: .wildcard, stage: .wildcard))
+                } else if let second = contenders.first {
+                    series.append(PlayoffSeries(upperTier: upper, upperTeam: ninth, lowerTeam: second))
+                }
             }
         }
         for entry in series { resetRotation(entry) }

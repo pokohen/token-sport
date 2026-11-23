@@ -100,13 +100,15 @@ extension Game {
         let away = next.userIsHome ? next.opponent : userTeamID
         let tier = next.kind == .friendly || next.kind == .cup ? min(userTier, teams[next.opponent].tier) : userTier
         // 친선 경기 규칙은 두 구단 중 윗 리그를 따른다 (콜드게임은 시민 구단끼리만).
-        if sport == .football {
+        switch sport {
+        case .football:
             try startFootballMatch(next, home: home, away: away, tier: tier, now: now)
             return
-        }
-        if sport == .basketball {
+        case .basketball:
             try startBasketballMatch(next, home: home, away: away, tier: tier, now: now)
             return
+        case .baseball:
+            break
         }
         guard var state = makeMatch(home: home, away: away, kind: next.kind, tier: tier, seed: rng.next()) else {
             throw GameError("경기를 시작할 수 없습니다.")
@@ -340,7 +342,7 @@ extension Game {
     mutating func ensurePlayable(_ id: TeamID) {
         guard !teams[id].isUser else { return }
         func short() -> Bool {
-            if sport != .baseball { return !canField(teams[id]) }
+            if sport.groupsByPosition { return !canField(teams[id]) }
             return LineupBuilder.build(team: teams[id], players: players) == nil
                 || roster(of: id).filter({ $0.isPitcher }).count < Balance.minPitchers
         }

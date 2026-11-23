@@ -115,6 +115,6 @@ struct BallIcon: View {
     var body: some View {
         Image(nsImage: BallSprite.image(sport, size: size))
             .interpolation(.none)
-            .accessibilityLabel(sport == .football ? "축구공" : sport == .basketball ? "농구공" : "야구공")
+            .accessibilityLabel(sport.ballName)
     }
 }

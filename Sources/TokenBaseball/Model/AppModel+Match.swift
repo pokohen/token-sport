@@ -55,7 +55,7 @@ extension AppModel {
                 if events.contains(where: { $0.kind == .inning }) { pause += .seconds(4) }
                 if events.contains(where: { $0.kind == .change }) { pause += .seconds(3) }
                 // 농구는 득점이 워낙 잦아서 득점마다 멈추지 않는다.
-                if self.sport != .basketball, events.contains(where: { $0.kind == .score }) { pause += .seconds(2) }
+                if self.sport.pausesOnScore, events.contains(where: { $0.kind == .score }) { pause += .seconds(2) }
                 if self.game?.isMatchLive != true { break }
                 // 배속: 기다리는 시간만 줄인다. 경기 내용은 배속과 상관없이 같다.
                 try? await Task.sleep(for: pause / max(1, self.matchSpeed))
@@ -67,8 +67,8 @@ extension AppModel {
     func handle(_ events: [MatchEvent], iScored: Bool) {
         pitchesSinceSave += 1
         if game?.isMatchLive != true { return matchDidFinish() }
-        if iScored, sport != .basketball {
-            notify(sport == .football ? "골!" : "득점!", events.last { $0.kind == .score }?.text ?? "")
+        if iScored, let title = sport.scoreAlertTitle {
+            notify(title, events.last { $0.kind == .score }?.text ?? "")
         }
         if pitchesSinceSave >= 15 || events.contains(where: { $0.kind == .inning }) {
             pitchesSinceSave = 0

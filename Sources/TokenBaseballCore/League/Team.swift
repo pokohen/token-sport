@@ -8,7 +8,7 @@ public enum TeamStyle: String, Codable, CaseIterable, Sendable {
     case balanced = "균형형"
 
     public func label(_ sport: Sport) -> String {
-        self == .pitching && sport != .baseball ? "수비 중시형" : rawValue
+        self == .pitching && sport.groupsByPosition ? "수비 중시형" : rawValue
     }
 }
 
@@ -37,9 +37,9 @@ public struct TrainingFocus: Codable, Equatable, Sendable {
 
     /// 세부 능력치별 성장 강조 (기본 방침이면 모두 1).
     /// 축구에서는 네 칸을 공격(batting) · 패스(pitching) · 수비(defense) · 체력(running)으로 쓴다.
-    func emphasis(for key: Attributes.Key, sport: Sport = .baseball) -> Double {
+    func emphasis(for key: Attributes.Key, sport: Sport) -> Double {
         let focus = normalized
-        if sport != .baseball {
+        if sport.groupsByPosition {
             switch key {
             case .shooting, .dribbling, .three: return focus.batting / 0.25
             case .passing: return focus.pitching / 0.25
