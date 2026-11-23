@@ -44,7 +44,7 @@ struct HomeTab: View {
 
     private var record: String {
         guard let row = game.standings[game.userTier.index].first(where: { $0.teamID == game.userTeamID }) else { return "" }
-        return "\(row.wins)승 \(row.draws)무 \(row.losses)패" + (game.sport == .football ? " · 승점 \(row.points)" : "")
+        return "\(row.wins)승 \(row.draws)무 \(row.losses)패" + (game.sport.ranksByPoints ? " · 승점 \(row.points)" : "")
     }
 
     @ViewBuilder private var warning: some View {

@@ -44,7 +44,7 @@ struct LeagueTab: View {
                 Text("승").frame(width: 24)
                 Text("무").frame(width: 24)
                 Text("패").frame(width: 24)
-                if game.sport == .football {
+                if game.sport.ranksByPoints {
                     Text("득실").frame(width: 32, alignment: .trailing)
                     Text("승점").frame(width: 32, alignment: .trailing)
                 } else {
@@ -64,7 +64,7 @@ struct LeagueTab: View {
                         Text("\(row.wins)").frame(width: 24)
                         Text("\(row.draws)").frame(width: 24)
                         Text("\(row.losses)").frame(width: 24)
-                        if game.sport == .football {
+                        if game.sport.ranksByPoints {
                             Text("\(row.goalDifference > 0 ? "+" : "")\(row.goalDifference)").frame(width: 32, alignment: .trailing)
                             Text("\(row.points)").bold().frame(width: 32, alignment: .trailing)
                         } else {
@@ -78,7 +78,7 @@ struct LeagueTab: View {
                 .buttonStyle(.plain)
                 if openTeam == team.id { TeamDetail(game: game, team: team, row: row) }
             }
-            Text(game.sport == .football
+            Text(game.sport.usesEnglishPromotion
                 ? "팀을 누르면 선수단을 볼 수 있습니다. \(footballRuleText(teams: rows.count))"
                 : "팀을 누르면 선수단을 볼 수 있습니다. 1위는 자동 승격, 2위와 3위는 와일드카드를 거쳐 윗 리그 9위와 승강 플레이오프, 10위는 자동 강등.").note()
                 .fixedSize(horizontal: false, vertical: true)

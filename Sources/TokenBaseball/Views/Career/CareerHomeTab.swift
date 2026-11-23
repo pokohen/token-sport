@@ -49,7 +49,7 @@ struct CareerHomeTab: View {
                 EmblemView(team: game.userTeam, size: 44)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(me.name).font(.headline)
-                    Text(me.position.sport != .baseball
+                    Text(!me.position.sport.showsHandedness
                         ? "\(me.age)세 · \(me.position.label)"
                         : "\(me.age)세 · \(me.position.label) · \(me.throwsHand.rawValue)투\(me.bats.rawValue)타").note()
                     Text(career.isFreeAgent

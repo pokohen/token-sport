@@ -119,16 +119,19 @@ struct CareerTab: View {
 
     @ViewBuilder private func rivals(_ me: Player) -> some View {
         if let team = me.teamID {
-            let basketball = me.position.sport == .basketball
-            let football = me.position.sport != .baseball
-            let peers = game.roster(of: team).filter { football ? $0.position == me.position : $0.isPitcher == me.isPitcher }
+            let sport = me.position.sport
+            let byPosition = sport.groupsByPosition
+            let peers = game.roster(of: team).filter { byPosition ? $0.position == me.position : $0.isPitcher == me.isPitcher }
                 .sorted { ($0.ability, -$0.id) > ($1.ability, -$1.id) }
-            Card(football ? "주전 경쟁 (\(me.position.label))" : me.isPitcher ? "팀 투수진" : "팀 타선") {
-                if basketball {
+            Card(byPosition ? "주전 경쟁 (\(me.position.label))" : me.isPitcher ? "팀 투수진" : "팀 타선") {
+                switch sport {
+                case .basketball:
                     Text("\(me.position.label) 선발은 한 명입니다. 같은 포지션에서 가장 좋은 선수를 넘어서야 선발로 나오고, 감독 신뢰가 높으면 능력이 조금 낮아도 선발입니다. 벤치에서도 감독 신뢰만큼 출전 시간을 받습니다.").note()
-                } else if football {
+                case .football:
                     let quota = game.formation(of: team).slots.filter { $0 == me.position }.count
                     Text("포메이션 \(game.formation(of: team).label): \(me.position.label) 선발은 \(quota)명입니다. 감독 신뢰가 높으면 능력이 조금 낮아도 선발로 나옵니다.").note()
+                case .baseball:
+                    EmptyView()
                 }
                 ForEach(peers) { player in
                     PlayerLine(player: player, highlighted: player.id == me.id)
