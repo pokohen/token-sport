@@ -120,7 +120,7 @@ public enum PlayerFactory {
     }
 
     /// 한 팀 로스터의 포지션 목록.
-    public static func rosterPositions(_ tier: LeagueTier, sport: Sport = .baseball) -> [Position] {
+    public static func rosterPositions(_ tier: LeagueTier, sport: Sport) -> [Position] {
         switch sport {
         case .football:
             let shape = Balance.footballShape(tier)

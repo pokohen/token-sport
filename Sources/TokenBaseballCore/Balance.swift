@@ -104,7 +104,7 @@ public enum Balance {
 
     // MARK: 로스터
 
-    public static func rosterLimit(_ tier: LeagueTier, sport: Sport = .baseball) -> Int {
+    public static func rosterLimit(_ tier: LeagueTier, sport: Sport) -> Int {
         switch sport {
         case .football:
             switch tier {

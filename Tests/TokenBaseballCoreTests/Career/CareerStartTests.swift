@@ -30,9 +30,9 @@ import Testing
         #expect(game.funds.balance == FundsLedger.startingFunds)
         // 같은 포지션 선수의 자리를 넘겨받으므로 로스터 구성은 그대로다.
         let roster = game.roster(of: game.userTeamID)
-        #expect(roster.count == PlayerFactory.rosterPositions(.citizenAmateur).count)
+        #expect(roster.count == PlayerFactory.rosterPositions(.citizenAmateur, sport: .baseball).count)
         #expect(roster.map(\.position).sorted { $0.rawValue < $1.rawValue }
-            == PlayerFactory.rosterPositions(.citizenAmateur).sorted { $0.rawValue < $1.rawValue })
+            == PlayerFactory.rosterPositions(.citizenAmateur, sport: .baseball).sorted { $0.rawValue < $1.rawValue })
         #expect(game.career?.clubs == [game.userTeam.name])
         #expect(game.career?.goal != nil)
     }

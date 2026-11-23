@@ -281,7 +281,7 @@ public enum CareerTalent: String, Sendable {
 
 /// 능력치 하나를 올리는 훈련.
 public enum CareerDrill {
-    public static func name(_ key: Attributes.Key, sport: Sport = .baseball) -> String {
+    public static func name(_ key: Attributes.Key, sport: Sport) -> String {
         switch sport {
         case .football:
             switch key {

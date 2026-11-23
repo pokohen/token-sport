@@ -49,11 +49,11 @@ struct AutoManager {
             guard let worst = mates.min(by: { ($0.ability, $0.id) < ($1.ability, $1.id) }) else { continue }
             let promising = player.age <= 23 && player.potential > worst.ability + 12
             guard player.ability > worst.ability + 2 || promising || candidate.source == .draft else { continue }
-            if game.userTeam.roster.count >= Balance.rosterLimit(game.userTier) { try? game.release(worst.id) }
+            if game.userTeam.roster.count >= Balance.rosterLimit(game.userTier, sport: .baseball) { try? game.release(worst.id) }
             try? game.sign(candidate: candidate.id)
         }
         // 오프시즌에는 FA 시장에서 가장 좋은 선수에게 제안한다.
-        if game.phase == .offseason, game.userTeam.roster.count < Balance.rosterLimit(game.userTier) {
+        if game.phase == .offseason, game.userTeam.roster.count < Balance.rosterLimit(game.userTier, sport: .baseball) {
             for player in game.freeAgentMarket.prefix(3) {
                 try? game.proposeFreeAgent(
                     player.id, salary: Balance.marketSalary(ability: player.ability) * 3 / 2, years: 2)
@@ -571,7 +571,7 @@ enum Invariants {
                 #expect(game.candidates.filter { $0.source == .draft }.count == 5)
                 let pick = try #require(game.candidates.first { $0.source == .draft })
                 // 로스터가 가득 차 있으면 지명할 수 없다. 한 명을 내보내고 지명한다.
-                if game.userTeam.roster.count >= Balance.rosterLimit(game.userTier) {
+                if game.userTeam.roster.count >= Balance.rosterLimit(game.userTier, sport: .baseball) {
                     #expect(throws: GameError.self) { try game.sign(candidate: pick.id) }
                     let batters = game.roster(of: game.userTeamID).filter { !$0.isPitcher }
                     try game.release(try #require(batters.min { $0.ability < $1.ability }).id)
@@ -746,7 +746,7 @@ enum Invariants {
 
         // 야수 8명에 투수로 정원을 꽉 채운 상대를 만든다.
         Self.dropBatters(&game, opponent)
-        while game.teams[opponent].roster.count < Balance.rosterLimit(tier) {
+        while game.teams[opponent].roster.count < Balance.rosterLimit(tier, sport: .baseball) {
             let pitcher = game.makePlayer(PlayerFactory.Spec(position: .reliever, tier: tier, season: game.season))
             game.add(pitcher.id, to: opponent)
         }
@@ -755,23 +755,23 @@ enum Invariants {
         try manager.playOne(&game)
         #expect(game.friendliesPlayed == 1)
         #expect(Self.isPlayable(game, opponent))
-        #expect(game.teams[opponent].roster.count <= Balance.rosterLimit(tier))
+        #expect(game.teams[opponent].roster.count <= Balance.rosterLimit(tier, sport: .baseball))
     }
 
     @Test func 윗_리그_로스터를_그대로_들고_강등된_구단도_경기를_치를_수_있게_정리된다() throws {
         var game = TestGame.make(seed: 31)
         let team = try #require(game.teams(in: .amateur).first { !$0.isUser }).id
-        #expect(game.teams[team].roster.count == Balance.rosterLimit(.amateur))
+        #expect(game.teams[team].roster.count == Balance.rosterLimit(.amateur, sport: .baseball))
 
         // 22명 그대로 18명 정원인 리그로 내려가고, 야수가 떠나 8명만 남는다.
         game.teams[team].tier = .citizenPro
         Self.dropBatters(&game, team)
-        #expect(game.teams[team].roster.count >= Balance.rosterLimit(.citizenPro))
+        #expect(game.teams[team].roster.count >= Balance.rosterLimit(.citizenPro, sport: .baseball))
         #expect(!Self.isPlayable(game, team))
 
         game.ensurePlayable(team)
         #expect(Self.isPlayable(game, team))
-        #expect(game.teams[team].roster.count <= Balance.rosterLimit(.citizenPro))
+        #expect(game.teams[team].roster.count <= Balance.rosterLimit(.citizenPro, sport: .baseball))
         #expect(game.roster(of: team).filter { $0.isPitcher }.count >= Balance.minPitchers)
     }
 }
@@ -911,7 +911,7 @@ enum Invariants {
         game.startOffseason()
         game.teams[game.userTeamID].fame = 100_000
         // 이미 외국인 2명이 있는 팀으로 만든다. 로스터에는 빈자리가 넉넉하다.
-        #expect(game.userTeam.roster.count + 6 <= Balance.rosterLimit(.semiPro))
+        #expect(game.userTeam.roster.count + 6 <= Balance.rosterLimit(.semiPro, sport: .baseball))
         for player in game.roster(of: game.userTeamID).prefix(2) { game.players[player.id]?.isForeign = true }
         for _ in 0..<6 {
             var spec = PlayerFactory.Spec(position: .left, tier: .semiPro, season: game.season)

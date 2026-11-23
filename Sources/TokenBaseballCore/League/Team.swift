@@ -37,7 +37,7 @@ public struct TrainingFocus: Codable, Equatable, Sendable {
 
     /// 세부 능력치별 성장 강조 (기본 방침이면 모두 1).
     /// 축구에서는 네 칸을 공격(batting) · 패스(pitching) · 수비(defense) · 체력(running)으로 쓴다.
-    func emphasis(for key: Attributes.Key, sport: Sport = .baseball) -> Double {
+    func emphasis(for key: Attributes.Key, sport: Sport) -> Double {
         let focus = normalized
         if sport.groupsByPosition {
             switch key {

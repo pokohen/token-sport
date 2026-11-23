@@ -127,7 +127,7 @@ extension Game {
         // 포지션 가중치와 방침에 따라 세부 능력치에 나눈다. 능력(CA)은 정확히 points만큼 오른다.
         let weights = Attributes.weights(for: player.position)
         let emphasis = weights.map {
-            byPosition ? focus.emphasis(for: $0.0, sport: sport) : player.isPitcher ? 1.0 : focus.emphasis(for: $0.0)
+            byPosition ? focus.emphasis(for: $0.0, sport: sport) : player.isPitcher ? 1.0 : focus.emphasis(for: $0.0, sport: sport)
         }
         let scale = zip(weights, emphasis).reduce(0) { $0 + $1.0.1 * $1.1 }
         guard scale > 0 else { return }
