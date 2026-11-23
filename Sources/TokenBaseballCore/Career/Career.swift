@@ -282,7 +282,8 @@ public enum CareerTalent: String, Sendable {
 /// 능력치 하나를 올리는 훈련.
 public enum CareerDrill {
     public static func name(_ key: Attributes.Key, sport: Sport = .baseball) -> String {
-        if sport == .football {
+        switch sport {
+        case .football:
             switch key {
             case .shooting: return "슈팅 연습"
             case .passing: return "패스 훈련"
@@ -294,8 +295,7 @@ public enum CareerDrill {
             case .stamina: return "러닝"
             default: return key.label
             }
-        }
-        if sport == .basketball {
+        case .basketball:
             switch key {
             case .shooting: return "미들슛 연습"
             case .three: return "3점슛 연습"
@@ -308,6 +308,8 @@ public enum CareerDrill {
             case .stamina: return "셔틀런"
             default: return key.label
             }
+        case .baseball:
+            break
         }
         switch key {
         case .contact: return "티 배팅"

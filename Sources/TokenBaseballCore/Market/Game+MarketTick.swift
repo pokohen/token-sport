@@ -68,12 +68,15 @@ extension Game {
         case .renewal:
             guard player.teamID == userTeamID else { return }
             let demand = renewalDemand(player)
-            let starter = sport == .football
-                ? (currentFootballLineup.map { lineup in lineup.starters.contains { $0.id == player.id } } ?? true)
-                : currentLineup.map { lineup in
+            let starter = switch sport {
+            case .football:
+                currentFootballLineup.map { lineup in lineup.starters.contains { $0.id == player.id } } ?? true
+            case .baseball, .basketball:
+                currentLineup.map { lineup in
                     lineup.batters.contains { $0.id == player.id } || lineup.starter == player.id
                         || lineup.bullpen.contains(player.id)
                 } ?? true
+            }
             var chance = proposal.salary >= demand.salary
                 ? 0.9 : 0.55 + (Double(proposal.salary) / Double(demand.salary) - 1) * 1.5
             if relegatedThisOffseason { chance -= 0.3 }
@@ -148,7 +151,7 @@ extension Game {
             if phase == .regular, rng.chance(0.4) {
                 swap = roster(of: buyer.id)
                     .filter {
-                        (sport != .baseball ? $0.position == player.position : $0.isPitcher == player.isPitcher)
+                        (sport.groupsByPosition ? $0.position == player.position : $0.isPitcher == player.isPitcher)
                             && abs($0.ability - player.ability) <= 6
                     }
                     .min { (abs($0.ability - player.ability), $0.id) < (abs($1.ability - player.ability), $1.id) }?.id

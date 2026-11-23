@@ -48,7 +48,8 @@ extension Game {
         home: TeamID, away: TeamID, kind: MatchKind, tier: LeagueTier, seed: UInt64,
         footballRules: FootballRules? = nil
     ) -> QuietResult? {
-        if sport == .football {
+        switch sport {
+        case .football:
             guard var match = makeFootballMatch(home: home, away: away, kind: kind, seed: seed, rules: footballRules)
             else { return nil }
             match.runToEnd()
@@ -56,14 +57,15 @@ extension Game {
             return QuietResult(
                 homeScore: match.home.goals, awayScore: match.away.goals,
                 homeWon: match.result == .homeWin, shootout: match.wentToShootout)
-        }
-        if sport == .basketball {
+        case .basketball:
             guard var match = makeBasketballMatch(home: home, away: away, seed: seed) else { return nil }
             match.runToEnd()
             applyBasketball(match, tier: tier, countsForStandings: false)
             return QuietResult(
                 homeScore: match.home.points, awayScore: match.away.points,
                 homeWon: match.result == .homeWin, shootout: false)
+        case .baseball:
+            break
         }
         guard var match = makeMatch(home: home, away: away, kind: kind, tier: tier, seed: seed) else { return nil }
         match.runToEnd()
@@ -78,15 +80,17 @@ extension Game {
     /// 경기를 만들 수 없으면 nil.
     mutating func homeWinsCPUMatch(home: TeamID, away: TeamID, kind: MatchKind, tier: LeagueTier) -> Bool? {
         let seed = rng.next()
-        if sport == .football {
+        switch sport {
+        case .football:
             guard var match = makeFootballMatch(home: home, away: away, kind: kind, seed: seed) else { return nil }
             match.runToEnd()
             return match.result == .homeWin
-        }
-        if sport == .basketball {
+        case .basketball:
             guard var match = makeBasketballMatch(home: home, away: away, seed: seed) else { return nil }
             match.runToEnd()
             return match.result == .homeWin
+        case .baseball:
+            break
         }
         guard var game = makeMatch(home: home, away: away, kind: kind, tier: tier, seed: seed) else { return nil }
         game.runToEnd()
@@ -282,11 +286,13 @@ extension Game {
     /// 이 선수를 내보내도 경기를 치를 인원이 남는지.
     func canSpare(_ id: PlayerID) -> Bool {
         let mates = roster(of: userTeamID).filter { $0.id != id }
-        if sport == .football {
+        switch sport {
+        case .football:
             return mates.count >= Balance.footballStarters && mates.contains { $0.position == .goalkeeper }
+        case .baseball, .basketball:
+            return mates.filter { !$0.isPitcher }.count >= Balance.minBatters
+                && mates.filter { $0.isPitcher }.count >= Balance.minPitchers
         }
-        return mates.filter { !$0.isPitcher }.count >= Balance.minBatters
-            && mates.filter { $0.isPitcher }.count >= Balance.minPitchers
     }
 
     /// 축구: 내 팀이 최소 인원(14명, 골키퍼 1명 이상)에 못 미치면 임시 선수를 데려온다.

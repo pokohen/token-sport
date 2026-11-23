@@ -151,10 +151,12 @@ public struct Game: Codable, Equatable, Sendable {
     public var tradeWindowOpen: Bool {
         if phase == .offseason { return true }
         guard phase == .regular else { return false }
-        if sport == .football {
+        switch sport {
+        case .football:
             return round < Balance.footballSummerWindowRounds || Balance.footballWinterWindow.contains(round)
+        case .baseball, .basketball:
+            return round < Balance.tradeDeadlineRound
         }
-        return round < Balance.tradeDeadlineRound
     }
 
     // MARK: 소식

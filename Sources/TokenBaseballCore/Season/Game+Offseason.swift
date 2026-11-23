@@ -55,16 +55,20 @@ extension Game {
             for id in team.roster {
                 guard var player = players[id] else { continue }
                 let improvement = max(0, player.ability - player.abilityAtSeasonStart)
-                let performance = player.position.sport == .football
-                    ? Self.footballPerformance(player) * 1.3
-                    : player.position.sport == .basketball
-                    ? Self.basketballPerformance(player)
-                    : player.isPitcher
+                let performance = switch player.position.sport {
+                case .football: Self.footballPerformance(player) * 1.3
+                case .basketball: Self.basketballPerformance(player)
+                case .baseball: player.isPitcher
                     ? Double(player.pitching.wins + player.pitching.saves) / 15
                     : max(0, player.batting.ops - 0.7)
+                }
                 let bonus = min(Balance.raiseMaxBonus, improvement * 0.02 + performance * 0.15)
                 // 축구는 계약 기간 동안 연봉이 그대로다 (재계약할 때 오른다). 야구는 시즌마다 연봉 협상을 한다.
-                if player.position.sport != .football {
+                let yearlyRaise = switch player.position.sport {
+                case .football: false
+                case .baseball, .basketball: true
+                }
+                if yearlyRaise {
                     player.contract.salary = Int(Double(player.contract.salary) * (1 + rng.double(Balance.raiseBase) + bonus))
                 }
                 player.contract.seasonsLeft -= 1
@@ -145,9 +149,12 @@ extension Game {
     /// 신인 드래프트 (3부 이상): 지난 시즌 순위 역순으로 지명한다.
     mutating func runDraft() {
         draftDone = true
-        if sport == .football {
+        switch sport {
+        case .football:
             runYouthIntake()
             return
+        case .baseball, .basketball:
+            break
         }
         for tier in [LeagueTier.pro, .semiPro, .amateur] {
             let range = Balance.abilityRange(tier)
@@ -233,10 +240,7 @@ extension Game {
             teams[team.id].streak = 0
             for id in team.roster {
                 guard var player = players[id] else { continue }
-                player.batting = BattingLine()
-                player.pitching = PitchingLine()
-                if player.position.sport == .football { player.football = FootballLine() }
-                if player.position.sport == .basketball { player.basketball = BasketballLine() }
+                player.resetSeasonLines()
                 player.suspendedMatches = nil
                 player.abilityAtSeasonStart = player.ability
                 player.isHot = false
@@ -270,9 +274,12 @@ extension Game {
     mutating func fillUserMinimumRoster() {
         // 선수 모드의 내 구단은 CPU 구단이라 CPU 방식으로 채운다.
         guard !isCareer else { return }
-        if sport == .football {
+        switch sport {
+        case .football:
             fillUserMinimumSquad()
             return
+        case .baseball, .basketball:
+            break
         }
         var added: [String] = []
         func count(_ pitcher: Bool) -> Int { roster(of: userTeamID).filter { $0.isPitcher == pitcher }.count }

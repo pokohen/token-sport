@@ -315,11 +315,10 @@ public enum Trait: String, Codable, CaseIterable, Sendable {
 
     /// 이 포지션의 선수가 가질 수 있는 특성. 야구 쪽 순서는 예전 그대로다.
     public static func pool(for position: Position) -> [Trait] {
-        switch position {
-        case .goalkeeper: [.coolHead]
-        case .defender, .midfielder, .forward: [.clutch, .ironGlove, .ironLungs, .setPiece]
-        case .pointGuard, .shootingGuard, .smallForward, .powerForward, .center5: [.clutch, .ironLungs]
-        default:
+        switch position.sport {
+        case .football: position == .goalkeeper ? [.coolHead] : [.clutch, .ironGlove, .ironLungs, .setPiece]
+        case .basketball: [.clutch, .ironLungs]
+        case .baseball:
             [.clutch, .slowStarter, .leftyKiller, .ironGlove, .coolHead]
                 .filter { $0.forPitcher == position.isPitcher || $0 == .ironGlove && !position.isPitcher }
         }
@@ -414,4 +413,17 @@ public struct Player: Codable, Identifiable, Equatable, Sendable {
     }
 
     public var isExpiring: Bool { contract.seasonsLeft <= 1 }
+}
+
+extension Player {
+    /// 시즌 기록을 비운다. 그 종목의 기록만 새로 만든다 (다른 종목의 기록은 nil로 둔다).
+    mutating func resetSeasonLines() {
+        batting = BattingLine()
+        pitching = PitchingLine()
+        switch position.sport {
+        case .football: football = FootballLine()
+        case .basketball: basketball = BasketballLine()
+        case .baseball: break
+        }
+    }
 }

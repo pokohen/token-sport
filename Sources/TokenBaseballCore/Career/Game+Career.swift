@@ -222,13 +222,15 @@ extension Game {
     /// - 불펜 투수: 선발이 내려가면 가장 먼저 올라온다.
     mutating func prepareCareerLineup(kind: MatchKind = .regular) {
         guard let career, let me = players[career.playerID], me.teamID == userTeamID else { return }
-        if me.position.sport == .football {
+        switch me.position.sport {
+        case .football:
             prepareCareerFootballLineup(kind: kind)
             return
-        }
-        if me.position.sport == .basketball {
+        case .basketball:
             prepareCareerBasketballLineup()
             return
+        case .baseball:
+            break
         }
         var team = teams[userTeamID]
         team.lineupOverride = []

@@ -10,7 +10,10 @@ public enum Promotion: String, Codable, CaseIterable, Sendable {
     case tv = "TV 광고"
 
     public func label(_ sport: Sport) -> String {
-        self == .youthClinic && sport == .football ? "유소년 축구 교실" : rawValue
+        switch sport {
+        case .football: self == .youthClinic ? "유소년 축구 교실" : rawValue
+        case .baseball, .basketball: rawValue
+        }
     }
 
     public var cost: Int {
@@ -258,7 +261,7 @@ extension Game {
     }
 
     public mutating func applyForPromotion() throws {
-        guard sport != .football else {
+        guard !sport.usesEnglishPromotion else {
             throw GameError("축구는 신청이 필요 없습니다. 순위와 구장 등급으로 승격이 정해집니다.")
         }
         guard let requirement = promotionRequirement else { throw GameError("이미 최상위 리그입니다.") }

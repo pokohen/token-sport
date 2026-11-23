@@ -147,14 +147,12 @@ extension Game {
             if kind != .friendly {
                 let cap = Balance.careerFameCap(teams[userTeamID].tier)
                 // 선발 투수는 나오는 경기가 적어서 한 경기가 더 크게 반영된다.
-                // 축구는 평점이 6점대에 몰려 있어서 기준을 낮추고 크게 반영한다.
-                // 농구도 축구처럼 평점이 6점대에 몰린다.
-                let football = me.position.sport != .baseball
-                let rarity = me.position == .starter ? 3.0 : football ? 2.0 : 1.0
+                // 평점이 6점대에 몰린 종목(축구, 농구)은 기준을 낮추고 크게 반영한다.
+                let rarity = me.position == .starter ? 3.0 : me.position.sport.careerFameWeight
                 // 기세가 붙어 있으면 이름이 더 빨리 알려진다.
                 let momentum = (career.streak ?? 0) >= Balance.careerStreakLength ? Balance.careerMomentumFame : 1
                 if career.fame < cap {
-                    career.fame += max(0, performance.rating - (football ? 6.3 : 6.5)) * 0.8 * rarity * momentum
+                    career.fame += max(0, performance.rating - me.position.sport.careerRatingBaseline) * 0.8 * rarity * momentum
                         * (cap - career.fame) / cap
                 }
             }

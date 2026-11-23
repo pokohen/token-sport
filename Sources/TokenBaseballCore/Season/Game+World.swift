@@ -113,8 +113,8 @@ extension Game {
         // 훈련 방침: 비중만큼 타자와 투수에게 경험치가 나뉜다.
         let normalized = focus.normalized
         let sport = player.position.sport
-        let isFootball = sport != .baseball
-        if isFootball {
+        let byPosition = sport.groupsByPosition
+        if byPosition {
             // 축구와 농구는 포지션별로 경험치를 나누지 않는다. 방침은 세부 능력치의 비중만 바꾼다.
         } else if player.isPitcher {
             points *= clamp(normalized.pitching / 0.25, 0.5, 2)
@@ -127,7 +127,7 @@ extension Game {
         // 포지션 가중치와 방침에 따라 세부 능력치에 나눈다. 능력(CA)은 정확히 points만큼 오른다.
         let weights = Attributes.weights(for: player.position)
         let emphasis = weights.map {
-            isFootball ? focus.emphasis(for: $0.0, sport: sport) : player.isPitcher ? 1.0 : focus.emphasis(for: $0.0)
+            byPosition ? focus.emphasis(for: $0.0, sport: sport) : player.isPitcher ? 1.0 : focus.emphasis(for: $0.0)
         }
         let scale = zip(weights, emphasis).reduce(0) { $0 + $1.0.1 * $1.1 }
         guard scale > 0 else { return }
@@ -170,8 +170,10 @@ extension Game {
             let team = rng.pick(rivals)
             let young = roster(of: team.id).filter { $0.age <= 22 && $0.potential - $0.ability > 8 }
             if let player = young.max(by: { ($0.potential, $0.id) < ($1.potential, $1.id) }) {
-                let what = sport == .football ? "기량이 눈에 띄게 늘었습니다"
-                    : player.isPitcher ? "구속이 눈에 띄게 올랐습니다" : "타격이 눈에 띄게 늘었습니다"
+                let what = switch sport {
+                case .football: "기량이 눈에 띄게 늘었습니다"
+                case .baseball, .basketball: player.isPitcher ? "구속이 눈에 띄게 올랐습니다" : "타격이 눈에 띄게 늘었습니다"
+                }
                 post("\(team.name) \(player.age)세 \(player.position.label) \(player.name), \(what)")
             }
         }
@@ -238,8 +240,11 @@ extension Game {
 
     /// 팀 강도를 정하는 선수들: 야수 상위 9명과 선발 투수.
     func coreRoster(_ id: TeamID) -> [Player] {
-        if sport == .football { return FootballLineupBuilder.core(team: teams[id], players: players) }
-        if sport == .basketball { return BasketballLineupBuilder.core(team: teams[id], players: players) }
+        switch sport {
+        case .football: return FootballLineupBuilder.core(team: teams[id], players: players)
+        case .basketball: return BasketballLineupBuilder.core(team: teams[id], players: players)
+        case .baseball: break
+        }
         let all = roster(of: id)
         let batters = all.filter { !$0.isPitcher }.sorted { ($0.ability, -$0.id) > ($1.ability, -$1.id) }.prefix(9)
         return Array(batters) + all.filter { $0.position == .starter }

@@ -71,7 +71,11 @@ public enum NameGenerator {
     public static func playerName(_ rng: inout SeededRNG, sport: Sport = .baseball) -> String {
         while true {
             let name = rng.pick(surnames) + rng.pick(givenFirst) + rng.pick(givenSecond)
-            let banned = sport == .baseball ? blocked : sport == .football ? blockedFootball : blockedBasketball
+            let banned = switch sport {
+            case .baseball: blocked
+            case .football: blockedFootball
+            case .basketball: blockedBasketball
+            }
             if !banned.contains(name) { return name }
         }
     }
@@ -151,7 +155,8 @@ public enum NameGenerator {
         tier: LeagueTier, taken: Set<String>, sport: Sport = .baseball, _ rng: inout SeededRNG
     ) -> (city: String, name: String) {
         let shortTaken = Set(taken.map(shortName))
-        if sport == .football {
+        switch sport {
+        case .football:
             for attempt in 0..<500 {
                 let city = rng.pick(cpuCities)
                 let name: String
@@ -174,8 +179,7 @@ public enum NameGenerator {
                 }
             }
             return ("", "제\(taken.count + 1) 시민 FC")
-        }
-        if sport == .basketball {
+        case .basketball:
             for attempt in 0..<500 {
                 let city = rng.pick(cpuCities)
                 let name: String
@@ -198,6 +202,8 @@ public enum NameGenerator {
                 }
             }
             return ("", "제\(taken.count + 1) 시민 농구단")
+        case .baseball:
+            break
         }
         for attempt in 0..<500 {
             let city = rng.pick(cpuCities)

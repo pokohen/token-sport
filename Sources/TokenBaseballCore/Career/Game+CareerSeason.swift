@@ -13,10 +13,7 @@ extension Game {
         career.sessionsLeft = Balance.careerSessionsPerMatch
         if me.teamID == nil {
             // 무소속 선수는 구단 로스터에 없어서 시즌 기록이 따로 비워지지 않는다.
-            players[me.id]?.batting = BattingLine()
-            players[me.id]?.pitching = PitchingLine()
-            if me.position.sport == .football { players[me.id]?.football = FootballLine() }
-            if me.position.sport == .basketball { players[me.id]?.basketball = BasketballLine() }
+            players[me.id]?.resetSeasonLines()
             players[me.id]?.abilityAtSeasonStart = me.ability
             players[me.id]?.isHot = false
             players[me.id]?.suspendedMatches = nil
@@ -55,10 +52,7 @@ extension Game {
         career.seasonRatedGames = 0
         career.seasonRatingTotal = 0
         self.career = career
-        players[me.id]?.batting = BattingLine()
-        players[me.id]?.pitching = PitchingLine()
-        if me.position.sport == .football { players[me.id]?.football = FootballLine() }
-        if me.position.sport == .basketball { players[me.id]?.basketball = BasketballLine() }
+        players[me.id]?.resetSeasonLines()
     }
 
     /// 이번 시즌 목표를 정한다: 지금 소속 구단의 리그와 내 능력에 맞춘다.
