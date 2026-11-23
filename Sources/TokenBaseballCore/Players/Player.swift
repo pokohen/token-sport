@@ -240,66 +240,6 @@ public struct Contract: Codable, Equatable, Sendable {
     }
 }
 
-public struct BattingLine: Codable, Equatable, Sendable {
-    public var games = 0, plateAppearances = 0, atBats = 0, hits = 0
-    public var doubles = 0, triples = 0, homeRuns = 0
-    public var runsBattedIn = 0, runs = 0, walks = 0, strikeouts = 0, steals = 0
-
-    public init() {}
-
-    public var average: Double { atBats == 0 ? 0 : Double(hits) / Double(atBats) }
-    public var onBase: Double {
-        let denominator = atBats + walks
-        return denominator == 0 ? 0 : Double(hits + walks) / Double(denominator)
-    }
-    public var totalBases: Int { hits + doubles + 2 * triples + 3 * homeRuns }
-    public var slugging: Double { atBats == 0 ? 0 : Double(totalBases) / Double(atBats) }
-    public var ops: Double { onBase + slugging }
-
-    public static func += (lhs: inout BattingLine, rhs: BattingLine) {
-        lhs.games += rhs.games
-        lhs.plateAppearances += rhs.plateAppearances
-        lhs.atBats += rhs.atBats
-        lhs.hits += rhs.hits
-        lhs.doubles += rhs.doubles
-        lhs.triples += rhs.triples
-        lhs.homeRuns += rhs.homeRuns
-        lhs.runsBattedIn += rhs.runsBattedIn
-        lhs.runs += rhs.runs
-        lhs.walks += rhs.walks
-        lhs.strikeouts += rhs.strikeouts
-        lhs.steals += rhs.steals
-    }
-}
-
-public struct PitchingLine: Codable, Equatable, Sendable {
-    public var games = 0, starts = 0, wins = 0, losses = 0, saves = 0
-    public var outs = 0, hits = 0, runs = 0, earnedRuns = 0
-    public var walks = 0, strikeouts = 0, homeRuns = 0, pitches = 0
-
-    public init() {}
-
-    public var era: Double { outs == 0 ? 0 : Double(earnedRuns) * 27 / Double(outs) }
-    /// "5.2" 같은 이닝 표기.
-    public var innings: String { "\(outs / 3).\(outs % 3)" }
-
-    public static func += (lhs: inout PitchingLine, rhs: PitchingLine) {
-        lhs.games += rhs.games
-        lhs.starts += rhs.starts
-        lhs.wins += rhs.wins
-        lhs.losses += rhs.losses
-        lhs.saves += rhs.saves
-        lhs.outs += rhs.outs
-        lhs.hits += rhs.hits
-        lhs.runs += rhs.runs
-        lhs.earnedRuns += rhs.earnedRuns
-        lhs.walks += rhs.walks
-        lhs.strikeouts += rhs.strikeouts
-        lhs.homeRuns += rhs.homeRuns
-        lhs.pitches += rhs.pitches
-    }
-}
-
 /// 선수 특성. 경기 시뮬레이션의 해당 상황에서 작은 보정을 준다.
 public enum Trait: String, Codable, CaseIterable, Sendable {
     case clutch = "찬스에 강함"

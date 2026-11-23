@@ -49,9 +49,7 @@ struct CareerHomeTab: View {
                 EmblemView(team: game.userTeam, size: 44)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(me.name).font(.headline)
-                    Text(!me.position.sport.showsHandedness
-                        ? "\(me.age)세 · \(me.position.label)"
-                        : "\(me.age)세 · \(me.position.label) · \(me.throwsHand.rawValue)투\(me.bats.rawValue)타").note()
+                    Text(["\(me.age)세", me.position.label, me.handedness].compactMap { $0 }.joined(separator: " · ")).note()
                     Text(career.isFreeAgent
                         ? "무소속 · \(game.season)시즌"
                         : "\(game.userTeam.name) · \(game.userTier.displayName)").note()

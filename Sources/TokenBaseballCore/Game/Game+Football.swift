@@ -1,6 +1,6 @@
 import Foundation
 
-/// 축구 모드에서만 쓰는 부분: 경기 시작·진행·정산, 시상, 기록 순위, 최소 인원.
+/// 축구에서만 쓰는 부분: 경기 만들기·시작·진행·정산, 내 구단 최소 인원, 시상, 기록 순위.
 /// 시즌 흐름·재정·이적 시장은 야구와 같은 코드를 쓴다.
 extension Game {
     // MARK: 경기 만들기
@@ -31,70 +31,6 @@ extension Game {
         else { return nil }
         return FootballMatch(
             away: awaySide, home: homeSide, rules: rules ?? footballRules(for: kind, home: home), seed: seed)
-    }
-
-    /// 화면 없이 치른 경기의 결과.
-    struct QuietResult {
-        var homeScore: Int
-        var awayScore: Int
-        var homeWon: Bool
-        /// 축구: 승부차기로 갈렸는지.
-        var shootout: Bool
-    }
-
-    /// 순위표에 들어가지 않는 경기(승강 플레이오프, 컵대회)를 화면 없이 끝까지 치르고 선수 기록에 반영한다.
-    /// 종목에 맞는 엔진을 쓴다. 경기를 만들 수 없으면(선수가 모자란 구단) nil.
-    mutating func playQuietKnockout(
-        home: TeamID, away: TeamID, kind: MatchKind, tier: LeagueTier, seed: UInt64,
-        footballRules: FootballRules? = nil
-    ) -> QuietResult? {
-        switch sport {
-        case .football:
-            guard var match = makeFootballMatch(home: home, away: away, kind: kind, seed: seed, rules: footballRules)
-            else { return nil }
-            match.runToEnd()
-            applyFootball(match, tier: tier, countsForStandings: false, competitive: true)
-            return QuietResult(
-                homeScore: match.home.goals, awayScore: match.away.goals,
-                homeWon: match.result == .homeWin, shootout: match.wentToShootout)
-        case .basketball:
-            guard var match = makeBasketballMatch(home: home, away: away, seed: seed) else { return nil }
-            match.runToEnd()
-            applyBasketball(match, tier: tier, countsForStandings: false)
-            return QuietResult(
-                homeScore: match.home.points, awayScore: match.away.points,
-                homeWon: match.result == .homeWin, shootout: false)
-        case .baseball:
-            break
-        }
-        guard var match = makeMatch(home: home, away: away, kind: kind, tier: tier, seed: seed) else { return nil }
-        match.runToEnd()
-        // 기록에는 넣지 않지만 선발 등판은 남겨서 같은 투수가 연달아 나오지 않게 한다.
-        apply(match, tier: tier, countsForStandings: false)
-        return QuietResult(
-            homeScore: match.home.runs, awayScore: match.away.runs,
-            homeWon: match.home.runs > match.away.runs, shootout: false)
-    }
-
-    /// 화면 없이 한 경기를 끝까지 치르고 홈 팀이 이겼는지 돌려준다 (승부가 나야 하는 경기용).
-    /// 경기를 만들 수 없으면 nil.
-    mutating func homeWinsCPUMatch(home: TeamID, away: TeamID, kind: MatchKind, tier: LeagueTier) -> Bool? {
-        let seed = rng.next()
-        switch sport {
-        case .football:
-            guard var match = makeFootballMatch(home: home, away: away, kind: kind, seed: seed) else { return nil }
-            match.runToEnd()
-            return match.result == .homeWin
-        case .basketball:
-            guard var match = makeBasketballMatch(home: home, away: away, seed: seed) else { return nil }
-            match.runToEnd()
-            return match.result == .homeWin
-        case .baseball:
-            break
-        }
-        guard var game = makeMatch(home: home, away: away, kind: kind, tier: tier, seed: seed) else { return nil }
-        game.runToEnd()
-        return game.home.runs > game.away.runs
     }
 
     // MARK: 경기 시작과 진행
@@ -278,20 +214,6 @@ extension Game {
                 teams[teamID].funds += Balance.cpuIncomePerMatch(tier)
                 teams[teamID].fame += side.goals > opponent.goals ? 1.5 : 0
             }
-        }
-    }
-
-    // MARK: 인원
-
-    /// 이 선수를 내보내도 경기를 치를 인원이 남는지.
-    func canSpare(_ id: PlayerID) -> Bool {
-        let mates = roster(of: userTeamID).filter { $0.id != id }
-        switch sport {
-        case .football:
-            return mates.count >= Balance.footballStarters && mates.contains { $0.position == .goalkeeper }
-        case .baseball, .basketball:
-            return mates.filter { !$0.isPitcher }.count >= Balance.minBatters
-                && mates.filter { $0.isPitcher }.count >= Balance.minPitchers
         }
     }
 

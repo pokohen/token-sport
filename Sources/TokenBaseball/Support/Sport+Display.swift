@@ -20,12 +20,20 @@ extension Sport {
         }
     }
 
-    /// 내 팀이 득점했을 때 보내는 알림의 제목. 농구는 득점이 워낙 잦아서 알리지 않고, 중계도 멈추지 않는다.
+    /// 내 팀이 득점했을 때 보내는 알림의 제목. 농구는 득점이 워낙 잦아서 알리지 않는다.
     var scoreAlertTitle: String? {
         switch self {
         case .baseball: "득점!"
         case .football: "골!"
         case .basketball: nil
+        }
+    }
+
+    /// 득점 장면에서 중계를 잠깐 멈춘다. 농구는 득점이 워낙 잦아서 멈추지 않는다.
+    var pausesOnScore: Bool {
+        switch self {
+        case .baseball, .football: true
+        case .basketball: false
         }
     }
 
@@ -45,13 +53,6 @@ extension Sport {
         }
     }
 
-    /// 선수 줄에 던지는 손과 치는 손(우투좌타)을 적는다.
-    var showsHandedness: Bool {
-        switch self {
-        case .baseball: true
-        case .football, .basketball: false
-        }
-    }
 
     /// 경기 중 상단바 훈련 그림.
     var liveDrill: Sprites.Drill {
@@ -59,6 +60,16 @@ extension Sport {
         case .baseball: .batting
         case .football: .shooting
         case .basketball: .dribbling
+        }
+    }
+}
+
+extension Player {
+    /// 던지는 손과 치는 손 ("우투좌타"). 야구 선수만 있다.
+    var handedness: String? {
+        switch position.sport {
+        case .baseball: "\(throwsHand.rawValue)투\(bats.rawValue)타"
+        case .football, .basketball: nil
         }
     }
 }

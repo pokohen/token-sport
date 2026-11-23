@@ -131,6 +131,15 @@ public struct LiveFootballMatch: Codable, Equatable, Sendable {
     public var tier: LeagueTier
 }
 
+/// 진행 중인 내 농구 경기와, 같은 라운드의 내 리그 다른 경기들.
+public struct LiveBasketballMatch: Codable, Equatable, Sendable {
+    public var kind: MatchKind
+    public var state: BasketballMatch
+    public var others: [BasketballMatch]
+    public var userIsHome: Bool
+    public var tier: LeagueTier
+}
+
 /// 끝난 내 경기 결과. 상단바의 "경기 종료" 표시에 쓴다.
 public struct LastResult: Codable, Equatable, Sendable {
     public var kind: MatchKind

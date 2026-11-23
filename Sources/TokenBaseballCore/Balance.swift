@@ -350,22 +350,20 @@ public enum Balance {
             }
         case .baseball:
             return ageGrowthFactor(age)
-        case .football:
-            break
-        }
-        if position == .goalkeeper {
+        case .football where position == .goalkeeper:
             switch age {
             case ...23: return 1.5
             case 24...28: return 1.0
             case 29...31: return 0.4
             default: return 0
             }
-        }
-        switch age {
-        case ...21: return 1.5
-        case 22...25: return 1.0
-        case 26...28: return 0.4
-        default: return 0
+        case .football:
+            switch age {
+            case ...21: return 1.5
+            case 22...25: return 1.0
+            case 26...28: return 0.4
+            default: return 0
+            }
         }
     }
 

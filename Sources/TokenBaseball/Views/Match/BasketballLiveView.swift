@@ -15,13 +15,9 @@ struct BasketballLiveView: View {
     var body: some View {
         VStack(spacing: 10) {
             Card(live.kind.label, trailing: state.isFinished ? "경기 종료" : state.clockLabel) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(state.away.name).font(.callout.weight(.semibold)).lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                    Text("\(state.away.points) : \(state.home.points)").font(.title.bold().monospacedDigit())
-                    Text(state.home.name).font(.callout.weight(.semibold)).lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
+                LiveScoreLine(
+                    awayName: state.away.name, awayScore: state.away.points,
+                    homeName: state.home.name, homeScore: state.home.points)
                 quarters
             }
             if let myName {
@@ -30,22 +26,18 @@ struct BasketballLiveView: View {
             Card {
                 if !state.isFinished {
                     let myBall = state.homeHasBall == live.userIsHome
-                    Text(myBall ? "\(mine.shortName) 공격 →" : "← \(theirs.shortName) 공격")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(myBall ? Theme.win : Theme.loss)
-                        .frame(maxWidth: .infinity, alignment: myBall ? .trailing : .leading)
+                    AttackDirectionLabel(myBall: myBall, mine: mine.shortName, theirs: theirs.shortName)
                 }
                 let a = mine.totals, b = theirs.totals
-                Grid(horizontalSpacing: 8, verticalSpacing: 3) {
-                    statRow("야투", shots(a.fieldGoalsMade, a.fieldGoalsAttempted), shots(b.fieldGoalsMade, b.fieldGoalsAttempted))
-                    statRow("3점슛", shots(a.threesMade, a.threesAttempted), shots(b.threesMade, b.threesAttempted))
-                    statRow("자유투", shots(a.freeThrowsMade, a.freeThrowsAttempted), shots(b.freeThrowsMade, b.freeThrowsAttempted))
-                    statRow("리바운드", "\(a.rebounds)", "\(b.rebounds)")
-                    statRow("어시스트", "\(a.assists)", "\(b.assists)")
-                    statRow("스틸 · 블록", "\(a.steals) · \(a.blocks)", "\(b.steals) · \(b.blocks)")
-                    statRow("실책", "\(a.turnovers)", "\(b.turnovers)")
-                }
-                .font(.caption.monospacedDigit())
+                MirrorStatGrid(rows: [
+                    .init("야투", shots(a.fieldGoalsMade, a.fieldGoalsAttempted), shots(b.fieldGoalsMade, b.fieldGoalsAttempted)),
+                    .init("3점슛", shots(a.threesMade, a.threesAttempted), shots(b.threesMade, b.threesAttempted)),
+                    .init("자유투", shots(a.freeThrowsMade, a.freeThrowsAttempted), shots(b.freeThrowsMade, b.freeThrowsAttempted)),
+                    .init("리바운드", "\(a.rebounds)", "\(b.rebounds)"),
+                    .init("어시스트", "\(a.assists)", "\(b.assists)"),
+                    .init("스틸 · 블록", "\(a.steals) · \(a.blocks)", "\(b.steals) · \(b.blocks)"),
+                    .init("실책", "\(a.turnovers)", "\(b.turnovers)"),
+                ])
             }
             CommentaryCard(log: state.log, myName: myName)
             OtherMatchesCard(rows: live.others.map {
@@ -84,13 +76,5 @@ struct BasketballLiveView: View {
 
     private func shots(_ made: Int, _ tried: Int) -> String {
         tried == 0 ? "0/0" : "\(made)/\(tried) (\(Int((Double(made) / Double(tried) * 100).rounded()))%)"
-    }
-
-    private func statRow(_ label: String, _ left: String, _ right: String) -> some View {
-        GridRow {
-            Text(left).frame(maxWidth: .infinity, alignment: .trailing)
-            Text(label).foregroundStyle(.secondary).frame(width: 84)
-            Text(right).frame(maxWidth: .infinity, alignment: .leading)
-        }
     }
 }

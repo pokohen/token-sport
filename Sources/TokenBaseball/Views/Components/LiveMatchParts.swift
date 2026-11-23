@@ -77,3 +77,65 @@ struct LastResultCard: View {
         return result.myRuns > result.theirRuns ? Theme.win : result.myRuns < result.theirRuns ? Theme.loss : .primary
     }
 }
+
+/// 중계 맨 위의 점수 줄: 원정 이름 · 점수 · 홈 이름.
+struct LiveScoreLine: View {
+    let awayName: String
+    let awayScore: Int
+    let homeName: String
+    let homeScore: Int
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(awayName).font(.callout.weight(.semibold)).lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            Text("\(awayScore) : \(homeScore)").font(.title.bold().monospacedDigit())
+            Text(homeName).font(.callout.weight(.semibold)).lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+/// 지금 공격하는 쪽. 내 공격이면 오른쪽(→), 상대 공격이면 왼쪽(←)에 붙는다.
+struct AttackDirectionLabel: View {
+    let myBall: Bool
+    let mine: String
+    let theirs: String
+
+    var body: some View {
+        Text(myBall ? "\(mine) 공격 →" : "← \(theirs) 공격")
+            .font(.caption.weight(.medium))
+            .foregroundStyle(myBall ? Theme.win : Theme.loss)
+            .frame(maxWidth: .infinity, alignment: myBall ? .trailing : .leading)
+    }
+}
+
+/// 두 팀 기록을 가운데 항목 이름을 두고 좌우로 견주는 표. 왼쪽이 내 팀이다.
+struct MirrorStatGrid: View {
+    struct Row {
+        let label: String
+        let mine: String
+        let theirs: String
+        init(_ label: String, _ mine: String, _ theirs: String) {
+            self.label = label
+            self.mine = mine
+            self.theirs = theirs
+        }
+    }
+
+    let rows: [Row]
+
+    var body: some View {
+        Grid(horizontalSpacing: 8, verticalSpacing: 3) {
+            ForEach(rows.indices, id: \.self) { index in
+                let row = rows[index]
+                GridRow {
+                    Text(row.mine).frame(maxWidth: .infinity, alignment: .trailing)
+                    Text(row.label).foregroundStyle(.secondary).frame(width: 84)
+                    Text(row.theirs).frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+        .font(.caption.monospacedDigit())
+    }
+}
