@@ -4,7 +4,7 @@
 
 [플레이 가이드 목록](README.md) · 전문가 검토: [야구 검토](../review/baseball.md) · 규칙의 근거: [메인](../01-main.md), [경기](../02-match.md), [리그](../03-league.md), [구단 운영](../04-club-management.md), [선수 영입](../05-player-recruitment.md)
 
-> ⚠️ **구단 경영 모드는 지금 앱에서 뺐다.** 코드와 저장 파일은 남아 있지만 앱에서 고를 수 없고, 예전에 구단을 하던 저장 파일도 선수 모드로 열린다. 이 가이드는 기록으로 남겨 둔다. 지금은 선수 키우기([야구](baseball-player.md), [축구](football-player.md), [농구](../11-basketball.md))가 중심이다.
+> ⚠️ **구단 경영 모드는 지금 앱에서 뺐다.** 코드와 저장 파일은 남아 있지만 앱에서 고를 수 없고, 예전에 구단을 하던 저장 파일도 선수 모드로 열린다. 이 가이드는 기록으로 남겨 둔다. 지금은 선수 키우기([야구](baseball-player.md), [축구](football-player.md), [농구](basketball-player.md))가 중심이다.
 
 ## 시작하기
 

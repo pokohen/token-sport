@@ -30,7 +30,7 @@ AI 코딩 도구에서 쓴 토큰이 **훈련 포인트**가 되는 macOS 메뉴
 
 - ⚾ [야구 개인 성장](docs/guide/baseball-player.md)
 - ⚽ [축구 개인 성장](docs/guide/football-player.md)
-- 🏀 [농구 선수 모드](docs/11-basketball.md)
+- 🏀 [농구 개인 성장](docs/guide/basketball-player.md)
 
 규칙의 근거와 수치는 [기획 문서](docs/README.md)에 있다. 경기 규칙, 훈련, 승강제는 축구·야구 전문가 관점의 검토를 거쳐 고쳤다 → [전문가 검토](docs/review/README.md).
 
