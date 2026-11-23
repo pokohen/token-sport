@@ -54,6 +54,14 @@ extension Sport {
     }
 
 
+    /// 설정 탭 안내문: 무엇과 무관한지.
+    var leagueDisclaimer: String {
+        switch self {
+        case .baseball: "KBO 및 각 구단과 무관한"
+        case .football, .basketball: "실제 리그·구단과 무관한"
+        }
+    }
+
     /// 경기 중 상단바 훈련 그림.
     var liveDrill: Sprites.Drill {
         switch self {

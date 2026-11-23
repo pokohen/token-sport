@@ -171,8 +171,8 @@ extension Game {
             let young = roster(of: team.id).filter { $0.age <= 22 && $0.potential - $0.ability > 8 }
             if let player = young.max(by: { ($0.potential, $0.id) < ($1.potential, $1.id) }) {
                 let what = switch sport {
-                case .football: "기량이 눈에 띄게 늘었습니다"
-                case .baseball, .basketball: player.isPitcher ? "구속이 눈에 띄게 올랐습니다" : "타격이 눈에 띄게 늘었습니다"
+                case .football, .basketball: "기량이 눈에 띄게 늘었습니다"
+                case .baseball: player.isPitcher ? "구속이 눈에 띄게 올랐습니다" : "타격이 눈에 띄게 늘었습니다"
                 }
                 post("\(team.name) \(player.age)세 \(player.position.label) \(player.name), \(what)")
             }
