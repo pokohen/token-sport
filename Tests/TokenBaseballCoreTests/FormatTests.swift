@@ -3,6 +3,18 @@ import Testing
 @testable import TokenBaseballCore
 
 @Suite struct FormatTests {
+    @Test func 능력치_이름은_종목에_맞춘다() {
+        #expect(Attributes.Key.speed.label(for: .baseball) == "주력")
+        #expect(Attributes.Key.speed.label(for: .football) == "스피드")
+        #expect(Attributes.Key.speed.label(for: .basketball) == "스피드")
+        #expect(Attributes.Key.shooting.label(for: .football) == "슈팅")
+        #expect(Attributes.Key.shooting.label(for: .basketball) == "슛")
+        // 선수 만들기와 훈련 탭이 같은 이름을 쓰도록, 종목의 모든 능력치에 이름이 있다.
+        for sport in Sport.allCases {
+            for key in Attributes.Key.all(for: sport) { #expect(!key.label(for: sport).isEmpty) }
+        }
+    }
+
     @Test func 자금은_줄여서_표시한다() {
         #expect(Format.money(320_000_000) == "₩3.2억")
         #expect(Format.money(85_000_000) == "₩8,500만")

@@ -94,17 +94,17 @@ struct CareerForm: View {
             ForEach(Attributes.weights(for: setup.position).map(\.0), id: \.self) { key in
                 let count = setup.points[key] ?? 0
                 HStack(spacing: 8) {
-                    Text(key.label)
+                    Text(key.label(for: setup.position.sport))
                     Spacer()
                     Text(count > 0 ? "+\(Int(Double(count) * Balance.careerStartPointValue))" : "—")
                         .monospacedDigit()
                         .foregroundStyle(count > 0 ? Color.accentColor : Color.secondary)
                     Button { setup.points[key] = count - 1 } label: { Image(systemName: "minus") }
                         .disabled(count <= 0)
-                        .accessibilityLabel("\(key.label) 포인트 빼기")
+                        .accessibilityLabel("\(key.label(for: setup.position.sport)) 포인트 빼기")
                     Button { setup.points[key] = count + 1 } label: { Image(systemName: "plus") }
                         .disabled(setup.pointsLeft <= 0 || count >= Balance.careerStartPointsPerStat)
-                        .accessibilityLabel("\(key.label) 포인트 넣기")
+                        .accessibilityLabel("\(key.label(for: setup.position.sport)) 포인트 넣기")
                 }
                 .controlSize(.small)
             }
