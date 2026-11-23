@@ -299,7 +299,7 @@ enum ReviewGame {
             for key in game.careerTrainableKeys.prefix(2) {
                 let before = try #require(game.myPlayer).ability
                 try game.trainCareer(key)
-                #expect(abs(try #require(game.myPlayer).ability - before - Balance.careerTrainingStep) < 0.0001)
+                #expect(abs(try #require(game.myPlayer).ability - before - game.careerTrainingStep) < 0.0001)
             }
         }
     }

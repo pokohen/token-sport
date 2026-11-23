@@ -13,11 +13,13 @@ struct MatchTab: View {
                     live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance)
             } else if let live = game.liveFootball {
                 FootballLiveView(live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance)
+            } else if let live = game.liveBasketball {
+                BasketballLiveView(live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance)
             } else {
                 if let result = game.lastResult { LastResultCard(result: result) }
                 NextMatchCard(game: game)
                 schedule
-                if game.sport == .football, game.isCareer {
+                if game.sport != .baseball, game.isCareer {
                     PlayStyleCard(game: game)
                 } else if game.sport == .football {
                     TacticCard(game: game)

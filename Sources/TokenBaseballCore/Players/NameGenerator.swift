@@ -58,10 +58,21 @@ public enum NameGenerator {
         "풋살 리그 출신", "입단 테스트 출신", "지역 리그 득점왕 출신",
     ]
 
+    /// 실제 농구 선수와 이름이 겹치지 않게 막는 이름.
+    static let blockedBasketball: Set<String> = [
+        "허재", "서장훈", "김주성", "양동근", "이상민", "문경은", "우지원", "현주엽", "김승현", "허웅", "허훈",
+        "이정현", "김선형", "오세근", "최준용", "이대성", "전희철", "방성윤", "하승진", "라건아",
+    ]
+    static let basketballOrigins = [
+        "고교 농구부 출신", "대학 농구부 출신", "실업팀 출신", "하부 리그 출신", "유소년 클럽 출신",
+        "길거리 농구 출신", "입단 테스트 출신", "지역 리그 득점왕 출신",
+    ]
+
     public static func playerName(_ rng: inout SeededRNG, sport: Sport = .baseball) -> String {
         while true {
             let name = rng.pick(surnames) + rng.pick(givenFirst) + rng.pick(givenSecond)
-            if !(sport == .football ? blockedFootball : blocked).contains(name) { return name }
+            let banned = sport == .baseball ? blocked : sport == .football ? blockedFootball : blockedBasketball
+            if !banned.contains(name) { return name }
         }
     }
 
@@ -73,7 +84,11 @@ public enum NameGenerator {
         if tier.isCitizen {
             return "\(rng.pick(neighborhoods)) \(rng.pick(jobs))"
         }
-        return rng.pick(sport == .football ? footballOrigins : proOrigins)
+        switch sport {
+        case .football: return rng.pick(footballOrigins)
+        case .basketball: return rng.pick(basketballOrigins)
+        case .baseball: return rng.pick(proOrigins)
+        }
     }
 
     // MARK: 구단
@@ -96,8 +111,19 @@ public enum NameGenerator {
         ("경주", "경주 천년 FC"), ("안동", "안동 하회 FC"),
     ]
 
+    /// 농구 1부 10팀: 연고지 + 우리말 애칭. 실제 구단을 떠올리게 하는 조합은 피했다.
+    public static let basketballProTeams: [(city: String, name: String)] = [
+        ("서울", "서울 남산 농구단"), ("부산", "부산 갈매기"), ("인천", "인천 등대"), ("대구", "대구 사과"),
+        ("광주", "광주 빛고을"), ("대전", "대전 과학"), ("울산", "울산 돌고래"), ("수원", "수원 화성"),
+        ("전주", "전주 비빔"), ("원주", "원주 치악"),
+    ]
+
     public static func proTeams(_ sport: Sport) -> [(city: String, name: String)] {
-        sport == .football ? footballProTeams : proTeams
+        switch sport {
+        case .baseball: proTeams
+        case .football: footballProTeams
+        case .basketball: basketballProTeams
+        }
     }
 
     /// 구단을 만들 때 고를 수 있는 연고지.
@@ -148,6 +174,30 @@ public enum NameGenerator {
                 }
             }
             return ("", "제\(taken.count + 1) 시민 FC")
+        }
+        if sport == .basketball {
+            for attempt in 0..<500 {
+                let city = rng.pick(cpuCities)
+                let name: String
+                switch tier {
+                case .pro, .semiPro:
+                    name = "\(city) \(rng.pick(mascots)) 농구단"
+                case .amateur:
+                    name = rng.chance(0.5)
+                        ? "\(rng.pick(schoolWords))대학교 농구부"
+                        : "\(city) \(rng.pick(industryWords)) 농구단"
+                case .citizenPro:
+                    name = rng.chance(0.6) ? "\(city) 시민 농구단" : "\(city) \(rng.pick(mascots)) 농구 클럽"
+                case .citizenSemiPro:
+                    name = rng.chance(0.6) ? "\(city) 시민 농구단" : "\(city) 농구 동호회"
+                case .citizenAmateur:
+                    name = rng.chance(0.5) ? "\(city) 시민 농구단" : "\(city) \(rng.pick(jobsClubs)) 농구회"
+                }
+                if !taken.contains(name), !shortTaken.contains(shortName(name)) || attempt > 300 {
+                    return (city, name)
+                }
+            }
+            return ("", "제\(taken.count + 1) 시민 농구단")
         }
         for attempt in 0..<500 {
             let city = rng.pick(cpuCities)

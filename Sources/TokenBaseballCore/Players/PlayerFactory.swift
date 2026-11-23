@@ -15,6 +15,9 @@ public enum PlayerFactory {
                 // 제 포지션에 덜 중요한 능력치. 골키핑은 골키퍼가 아니면 거의 없다.
                 let share = key == .keeping ? 0.15 : position == .goalkeeper ? 0.3 : 0.6
                 attributes[key] = clamp(ability * share + rng.gaussian() * 4, 1, 70)
+            } else if position.sport == .basketball {
+                // 제 포지션에 덜 중요한 능력치.
+                attributes[key] = clamp(ability * 0.6 + rng.gaussian() * 4, 1, 75)
             } else if position.isPitcher {
                 // 투수의 타격·수비 능력치 (지명타자 제도라 타석에는 서지 않는다)
                 attributes[key] = clamp(ability * 0.4 + rng.gaussian() * 3, 1, 60)
@@ -102,6 +105,7 @@ public enum PlayerFactory {
             batting: BattingLine(),
             pitching: PitchingLine(),
             football: sport == .football ? FootballLine() : nil,
+            basketball: sport == .basketball ? BasketballLine() : nil,
             lastStartGame: -99,
             abilityAtSeasonStart: ability,
             isHot: false
@@ -120,6 +124,11 @@ public enum PlayerFactory {
                 + Array(repeating: .defender, count: shape.defenders)
                 + Array(repeating: .midfielder, count: shape.midfielders)
                 + Array(repeating: .forward, count: shape.forwards)
+        }
+        if sport == .basketball {
+            return zip(Position.basketball, Balance.basketballShape(tier)).flatMap { position, count in
+                Array(repeating: position, count: count)
+            }
         }
         let shape = Balance.rosterShape(tier)
         var positions: [Position] = Position.fieldPositions + [.designated]

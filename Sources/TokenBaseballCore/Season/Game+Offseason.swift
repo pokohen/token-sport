@@ -57,6 +57,8 @@ extension Game {
                 let improvement = max(0, player.ability - player.abilityAtSeasonStart)
                 let performance = player.position.sport == .football
                     ? Self.footballPerformance(player) * 1.3
+                    : player.position.sport == .basketball
+                    ? Self.basketballPerformance(player)
                     : player.isPitcher
                     ? Double(player.pitching.wins + player.pitching.saves) / 15
                     : max(0, player.batting.ops - 0.7)
@@ -234,6 +236,7 @@ extension Game {
                 player.batting = BattingLine()
                 player.pitching = PitchingLine()
                 if player.position.sport == .football { player.football = FootballLine() }
+                if player.position.sport == .basketball { player.basketball = BasketballLine() }
                 player.suspendedMatches = nil
                 player.abilityAtSeasonStart = player.ability
                 player.isHot = false

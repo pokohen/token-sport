@@ -9,7 +9,7 @@ struct CareerTrainingTab: View {
         VStack(spacing: 10) {
             if let career = game.career, let me = game.myPlayer {
                 Card("훈련", trailing: sessionsText(career)) {
-                    KeyValueRow(key: "훈련 포인트", value: "\(game.funds.balance.formatted()) P")
+                    KeyValueRow(key: "훈련 포인트", value: "\(Format.tokens(game.funds.balance)) P")
                     if let critical = career.lastCritical {
                         Label(critical, systemImage: "sparkles")
                             .font(.callout.weight(.semibold)).foregroundStyle(Theme.warn)
@@ -36,7 +36,7 @@ struct CareerTrainingTab: View {
                 }
 
                 Card("내 선수") {
-                    KeyValueRow(key: "능력", value: "\(Int(me.ability)) (\(me.grade))")
+                    KeyValueRow(key: "능력", value: "\(String(format: "%.1f", me.ability)) (\(me.grade))")
                     KeyValueRow(key: "시즌 시작 때보다", value: String(format: "%+.1f", me.ability - me.abilityAtSeasonStart))
                     KeyValueRow(key: "최고 능력", value: "\(Int(career.peakAbility))")
                     KeyValueRow(key: "지금까지 훈련", value: "\(career.trainingCount)회 (크리티컬 \(career.criticalCount ?? 0)회)")
@@ -52,7 +52,7 @@ struct CareerTrainingTab: View {
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(CareerDrill.name(key, sport: game.sport)).font(.callout.weight(.medium))
-                Text("\(label(key)) \(String(format: "%.1f", value))").note()
+                Text("\(label(key)) \(String(format: "%.2f", value))").note()
             }
             .frame(width: 118, alignment: .leading)
             Bar(fraction: value / 99, color: .accentColor)
@@ -60,18 +60,19 @@ struct CareerTrainingTab: View {
             Button {
                 model.perform { try $0.trainCareer(key) }
             } label: {
-                Text("+\(String(format: "%.1f", game.careerTrainingGain(key))) · \(Format.tokens(game.careerTrainingCost(key))) P")
+                Text("+\(String(format: "%.2f", game.careerTrainingGain(key))) · \(Format.tokens(game.careerTrainingCost(key))) P")
                     .monospacedDigit().lineLimit(1).minimumScaleFactor(0.8)
                     .frame(width: 104)
             }
             .disabled(blocked != nil)
-            .help(blocked ?? "\(label(key)) +\(String(format: "%.1f", game.careerTrainingGain(key)))")
+            .help(blocked ?? "\(label(key)) +\(String(format: "%.2f", game.careerTrainingGain(key)))")
         }
     }
 
     /// 주력과 스피드는 같은 능력치다. 종목에 맞는 이름으로 보여 준다.
     private func label(_ key: Attributes.Key) -> String {
-        game.sport == .football && key == .speed ? "스피드" : key.label
+        if game.sport == .basketball, key == .shooting { return "슛" }
+        return game.sport != .baseball && key == .speed ? "스피드" : key.label
     }
 
     private func sessionsText(_ career: Career) -> String {
@@ -88,6 +89,6 @@ struct CareerTrainingTab: View {
             return "정해진 \(Balance.careerSessionsPerMatch)번을 다 써서 지금부터는 추가 훈련입니다. 비용이 \(String(format: "%.1f", game.careerSessionCostMultiplier))배이고, 한 번 할 때마다 \(Balance.careerExtraSessionCost)배씩 더 비싸집니다. 다음 경기를 치르면 처음 값으로 돌아갑니다."
         }
         if career.sessionsLeft <= 0 { return "오늘 훈련을 마쳤습니다. 다음 경기를 치르면 다시 \(Balance.careerSessionsPerMatch)번 훈련할 수 있습니다. 설정 탭에서 \"추가 훈련\"을 켜면 더 비싼 값에 이어서 할 수 있습니다." }
-        return "경기와 경기 사이에 \(Balance.careerSessionsPerMatch)번까지 훈련합니다. 어떤 훈련이든 능력이 \(Balance.careerTrainingStep)씩 오르고, 그 능력치가 높을수록 포인트가 많이 듭니다. 100번에 한 번꼴로 크리티컬이 터져 세 배 오릅니다. 쓰지 않은 포인트는 그대로 남습니다."
+        return "경기와 경기 사이에 \(Balance.careerSessionsPerMatch)번까지 훈련합니다. 어떤 훈련이든 능력이 \(String(format: "%.3f", game.careerTrainingStep))씩 오르고, 그 능력치가 높을수록 포인트가 많이 듭니다. 윗 리그로 갈수록 한 번에 더 많이 오르고 더 비쌉니다 (지금 \(game.userTier.rawValue)부: 비용 \(String(format: "%.1f", game.careerTrainingCostFactor))배). 100번에 한 번꼴로 크리티컬이 터져 세 배 오릅니다. 쓰지 않은 포인트는 그대로 남습니다."
     }
 }

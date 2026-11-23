@@ -139,6 +139,10 @@ extension Game {
             giveFootballAwards()
             return
         }
+        if sport == .basketball {
+            giveBasketballAwards()
+            return
+        }
         for tier in LeagueTier.allCases {
             let everyone = teams(in: tier).flatMap { roster(of: $0.id) }
             let batters = everyone.filter { !$0.isPitcher && $0.batting.plateAppearances >= 80 }

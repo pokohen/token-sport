@@ -32,6 +32,8 @@ struct CareerRivalCard: View {
     }
 
     private func line(_ player: Player) -> String {
-        CareerText.record(player, batting: player.batting, pitching: player.pitching, football: player.football)
+        CareerText.record(
+            player, batting: player.batting, pitching: player.pitching, football: player.football,
+            basketball: player.basketball)
     }
 }

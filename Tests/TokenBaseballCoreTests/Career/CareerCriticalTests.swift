@@ -32,7 +32,7 @@ import Testing
         var game = make()
         let key = game.careerTrainableKeys[0]
         var me = game.myPlayer!
-        me.potential = me.ability + Balance.careerTrainingStep * 1.5
+        me.potential = me.ability + game.careerTrainingStep * 1.5
         game.players[me.id] = me
         try game.trainCareer(key, critical: true)
         #expect(game.myPlayer!.ability <= game.myPlayer!.potential + 0.0001)

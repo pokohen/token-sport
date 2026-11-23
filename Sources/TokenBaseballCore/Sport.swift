@@ -2,12 +2,13 @@ import Foundation
 
 /// 종목. 구단을 만들 때 고르고, 세이브는 종목별로 따로 둔다.
 public enum Sport: String, Codable, CaseIterable, Sendable {
-    case baseball, football
+    case baseball, football, basketball
 
     public var label: String {
         switch self {
         case .baseball: "야구"
         case .football: "축구"
+        case .basketball: "농구"
         }
     }
 
@@ -15,6 +16,7 @@ public enum Sport: String, Codable, CaseIterable, Sendable {
         switch self {
         case .baseball: "⚾"
         case .football: "⚽"
+        case .basketball: "🏀"
         }
     }
 
@@ -23,7 +25,54 @@ public enum Sport: String, Codable, CaseIterable, Sendable {
         switch self {
         case .baseball: "야구단"
         case .football: "축구단"
+        case .basketball: "농구단"
         }
+    }
+}
+
+/// 농구 선수의 시즌 기록 (경기 중에는 그 경기의 기록).
+public struct BasketballLine: Codable, Equatable, Sendable {
+    public var games = 0, starts = 0
+    /// 뛴 시간(초).
+    public var seconds = 0
+    public var points = 0, rebounds = 0, assists = 0, steals = 0, blocks = 0, turnovers = 0, fouls = 0
+    public var fieldGoalsMade = 0, fieldGoalsAttempted = 0
+    public var threesMade = 0, threesAttempted = 0
+    public var freeThrowsMade = 0, freeThrowsAttempted = 0
+
+    public init() {}
+
+    public var minutes: Int { seconds / 60 }
+    public var pointsPerGame: Double { games == 0 ? 0 : Double(points) / Double(games) }
+    public var reboundsPerGame: Double { games == 0 ? 0 : Double(rebounds) / Double(games) }
+    public var assistsPerGame: Double { games == 0 ? 0 : Double(assists) / Double(games) }
+    public var minutesPerGame: Double { games == 0 ? 0 : Double(seconds) / 60 / Double(games) }
+    public var fieldGoalRate: Double {
+        fieldGoalsAttempted == 0 ? 0 : Double(fieldGoalsMade) / Double(fieldGoalsAttempted)
+    }
+    public var threeRate: Double { threesAttempted == 0 ? 0 : Double(threesMade) / Double(threesAttempted) }
+    /// 두 자릿수 기록이 둘 이상이면 더블더블 (득점, 리바운드, 어시스트, 스틸, 블록 가운데).
+    public var isDoubleDouble: Bool {
+        [points, rebounds, assists, steals, blocks].filter { $0 >= 10 }.count >= 2
+    }
+
+    public static func += (lhs: inout BasketballLine, rhs: BasketballLine) {
+        lhs.games += rhs.games
+        lhs.starts += rhs.starts
+        lhs.seconds += rhs.seconds
+        lhs.points += rhs.points
+        lhs.rebounds += rhs.rebounds
+        lhs.assists += rhs.assists
+        lhs.steals += rhs.steals
+        lhs.blocks += rhs.blocks
+        lhs.turnovers += rhs.turnovers
+        lhs.fouls += rhs.fouls
+        lhs.fieldGoalsMade += rhs.fieldGoalsMade
+        lhs.fieldGoalsAttempted += rhs.fieldGoalsAttempted
+        lhs.threesMade += rhs.threesMade
+        lhs.threesAttempted += rhs.threesAttempted
+        lhs.freeThrowsMade += rhs.freeThrowsMade
+        lhs.freeThrowsAttempted += rhs.freeThrowsAttempted
     }
 }
 

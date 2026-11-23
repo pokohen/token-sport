@@ -48,7 +48,7 @@ final class AppModel: ObservableObject {
     @Published var updateError: String?
 
     /// 고를 수 있는 모드. 구단 경영(야구 구단, 축구 구단)은 코드는 남아 있지만 앱에서는 뺐다.
-    let selectableSlots: [SaveSlot] = [.baseballPlayer, .footballPlayer]
+    let selectableSlots: [SaveSlot] = [.baseballPlayer, .footballPlayer, .basketballPlayer]
 
     /// 공 하나에 걸리는 시간 (1배속 기준).
     static let pitchInterval: Duration = .seconds(3)

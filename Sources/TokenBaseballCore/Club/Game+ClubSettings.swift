@@ -85,6 +85,7 @@ extension Game {
 
     public func leaders(_ tier: LeagueTier, count: Int = 5) -> [(title: String, rows: [Leader])] {
         if sport == .football { return footballLeaders(tier, count: count) }
+        if sport == .basketball { return basketballLeaders(tier, count: count) }
         let everyone = teams(in: tier).flatMap { roster(of: $0.id) }
         let minPA = max(1, round * 2)
         let minOuts = max(1, round * 2)

@@ -11,7 +11,9 @@ struct CareerRecordCard: View {
             Text(record.clubs.joined(separator: " → ")).note()
             KeyValueRow(key: "가장 높이 오른 리그", value: record.bestTier.displayName)
             KeyValueRow(key: "최고 능력", value: "\(Int(record.peakAbility))")
-            if let football = record.football {
+            if let basketball = record.basketball {
+                KeyValueRow(key: "통산", value: CareerText.basketball(basketball))
+            } else if let football = record.football {
                 KeyValueRow(key: "통산", value: CareerText.football(football, keeper: record.position == .goalkeeper))
             } else if record.position.isPitcher {
                 KeyValueRow(key: "통산", value: CareerText.pitching(record.pitching))

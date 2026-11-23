@@ -161,7 +161,8 @@ import Testing
         while game.phase == .regular { try auto.playOne(&game) }
         let career = try #require(game.career)
         #expect(!career.awards.isEmpty)
-        #expect(career.history.first?.awards.isEmpty == false)
+        // 시즌 도중에 옮겼으면 시상은 시즌을 마친 구단의 줄에 붙는다.
+        #expect(career.history.last?.awards.isEmpty == false)
         #expect(game.awards.contains { $0.isMine && $0.playerName == "김테스트" })
         #expect(game.awards.filter(\.isMine).allSatisfy { $0.playerName == "김테스트" })
     }

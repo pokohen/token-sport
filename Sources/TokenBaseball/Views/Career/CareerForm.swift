@@ -8,7 +8,25 @@ struct CareerForm: View {
     @State private var pitcher = false
 
     var body: some View {
-        if sport == .football { football } else { baseball }
+        switch sport {
+        case .football: football
+        case .basketball: basketball
+        case .baseball: baseball
+        }
+    }
+
+    private var basketball: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            TextField("선수 이름", text: $setup.name).textFieldStyle(.roundedBorder)
+            ChoiceGrid(items: CareerSetup.basketballPositions, selection: $setup.position, columns: 3) { $0.label }
+            Text(positionNote).note()
+            startPoints
+            Text("출신 (연고지)").font(.callout.weight(.medium))
+            ChoiceGrid(items: NameGenerator.userCities, selection: $setup.hometown, columns: 4) { $0 }
+        }
+        .font(.callout)
+        .onChange(of: setup.position) { setup.points = [:] }
+        .onAppear { if setup.position.sport != .basketball { setup.position = .shootingGuard } }
     }
 
     private var football: some View {
@@ -115,6 +133,16 @@ struct CareerForm: View {
             "미드필더: 패스·드리블이 중요합니다. 공을 앞으로 운반하고 도움을 올립니다."
         case .forward:
             "공격수: 슈팅·드리블·스피드가 중요합니다. 골로 평가받습니다. 주전이 아니면 벤치에서 시작해 후반에 교체로 들어갑니다."
+        case .pointGuard:
+            "포인트 가드: 공을 운반하고 공격을 조립합니다. 패스·드리블이 중요하고, 어시스트로 평가받습니다."
+        case .shootingGuard:
+            "슈팅 가드: 팀의 주 득점원입니다. 3점슛·슛이 중요하고, 득점으로 평가받습니다."
+        case .smallForward:
+            "스몰 포워드: 안팎에서 고르게 뜁니다. 슛·3점슛·수비가 중요합니다."
+        case .powerForward:
+            "파워 포워드: 골밑에서 싸웁니다. 리바운드·슛·피지컬이 중요하고, 리바운드로 평가받습니다."
+        case .center5:
+            "센터: 골밑을 지킵니다. 리바운드·피지컬·수비가 중요하고, 블록과 리바운드가 쌓입니다. 포지션마다 선발은 한 명이고, 선발이 아니어도 감독 신뢰만큼 출전 시간을 받습니다."
         case .designated:
             "지명타자: 매 경기 타석에 서고 수비는 하지 않습니다. 컨택·파워·선구안·주력만 훈련합니다."
         default:

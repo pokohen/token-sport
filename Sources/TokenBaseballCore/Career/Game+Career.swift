@@ -226,6 +226,10 @@ extension Game {
             prepareCareerFootballLineup(kind: kind)
             return
         }
+        if me.position.sport == .basketball {
+            prepareCareerBasketballLineup()
+            return
+        }
         var team = teams[userTeamID]
         team.lineupOverride = []
         team.firstReliever = nil

@@ -6,13 +6,13 @@ extension FootballMatch {
 
     mutating func shoot(_ events: inout [MatchEvent]) {
         guard let shooterIndex = pickAttacker({
-            Self.slotWeight($0.slot, forward: 3, midfielder: 1.4, defender: 0.35) * (0.5 + $0.shooting / 100)
+            Self.slotWeight($0.slot, forward: 3, midfielder: 1.4, defender: 0.35) * Self.skillShare($0.shooting)
                 * ($0.style?.shotWeight ?? 1)
         }) else { return }
         var assistIndex: Int?
         if rng.chance(0.7) {
             assistIndex = pickAttacker(excluding: shooterIndex) {
-                Self.slotWeight($0.slot, forward: 1.5, midfielder: 2, defender: 0.8) * (0.5 + $0.passing / 100)
+                Self.slotWeight($0.slot, forward: 1.5, midfielder: 2, defender: 0.8) * Self.skillShare($0.passing)
                     * ($0.style?.assistWeight ?? 1)
             }
         }
@@ -34,7 +34,9 @@ extension FootballMatch {
             }
             return
         }
-        guard rng.chance(clamp(0.41 + (power - keepingValue()) / 300, 0.2, 0.65)) else {
+        // 골문 안으로 가는지는 슈팅과 수비 압박으로 정한다. 골키퍼의 실력은 다음 단계(막아내는가)에만 들어간다.
+        // (여기에 골키퍼를 넣으면 좋은 골키퍼가 막은 공이 선방이 아니라 "빗나감"으로 잡힌다.)
+        guard rng.chance(clamp(0.41 + (power - wall) / 300, 0.2, 0.65)) else {
             say(&events, .play, "\(shooter.name) \(rng.pick(Self.missLines))")
             flip(to: 0)
             return
@@ -42,7 +44,7 @@ extension FootballMatch {
         attacking.shotsOnTarget += 1
         attacking.players[shooterIndex].line.shotsOnTarget += 1
         let keeping = keepingValue()
-        if rng.chance(clamp(0.36 * exp((power - keeping) / 90), 0.06, 0.6)) {
+        if rng.chance(clamp(0.36 * exp((power - keeping) / Self.keeperSpread), 0.06, 0.6)) {
             score(shooterIndex, assist: assistIndex, how: rng.pick(Self.goalLines), &events)
         } else {
             saved(by: shooter.name, &events)
@@ -105,10 +107,11 @@ extension FootballMatch {
                 attacking.shots += 1
                 attacking.players[takerIndex].line.shots += 1
                 let power = shootingValue(taker) + (taker.traits.contains(.setPiece) ? 8 : 0)
-                if rng.chance(clamp(0.36 + (power - keepingValue()) / 300, 0.15, 0.6)) {
+                let wall = defending.mean([.defender]) { $0.tackling }
+                if rng.chance(clamp(0.36 + (power - wall) / 300, 0.15, 0.6)) {
                     attacking.shotsOnTarget += 1
                     attacking.players[takerIndex].line.shotsOnTarget += 1
-                    if rng.chance(clamp(0.20 * exp((power - keepingValue()) / 90), 0.04, 0.45)) {
+                    if rng.chance(clamp(0.20 * exp((power - keepingValue()) / Self.keeperSpread), 0.04, 0.45)) {
                         score(takerIndex, assist: nil, how: "프리킥 직접 골!", &events)
                     } else {
                         saved(by: "\(taker.name) 프리킥", &events)
@@ -177,7 +180,7 @@ extension FootballMatch {
         }
         attacking.shotsOnTarget += 1
         attacking.players[index].line.shotsOnTarget += 1
-        if rng.chance(clamp(0.28 * exp((power - keepingValue()) / 90), 0.06, 0.55)) {
+        if rng.chance(clamp(0.28 * exp((power - keepingValue()) / Self.keeperSpread), 0.06, 0.55)) {
             let assist = attacking.players.firstIndex { $0.isOnPitch && $0.name == taker && $0.playerID != player.playerID }
             score(index, assist: assist, how: "헤더 골!", &events)
         } else {

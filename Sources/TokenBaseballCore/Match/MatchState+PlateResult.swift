@@ -44,10 +44,12 @@ extension MatchState {
         // 홈런
         // 타자 파워와 투수 구위의 "차이"로 정한다. (예전에는 파워에만 지수로 반응해 능력치가 높은
         // 리그일수록 홈런이 쏟아졌다.) 제구가 좋은 투수는 장타를 덜 맞는다.
+        // 차이는 +60까지 인정한다. 예전에는 +30에서 잘라서, 리그 수준을 훌쩍 넘는 타자의 홈런이
+        // 능력 60에서 90까지 거의 같았다.
         let control = fielding.pitchers[pitcherIndex].control
         let homeRunChance = clamp(
-            0.032 * exp(clamp(power - stuff, -30, 30) / 40) * (0.8 + power / 250) * (1 - (control - 50) * 0.004),
-            0.002, 0.09)
+            0.032 * exp(clamp(power - stuff, -30, 60) / 40) * (0.8 + power / 250) * (1 - (control - 50) * 0.004),
+            0.002, 0.16)
         if rng.chance(homeRunChance) {
             let runnersOn = bases.compactMap { $0 }.count
             events.append(MatchEvent(.play, "\(lead) 쳤습니다! \(batter.name)의 \(runnersOn == 3 ? "만루 " : "")홈런!"))

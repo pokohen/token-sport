@@ -17,8 +17,16 @@ extension Game {
         guard let me = myPlayer,
               let weight = Attributes.weights(for: me.position).first(where: { $0.0 == key })?.1, weight > 0
         else { return 0 }
-        return min(Balance.careerTrainingStep / weight, 99 - me.attributes[key])
+        // 한계까지 남은 만큼만 오른다 (마지막 훈련은 덜 오를 수 있다).
+        let step = min(careerTrainingStep, max(0, me.potential - me.ability))
+        return min(step / weight, 99 - me.attributes[key])
     }
+
+    /// 지금 리그에서 훈련 한 번에 오르는 능력(CA). 윗 리그일수록 크다. 무소속이면 마지막 구단의 리그를 따른다.
+    public var careerTrainingStep: Double { Balance.careerTrainingStep(userTier) }
+
+    /// 지금 리그의 훈련 비용 배수. 윗 리그일수록 비싸다.
+    public var careerTrainingCostFactor: Double { Balance.careerTrainingCostFactor(userTier) }
 
     /// 설정: 정해진 횟수를 넘겨서도 훈련할 수 있는지.
     public var careerExtraTrainingEnabled: Bool { settings.extraTraining ?? false }
@@ -45,7 +53,7 @@ extension Game {
         guard let me = myPlayer else { return 0 }
         var cost = Balance.careerTrainingCost(value: me.attributes[key])
         if me.potential - me.ability <= Balance.careerNearPotentialRoom { cost *= 2 }
-        return price(Int((Double(cost) * careerSessionCostMultiplier).rounded()))
+        return price(Int((Double(cost) * careerSessionCostMultiplier * careerTrainingCostFactor).rounded()))
     }
 
     /// 지금 이 훈련을 할 수 없는 이유. 할 수 있으면 nil.
@@ -59,11 +67,11 @@ extension Game {
         }
         if careerSessionsExhausted { return "다음 경기를 치르면 다시 훈련할 수 있습니다." }
         if me.attributes[key] >= 99 { return "이미 최고치입니다." }
-        if me.ability + Balance.careerTrainingStep > me.potential + 0.0001 {
+        if me.potential - me.ability < 0.01 {
             return "한계에 닿았습니다. 지금은 더 오르지 않습니다."
         }
         let cost = careerTrainingCost(key)
-        if funds.balance < cost { return "훈련 포인트가 모자랍니다. \(Format.tokens(cost)) P가 필요합니다." }
+        if let reason = insufficientFundsReason(cost) { return reason }
         return nil
     }
 
@@ -83,7 +91,7 @@ extension Game {
         var gain = careerTrainingGain(key)
         if critical {
             // 세 배까지. 다만 한계(잠재력)와 최고치 99는 넘지 않는다.
-            let room = max(1, (me.potential - me.ability) / Balance.careerTrainingStep)
+            let room = max(1, (me.potential - me.ability) / careerTrainingStep)
             gain = min(gain * min(Balance.careerCriticalMultiplier, room), 99 - me.attributes[key])
         }
         me.attributes[key] = min(99, me.attributes[key] + gain)
@@ -92,7 +100,7 @@ extension Game {
         career.trainingCount += 1
         if critical {
             career.criticalCount = (career.criticalCount ?? 0) + 1
-            career.lastCritical = "크리티컬! \(CareerDrill.name(key, sport: sport))이(가) 아주 잘됐습니다: +\(String(format: "%.1f", gain))"
+            career.lastCritical = "크리티컬! \(CareerDrill.name(key, sport: sport))이(가) 아주 잘됐습니다: +\(String(format: "%.2f", gain))"
         } else {
             career.lastCritical = nil
         }
@@ -114,10 +122,7 @@ extension Game {
         }
         if careerSessionsExhausted { return "다음 경기를 치르면 다시 훈련할 수 있습니다." }
         if me.potential >= 99 { return "더 넓힐 한계가 없습니다." }
-        if funds.balance < careerBreakthroughCost {
-            return "훈련 포인트가 모자랍니다. \(Format.tokens(careerBreakthroughCost)) P가 필요합니다."
-        }
-        return nil
+        return insufficientFundsReason(careerBreakthroughCost)
     }
 
     /// 한계 돌파 훈련: 큰 포인트를 들여 잠재력(능력의 한계)을 +1 넓힌다. 훈련 횟수를 한 번 쓴다.

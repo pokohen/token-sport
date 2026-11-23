@@ -21,10 +21,23 @@ public enum SaveSlot: String, CaseIterable, Sendable {
     case baseballPlayer = "baseball-player"
     /// 축구 선수 모드.
     case footballPlayer = "football-player"
+    /// 농구 선수 모드. (농구는 구단 모드가 없다.)
+    case basketballPlayer = "basketball-player"
 
-    public var sport: Sport { self == .football || self == .footballPlayer ? .football : .baseball }
+    public var sport: Sport {
+        switch self {
+        case .baseball, .baseballPlayer: .baseball
+        case .football, .footballPlayer: .football
+        case .basketballPlayer: .basketball
+        }
+    }
     /// 구단이 아니라 선수 한 명을 키우는 모드인지.
-    public var isCareer: Bool { self == .baseballPlayer || self == .footballPlayer }
+    public var isCareer: Bool {
+        switch self {
+        case .baseballPlayer, .footballPlayer, .basketballPlayer: true
+        case .baseball, .football: false
+        }
+    }
 
     public var label: String {
         switch self {
@@ -32,13 +45,27 @@ public enum SaveSlot: String, CaseIterable, Sendable {
         case .football: "축구 구단"
         case .baseballPlayer: "야구 선수"
         case .footballPlayer: "축구 선수"
+        case .basketballPlayer: "농구 선수"
         }
     }
 
-    public init(sport: Sport) { self = sport == .football ? .football : .baseball }
+    /// 그 종목의 구단 모드 칸. 농구는 구단 모드가 없어서 선수 모드 칸을 쓴다.
+    public init(sport: Sport) {
+        switch sport {
+        case .baseball: self = .baseball
+        case .football: self = .football
+        case .basketball: self = .basketballPlayer
+        }
+    }
 
     /// 그 종목의 선수 모드 칸.
-    public static func career(for sport: Sport) -> SaveSlot { sport == .football ? .footballPlayer : .baseballPlayer }
+    public static func career(for sport: Sport) -> SaveSlot {
+        switch sport {
+        case .baseball: .baseballPlayer
+        case .football: .footballPlayer
+        case .basketball: .basketballPlayer
+        }
+    }
 }
 
 /// 게임 상태를 로컬 JSON 파일로 저장한다. 서버로 보내지 않는다.

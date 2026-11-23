@@ -12,13 +12,13 @@ import Testing
         TestGame.addTokens(&game, 10_000_000, id: "a", at: TestGame.hours(1))
         let before = try #require(game.myPlayer)
         let cost = game.careerTrainingCost(.contact)
-        #expect(cost == Balance.careerTrainingCost(value: before.attributes.contact))
+        #expect(cost == Int((Double(Balance.careerTrainingCost(value: before.attributes.contact)) * Balance.careerTrainingCostFactor(.citizenAmateur)).rounded()))
         let balance = game.funds.balance
         try game.trainCareer(.contact)
         let after = try #require(game.myPlayer)
         // 어떤 훈련이든 능력이 같은 양만큼 오른다.
-        #expect(abs(after.ability - before.ability - Balance.careerTrainingStep) < 0.0001)
-        #expect(after.attributes.contact > before.attributes.contact + 0.5)
+        #expect(abs(after.ability - before.ability - Balance.careerTrainingStep(.citizenAmateur)) < 0.0001)
+        #expect(after.attributes.contact > before.attributes.contact + 0.05)
         #expect(after.ability > before.ability)
         #expect(game.funds.balance == balance - cost)
         #expect(game.funds.seasonExpense[FundsLedger.Category.training.rawValue] == cost)
@@ -119,7 +119,7 @@ import Testing
         var game = TestCareer.make(.starter)
         TestGame.addTokens(&game, 50_000_000, id: "a", at: TestGame.hours(1))
         let first = game.careerTrainingCost(.stuff)
-        try game.trainCareer(.stuff)
+        for _ in 0..<Balance.careerSessionsPerMatch { try game.trainCareer(.stuff) }
         let second = game.careerTrainingCost(.stuff)
         #expect(second > first)
         #expect(Double(second) < Double(first) * 1.15)

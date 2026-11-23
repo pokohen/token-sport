@@ -73,6 +73,7 @@ struct OnboardingView: View {
             HStack(spacing: 8) {
                 if fixedSport != .football { Image(systemName: fixedSport == nil ? "figure.baseball" : "baseball.fill") }
                 if fixedSport != .baseball { Image(systemName: fixedSport == nil ? "figure.soccer" : "soccerball") }
+                if fixedSport == nil { Image(systemName: "figure.basketball") }
             }
             .font(.system(size: 40)).foregroundStyle(Color.accentColor)
             if bankrupt {
@@ -86,7 +87,7 @@ struct OnboardingView: View {
                 }
             } else {
                 Text("Token Sports").font(.title2.bold())
-                Text("평소처럼 AI 코딩을 하면 쓴 토큰이 훈련 포인트로 쌓입니다. 야구 선수나 축구 선수 한 명이 되어, 그 포인트로 훈련하고 경기에 나서며 6부 시민 구단에서 1부 프로 리그의 스타까지 올라가 보세요.")
+                Text("평소처럼 AI 코딩을 하면 쓴 토큰이 훈련 포인트로 쌓입니다. 야구, 축구, 농구 선수 가운데 한 명이 되어, 그 포인트로 훈련하고 경기에 나서며 6부 시민 구단에서 1부 프로 리그의 스타까지 올라가 보세요.")
                 Card("토큰 사용량을 읽는 곳") {
                     Text(model.sources.claudeCode.root.path).font(.caption.monospaced()).textSelection(.enabled)
                     Text(model.sources.codex.root.path).font(.caption.monospaced()).textSelection(.enabled)
@@ -114,6 +115,7 @@ struct OnboardingView: View {
                                 Text(item.label).font(.headline)
                                 Text(model.hasSave(slot: item) ? "저장되어 있음"
                                     : item == .football ? "구단 경영 · 승점제" : item == .footballPlayer ? "선수 한 명의 커리어"
+                                    : item == .basketballPlayer ? "가드·포워드·센터의 커리어"
                                     : item.isCareer ? "타자·투수 한 명의 커리어" : "구단 경영 · 승률제").note()
                             }
                             .frame(maxWidth: .infinity)
@@ -131,7 +133,7 @@ struct OnboardingView: View {
                     : "구단과 선수는 따로 저장됩니다. 나중에 설정에서 다른 모드로 바꿔 하나 더 만들 수 있습니다. 한 번에 하나만 토큰을 받습니다.").note()
             case 2 where makingPlayer:
                 CareerForm(setup: $career, sport: slot.sport)
-                Text("\(LeagueTier.citizenAmateur.displayName) 리그의 시민 구단에 입단합니다. 시작 훈련 포인트 \(FundsLedger.startingFunds.formatted()) P.").note()
+                Text("\(LeagueTier.citizenAmateur.displayName) 리그의 시민 구단에 입단합니다. 시작 훈련 포인트 \(Format.tokens(FundsLedger.startingFunds)) P.").note()
             case 2:
                 ChoiceGrid(items: NameGenerator.userCities, selection: $city, columns: 4) { $0 }
             case 3:

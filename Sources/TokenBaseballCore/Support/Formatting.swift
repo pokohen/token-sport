@@ -34,6 +34,19 @@ public enum Format {
 }
 
 extension Game {
+    /// 이 칸의 돈 단위로: 선수 모드는 훈련 포인트(`1.2M P`), 구단 모드는 자금(`₩120만`).
+    public func fundsText(_ amount: Int) -> String {
+        isCareer ? "\(Format.tokens(amount)) P" : Format.money(amount)
+    }
+
+    /// 값을 낼 수 없으면 그 이유. 낼 수 있으면 nil.
+    func insufficientFundsReason(_ cost: Int) -> String? {
+        guard funds.balance < cost else { return nil }
+        return isCareer
+            ? "훈련 포인트가 모자랍니다. \(fundsText(cost))가 필요합니다."
+            : "자금이 모자랍니다. \(fundsText(cost))이 필요합니다."
+    }
+
     /// 로그에서 읽은 사용량을 자금에 반영한다. 번 금액을 돌려준다.
     @discardableResult
     public mutating func collect(_ records: [UsageRecord], now: Date) -> Int {
@@ -54,14 +67,16 @@ extension Game {
         if let liveFootball, let score = liveScore {
             return "⚽ \(score.mine):\(score.theirs) \(liveFootball.state.clockLabel)"
         }
+        if let liveBasketball, let score = liveScore {
+            return "🏀 \(score.mine):\(score.theirs) \(liveBasketball.state.clockLabel)"
+        }
         if let lastResult, !lastResult.acknowledged {
             return "\(sport.symbol) 경기 종료 \(lastResult.label)"
         }
         let ready = charges > 0 && nextMatch() != nil
         switch settings.menuBarDisplay {
         case .funds:
-            if isCareer { return "\(Format.tokens(funds.balance)) P" + (ready ? " •" : "") }
-            return Format.money(funds.balance) + (ready ? " •" : "")
+            return fundsText(funds.balance) + (ready ? " •" : "")
         case .today:
             return Format.tokens(todayTokens) + (ready ? " •" : "")
         case .nextMatch:
@@ -113,6 +128,11 @@ extension Game {
             return liveFootball.userIsHome
                 ? (liveFootball.state.home.goals, liveFootball.state.away.goals)
                 : (liveFootball.state.away.goals, liveFootball.state.home.goals)
+        }
+        if let liveBasketball {
+            return liveBasketball.userIsHome
+                ? (liveBasketball.state.home.points, liveBasketball.state.away.points)
+                : (liveBasketball.state.away.points, liveBasketball.state.home.points)
         }
         return nil
     }

@@ -132,6 +132,7 @@ extension Game {
         crisisMatchesLeft = nil
         live = nil
         liveFootball = nil
+        liveBasketball = nil
         offers = []
         proposals = []
         counters = []

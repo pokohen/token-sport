@@ -17,8 +17,17 @@ enum CareerText {
             : "\(line.games)경기 \(line.goals)골 \(line.assists)도움 슈팅 \(line.shots)"
     }
 
+    static func basketball(_ line: BasketballLine) -> String {
+        func average(_ value: Double) -> String { String(format: "%.1f", value) }
+        return "\(line.games)경기 평균 \(average(line.pointsPerGame))점 \(average(line.reboundsPerGame))리바운드 \(average(line.assistsPerGame))도움"
+    }
+
     /// 종목과 포지션에 맞는 기록 한 줄.
-    static func record(_ me: Player, batting: BattingLine, pitching: PitchingLine, football: FootballLine?) -> String {
+    static func record(
+        _ me: Player, batting: BattingLine, pitching: PitchingLine, football: FootballLine?,
+        basketball: BasketballLine? = nil
+    ) -> String {
+        if me.position.sport == .basketball { return CareerText.basketball(basketball ?? BasketballLine()) }
         if me.position.sport == .football {
             return CareerText.football(football ?? FootballLine(), keeper: me.position == .goalkeeper)
         }

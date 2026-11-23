@@ -13,6 +13,9 @@ struct TeamDetail: View {
             Text("강도 \(Int(game.strength(of: team.id))) · 훈련소 Lv\(team.trainingLevel) · 경기장 Lv\(team.stadiumLevel)\(team.isUser ? "" : " · \(team.style.label(game.sport))")").note()
             if game.sport == .football {
                 Text("득점 \(row.runsFor) · 실점 \(row.runsAgainst) · 골득실 \(row.goalDifference > 0 ? "+" : "")\(row.goalDifference) · 승점 \(row.points)").note()
+            } else if game.sport == .basketball {
+                let games = max(1, row.games)
+                Text("평균 득점 \(String(format: "%.1f", Double(row.runsFor) / Double(games))) · 평균 실점 \(String(format: "%.1f", Double(row.runsAgainst) / Double(games)))").note()
             } else {
                 Text("득점 \(row.runsFor) · 실점 \(row.runsAgainst) · 팀 타율 \(String(format: "%.3f", row.battingAverage)) · 팀 평균자책점 \(String(format: "%.2f", row.era))").note()
             }

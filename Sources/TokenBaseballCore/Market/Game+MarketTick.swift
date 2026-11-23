@@ -148,7 +148,7 @@ extension Game {
             if phase == .regular, rng.chance(0.4) {
                 swap = roster(of: buyer.id)
                     .filter {
-                        (sport == .football ? $0.position == player.position : $0.isPitcher == player.isPitcher)
+                        (sport != .baseball ? $0.position == player.position : $0.isPitcher == player.isPitcher)
                             && abs($0.ability - player.ability) <= 6
                     }
                     .min { (abs($0.ability - player.ability), $0.id) < (abs($1.ability - player.ability), $1.id) }?.id

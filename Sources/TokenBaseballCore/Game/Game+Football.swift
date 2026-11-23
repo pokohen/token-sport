@@ -57,6 +57,14 @@ extension Game {
                 homeScore: match.home.goals, awayScore: match.away.goals,
                 homeWon: match.result == .homeWin, shootout: match.wentToShootout)
         }
+        if sport == .basketball {
+            guard var match = makeBasketballMatch(home: home, away: away, seed: seed) else { return nil }
+            match.runToEnd()
+            applyBasketball(match, tier: tier, countsForStandings: false)
+            return QuietResult(
+                homeScore: match.home.points, awayScore: match.away.points,
+                homeWon: match.result == .homeWin, shootout: false)
+        }
         guard var match = makeMatch(home: home, away: away, kind: kind, tier: tier, seed: seed) else { return nil }
         match.runToEnd()
         // 기록에는 넣지 않지만 선발 등판은 남겨서 같은 투수가 연달아 나오지 않게 한다.
@@ -72,6 +80,11 @@ extension Game {
         let seed = rng.next()
         if sport == .football {
             guard var match = makeFootballMatch(home: home, away: away, kind: kind, seed: seed) else { return nil }
+            match.runToEnd()
+            return match.result == .homeWin
+        }
+        if sport == .basketball {
+            guard var match = makeBasketballMatch(home: home, away: away, seed: seed) else { return nil }
             match.runToEnd()
             return match.result == .homeWin
         }

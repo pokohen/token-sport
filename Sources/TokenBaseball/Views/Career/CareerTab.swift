@@ -11,6 +11,7 @@ struct CareerTab: View {
             if let career = game.career, let me = game.myPlayer {
                 if !career.offers.isEmpty { offers(career) }
                 contract(career, me)
+                CareerScoutCard(game: game, career: career)
                 CareerRivalCard(game: game, career: career, me: me)
                 CareerActivityCard(game: game, career: career)
                 season(career, me)
@@ -59,9 +60,9 @@ struct CareerTab: View {
                     Text("은퇴: \(reason)").note()
                 }
                 Text(career.transferRequested
-                    ? "이적을 요청해 두었습니다. 이적 기간 동안 제안이 더 자주 옵니다."
+                    ? "이적을 요청해 두었습니다. 이적 기간 동안 스카우트가 더 잘 오고, 더 낮은 관심도에서도 제안합니다."
                     : game.tradeWindowOpen
-                    ? "이적을 요청하면 제안이 더 자주 오지만 감독 신뢰가 10 떨어집니다. 이적 기간마다 한 번."
+                    ? "이적을 요청하면 스카우트들의 관심이 오르고 제안의 문턱이 낮아지지만, 감독 신뢰가 10 떨어집니다. 이적 기간마다 한 번."
                     : "지금은 이적 기간이 아닙니다 (정규시즌 \(Balance.tradeDeadlineRound)라운드까지, 그리고 오프시즌).").note()
             }
         }
@@ -69,8 +70,14 @@ struct CareerTab: View {
 
     private func season(_ career: Career, _ me: Player) -> some View {
         Card("이번 시즌", trailing: game.userTier.displayName) {
-            KeyValueRow(key: "기록", value: CareerText.record(me, batting: me.batting, pitching: me.pitching, football: me.football))
-            if let line = me.football {
+            KeyValueRow(key: "기록", value: CareerText.record(
+                me, batting: me.batting, pitching: me.pitching, football: me.football, basketball: me.basketball))
+            if let line = me.basketball {
+                KeyValueRow(
+                    key: "출전 시간 · 야투 · 3점슛",
+                    value: "평균 \(String(format: "%.1f", line.minutesPerGame))분 · \(Int((line.fieldGoalRate * 100).rounded()))% · \(Int((line.threeRate * 100).rounded()))%")
+                KeyValueRow(key: "스틸 · 블록 · 실책", value: "\(line.steals) · \(line.blocks) · \(line.turnovers)")
+            } else if let line = me.football {
                 KeyValueRow(key: "유효 슈팅 · 경고 · 퇴장", value: "\(line.shotsOnTarget) · \(line.yellowCards) · \(line.redCards)")
             } else if me.isPitcher {
                 KeyValueRow(key: "이닝 · 탈삼진", value: "\(me.pitching.innings)이닝 · \(me.pitching.strikeouts)개")
@@ -85,7 +92,8 @@ struct CareerTab: View {
         let totals = game.careerTotals
         return Card("통산") {
             KeyValueRow(key: "기록", value: CareerText.record(
-                me, batting: totals.batting, pitching: totals.pitching, football: game.careerFootballTotals))
+                me, batting: totals.batting, pitching: totals.pitching, football: game.careerFootballTotals,
+                basketball: game.careerBasketballTotals))
             KeyValueRow(
                 key: "평균 평점",
                 value: CareerText.rating(totals.ratedGames == 0 ? nil : totals.ratingTotal / Double(totals.ratedGames)))
@@ -94,10 +102,13 @@ struct CareerTab: View {
             if !career.awards.isEmpty { Text("수상: " + career.awards.joined(separator: " · ")).note() }
             if !career.history.isEmpty {
                 Divider()
-                ForEach(career.history.reversed(), id: \.season) { item in
+                // 시즌 도중에 옮기면 한 시즌이 두 줄이라 시즌 번호를 id로 쓸 수 없다.
+                ForEach(Array(career.history.enumerated().reversed()), id: \.offset) { _, item in
                     VStack(alignment: .leading, spacing: 1) {
                         Text("\(item.season)시즌 · \(item.age)세 · \(item.teamName) (\(item.tier.rawValue)부)").font(.caption.weight(.semibold))
-                        Text(CareerText.record(me, batting: item.batting, pitching: item.pitching, football: item.football)
+                        Text(CareerText.record(
+                            me, batting: item.batting, pitching: item.pitching, football: item.football,
+                            basketball: item.basketball)
                             + " · 평점 \(CareerText.rating(item.averageRating))").note()
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -108,11 +119,14 @@ struct CareerTab: View {
 
     @ViewBuilder private func rivals(_ me: Player) -> some View {
         if let team = me.teamID {
-            let football = me.position.sport == .football
+            let basketball = me.position.sport == .basketball
+            let football = me.position.sport != .baseball
             let peers = game.roster(of: team).filter { football ? $0.position == me.position : $0.isPitcher == me.isPitcher }
                 .sorted { ($0.ability, -$0.id) > ($1.ability, -$1.id) }
             Card(football ? "주전 경쟁 (\(me.position.label))" : me.isPitcher ? "팀 투수진" : "팀 타선") {
-                if football {
+                if basketball {
+                    Text("\(me.position.label) 선발은 한 명입니다. 같은 포지션에서 가장 좋은 선수를 넘어서야 선발로 나오고, 감독 신뢰가 높으면 능력이 조금 낮아도 선발입니다. 벤치에서도 감독 신뢰만큼 출전 시간을 받습니다.").note()
+                } else if football {
                     let quota = game.formation(of: team).slots.filter { $0 == me.position }.count
                     Text("포메이션 \(game.formation(of: team).label): \(me.position.label) 선발은 \(quota)명입니다. 감독 신뢰가 높으면 능력이 조금 낮아도 선발로 나옵니다.").note()
                 }

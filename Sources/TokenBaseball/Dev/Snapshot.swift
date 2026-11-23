@@ -13,6 +13,7 @@ enum Snapshot {
         renderCareer(model: model, to: directory.appendingPathComponent("career-pitcher", isDirectory: true), position: .starter)
         renderCareer(model: model, to: directory.appendingPathComponent("career-football", isDirectory: true), position: .forward)
         renderCareer(model: model, to: directory.appendingPathComponent("career-keeper", isDirectory: true), position: .goalkeeper)
+        renderCareer(model: model, to: directory.appendingPathComponent("career-basketball", isDirectory: true), position: .shootingGuard)
     }
 
     /// 선수 모드 화면.
@@ -28,6 +29,7 @@ enum Snapshot {
             game.runMatchToEnd()
         }
         game.generateDemoCareerOffer()
+        game.generateDemoCareerScouts()
         model.game = game
         model.todayTokens = 12_000_000
 
@@ -41,7 +43,7 @@ enum Snapshot {
         render(ResetCard(game: game, pending: .slot).padding(12), model, directory, "5-초기화-확인")
         try? game.startMatch(now: now.addingTimeInterval(10 * 3600))
         // 축구는 교체로 들어간 뒤의 장면이 나오도록 후반까지 돌린다.
-        for _ in 0..<(position.sport == .football ? 255 : 140) { game.stepMatch() }
+        for _ in 0..<(position.sport == .football ? 255 : position.sport == .basketball ? 200 : 140) { game.stepMatch() }
         model.game = game
         try? SaveStore(fileURL: directory.appendingPathComponent("demo-save.json")).save(GameSave(game: game))
         render(TabContent(tab: .match, game: game).padding(12), model, directory, "3-중계")
@@ -50,8 +52,11 @@ enum Snapshot {
                 MenuBarLabel(model: model)
                 Image(nsImage: BallSprite.menuBarImage(.baseball))
                 Image(nsImage: BallSprite.menuBarImage(.football))
+                Image(nsImage: BallSprite.menuBarImage(.basketball))
                 BallIcon(sport: .baseball)
                 BallIcon(sport: .football)
+                BallIcon(sport: .basketball)
+                BallIcon(sport: .basketball, size: 36)
                 ChargeMarks(sport: position.sport, charges: 2)
             }
             .padding(8), model, directory, "4-상단바", width: nil)

@@ -29,22 +29,25 @@ extension Game {
         return id
     }
 
-    /// 경기가 끝날 때마다: 답하지 않은 제안은 사라지고, 이적 기간이면 새 제안이 올 수 있다.
+    /// 경기가 끝날 때마다: 답하지 않은 제안은 사라지고, 이적 기간이면 관심이 쌓인 구단이 제안할 수 있다.
     mutating func resolveCareerMarketAfterMatch() {
         guard var career, !career.retired, players[career.playerID] != nil else { return }
         var kept: [CareerOffer] = []
+        var expired: [TeamID] = []
         for var offer in career.offers {
             guard offer.kind == .transfer else { kept.append(offer); continue }
             offer.matchesLeft -= 1
             if offer.matchesLeft > 0 {
                 kept.append(offer)
             } else {
+                expired.append(offer.teamID)
                 post("\(teams[offer.teamID].name)의 이적 제안이 답이 없어 사라졌습니다.")
             }
         }
         career.offers = kept
         if !tradeWindowOpen { career.transferRequested = false }
         self.career = career
+        for team in expired { coolCareerScout(team) }
 
         guard !career.isFreeAgent, tradeWindowOpen else { return }
         // 마지막 친선 경기 뒤에는 곧바로 새 시즌이라 답할 틈이 없다.
@@ -52,39 +55,23 @@ extension Game {
         guard career.matchesAtClub >= Balance.careerOfferCooldown,
               career.offers.filter({ $0.kind == .transfer }).isEmpty
         else { return }
-        let chance = (phase == .offseason ? 0.20 : 0.05) + career.fame / 400
-            + (career.transferRequested ? 0.35 : 0)
-        if rng.chance(min(0.9, chance)) { makeCareerTransferOffer() }
+        // 제안은 관심이 충분히 쌓인 스카우트의 구단에서 온다.
+        if let scout = careerScoutReadyToOffer() { makeCareerTransferOffer(from: scout) }
     }
 
-    /// 같은 리그나 한 단계 위 리그에서, 내 능력이 통할 만한 구단이 제안한다.
-    mutating func makeCareerTransferOffer() {
-        guard let career, let me = players[career.playerID], let myTeam = me.teamID else { return }
-        let myTier = teams[myTeam].tier
-        let tiers = [myTier.upper, myTier].compactMap { $0 }
-        let already = Set(career.offers.map(\.teamID))
-        var options: [(team: TeamID, role: CareerRole)] = []
-        for team in teams where team.id != myTeam && tiers.contains(team.tier) && !already.contains(team.id) {
-            let role = careerRole(on: team.id)
-            if role != .prospect {
-                options.append((team.id, role))
-            } else if team.tier < myTier, me.age <= 23, career.fame >= Balance.careerFameCap(myTier) * 0.8,
-                      me.ability >= Balance.abilityRange(team.tier).lowerBound - 8 {
-                // 이름이 알려진 어린 선수는 윗 리그에서 유망주로 데려가려 한다.
-                options.append((team.id, role))
-            }
-        }
-        guard !options.isEmpty else { return }
-        let upper = options.filter { teams[$0.team].tier < myTier }
-        let pick = rng.pick(upper.isEmpty || rng.chance(0.3) ? options : upper)
-        let bump = teams[pick.team].tier < myTier ? 1.3 : 1.1
+    /// 나를 지켜보던 구단이 제안한다. 관심이 클수록 연봉을 더 부른다.
+    mutating func makeCareerTransferOffer(from scout: CareerScout) {
+        guard let me = myPlayer, let myTeam = me.teamID else { return }
+        let team = scout.teamID
+        let upward = teams[team].tier < teams[myTeam].tier
+        let bump = (upward ? 1.3 : 1.1) + max(0, scout.interest - Balance.careerScoutOfferInterest) / 200
         let base = max(me.contract.salary, Balance.marketSalary(ability: me.ability))
         let salary = Int(Double(base) * bump * rng.double(1.0...1.15) / 1_000) * 1_000
         let offer = CareerOffer(
-            id: newCareerOfferID(), kind: .transfer, teamID: pick.team, salary: salary,
-            years: rng.int(1...3), role: pick.role, matchesLeft: 1)
+            id: newCareerOfferID(), kind: .transfer, teamID: team, salary: salary,
+            years: rng.int(1...3), role: careerRole(on: team), matchesLeft: 1)
         self.career?.offers.append(offer)
-        post("\(teams[pick.team].tier.displayName) \(teams[pick.team].name)에서 이적 제안이 왔습니다. 다음 경기가 끝나기 전에 답하세요.")
+        post("\(teams[team].tier.displayName) \(teams[team].name)에서 이적 제안이 왔습니다. 다음 경기가 끝나기 전에 답하세요.")
     }
 
     /// 무소속이 됐을 때 받는 입단 제안. 지금 능력에 맞는 리그의 구단 두세 곳이다.
@@ -126,12 +113,17 @@ extension Game {
         } else {
             // 소속이 생긴 것으로 먼저 적어야, 구단에 들어갈 때 라이벌이 새 리그에 맞게 정해진다.
             let wasFreeAgent = career.isFreeAgent
+            // 시즌 도중에 옮기면 지금까지의 기록은 옛 구단의 몫으로 남기고, 새 리그에서는 0부터 센다.
+            let midSeason = phase == .regular && !career.seasonClosed
+            if midSeason, !wasFreeAgent { splitCareerSeason() }
             self.career?.isFreeAgent = false
             joinCareerClub(offer.teamID)
+            // 새 구단에서는 처음부터 다시 눈에 띄어야 한다.
+            clearCareerScouts()
             players[me.id]?.contract = Contract(salary: offer.salary, seasonsLeft: offer.years)
             self.career?.trust = Balance.careerStartTrust
-            // 무소속으로 시즌을 맞았으면 목표가 예전 구단 기준이다. 새 구단에 맞게 다시 받는다.
-            if wasFreeAgent, phase == .regular { assignCareerGoal(announce: true) }
+            // 시즌 목표는 새 구단 기준으로, 남은 경기만큼 다시 받는다.
+            if midSeason { assignCareerGoal(announce: true, remaining: remainingSeasonShare) }
             post("\(club.tier.displayName) \(club.name)(으)로 옮겼습니다. \(offer.years)시즌, 연봉 ₩\(offer.salary.formatted()). 예상 입지: \(offer.role.rawValue).")
         }
         self.career?.offers = []
@@ -142,6 +134,7 @@ extension Game {
         guard let offer = career?.offers.first(where: { $0.id == id }) else { return }
         guard offer.kind != .tryout else { throw GameError("입단 제안 중 하나는 골라야 합니다.") }
         career?.offers.removeAll { $0.id == id }
+        if offer.kind == .transfer { coolCareerScout(offer.teamID) }
         post("\(teams[offer.teamID].name)의 \(offer.kind == .renewal ? "재계약" : "이적") 제안을 거절했습니다.")
     }
 
@@ -160,6 +153,7 @@ extension Game {
             post("\(name)이(가) 연봉을 ₩\(offer.salary.formatted())(으)로 올려 주었습니다.")
         } else if offer.kind == .transfer {
             self.career?.offers.remove(at: index)
+            coolCareerScout(offer.teamID)
             post("\(name)이(가) 연봉 인상을 거절하고 제안을 거두었습니다.")
         } else {
             self.career?.offers[index] = offer
@@ -174,6 +168,14 @@ extension Game {
         guard !career.transferRequested else { throw GameError("이번 이적 기간에 이미 요청했습니다.") }
         self.career?.transferRequested = true
         self.career?.trust = max(0, career.trust - 10)
-        post("구단에 이적을 요청했습니다. 감독 신뢰 −10.")
+        // 소문이 돈다: 지켜보던 구단들의 관심이 오르고, 제안의 문턱이 낮아지고, 새 스카우트가 더 잘 온다.
+        if var scouts = self.career?.scouts {
+            for index in scouts.indices {
+                scouts[index].interest = min(100, scouts[index].interest + Balance.careerScoutRequestBoost)
+                scouts[index].lastChange = Balance.careerScoutRequestBoost
+            }
+            self.career?.scouts = scouts
+        }
+        post("구단에 이적을 요청했습니다. 감독 신뢰 −10. 스카우트들의 관심이 오르고, 제안이 더 쉽게 옵니다.")
     }
 }

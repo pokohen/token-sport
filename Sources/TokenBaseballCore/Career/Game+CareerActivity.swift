@@ -63,7 +63,7 @@ extension Game {
             return "지금 리그에서는 명성이 더 오르지 않습니다. 윗 리그로 올라가야 합니다."
         }
         let cost = careerActivityCost(activity)
-        if funds.balance < cost { return "훈련 포인트가 모자랍니다. \(Format.tokens(cost)) P가 필요합니다." }
+        if let reason = insufficientFundsReason(cost) { return reason }
         return nil
     }
 

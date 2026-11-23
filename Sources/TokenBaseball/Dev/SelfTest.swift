@@ -52,6 +52,32 @@ enum SelfTest {
         check("축구 선수: 스타일", model.game?.career?.style == .greedy)
         playOne(model, label: "축구 선수 2")
         check("축구 선수: 평점 또는 미출전 기록", model.game?.lastResult?.summary.isEmpty == false)
+        // 스카우트: 붙이고, 저장했다가 다시 읽어도 남아 있다
+        model.perform { $0.generateDemoCareerScouts() }
+        let scoutCount = model.game?.careerScouts.count ?? 0
+        model.save()
+        let reloaded = (try? model.store.load())?.game
+        check("축구 선수: 스카우트가 저장된다", scoutCount > 0 && reloaded?.careerScouts.count == scoutCount)
+
+        // 2-1. 농구 선수 만들기 → 훈련 → 경기 (다른 칸에서 바로)
+        model.createCareer(CareerSetup(
+            name: "점검 가드", position: .pointGuard, hometown: "대구", points: [.passing: 2, .dribbling: 2, .three: 1]))
+        check("농구 선수: 만들어짐", model.game?.myPlayer?.name == "점검 가드", model.message ?? "")
+        check("농구 선수: 칸", model.slot == .basketballPlayer && exists("save-basketball-player.json"))
+        check("농구 선수: 종목", model.game?.sport == .basketball && model.sport == .basketball)
+        check("농구 선수: 세계", model.game?.teams.count == 60
+            && model.game?.players.values.allSatisfy { $0.position.sport == .basketball } == true)
+        playOne(model, label: "농구 선수 1")
+        if let key = model.game?.careerTrainableKeys.first {
+            let before = model.game?.myPlayer?.ability ?? 0
+            model.perform { try $0.trainCareer(key) }
+            check("농구 선수: 훈련", (model.game?.myPlayer?.ability ?? 0) > before, model.message ?? "")
+        }
+        model.perform { $0.setCareerStyle(.link) }
+        playOne(model, label: "농구 선수 2")
+        check("농구 선수: 기록", (model.game?.myPlayer?.basketball?.games ?? 0) == 2
+            && model.game?.career?.lastRating != nil)
+        check("축구 선수 저장은 그대로", exists("save-football-player.json"))
 
         // 3. 야구 구단으로 전환 (없음 → 창단)
         model.switchSlot(to: .baseball)
@@ -99,7 +125,7 @@ enum SelfTest {
         model = AppModel(store: store, sources: UsageSources())
         check("구단 모드로 껐어도 선수 모드로 연다", model.slot == .baseballPlayer && model.game?.myPlayer?.name == "점검 투수")
         check("구단 저장 파일은 그대로", exists("save-football.json") && exists("save.json"))
-        check("고를 수 있는 모드는 선수 둘", model.selectableSlots == [.baseballPlayer, .footballPlayer])
+        check("고를 수 있는 모드는 선수 셋", model.selectableSlots == [.baseballPlayer, .footballPlayer, .basketballPlayer])
 
         // 8. 경기 도중에 껐다 켰을 때
         model.switchSlot(to: .footballPlayer)
@@ -125,7 +151,13 @@ enum SelfTest {
             [UsageRecord(id: "selftest-extra", timestamp: Date(), usage: TokenUsage(output: 30_000_000))], now: Date())
         model.buyExtraMatchAndStart()
         check("추가 경기: 사서 바로 시작", model.game?.isMatchLive == true, model.message ?? "")
-        model.game?.runMatchToEnd()
+        // 결과 바로 보기: 중계가 도는 중에 눌러도 경기가 끝나고 값이 빠진다
+        let beforeSkip = model.game?.funds.seasonExpense[FundsLedger.Category.skipMatch.rawValue] ?? 0
+        model.skipMatch()
+        check("결과 바로 보기: 경기 끝", model.game?.isMatchLive == false && model.game?.lastResult != nil, model.message ?? "")
+        check("결과 바로 보기: 값 냄",
+              (model.game?.funds.seasonExpense[FundsLedger.Category.skipMatch.rawValue] ?? 0) - beforeSkip
+                  == model.game?.skipMatchCost)
         check("추가 경기: 값이 두 배", model.game?.extraMatchCost == Balance.extraMatchCost * 2)
         // 배속은 고른 값이 남는다
         let speedBefore = model.matchSpeed

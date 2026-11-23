@@ -79,6 +79,7 @@ extension Game {
         guard let me = myPlayer else { return "연속 기록" }
         switch me.position {
         case .goalkeeper: return "연속 무실점"
+        case _ where me.position.sport == .basketball: return "연속 두 자릿수 득점"
         case _ where me.position.sport == .football: return "연속 공격포인트"
         case _ where me.isPitcher: return "연속 무자책"
         default: return "연속 안타"
@@ -155,7 +156,7 @@ extension Game {
     private func isRivalCandidate(_ other: Player, for me: Player) -> Bool {
         guard other.id != me.id, let team = other.teamID, team != userTeamID,
               teams[team].tier == userTier else { return false }
-        if me.position.sport == .football { return other.position == me.position }
+        if me.position.sport != .baseball { return other.position == me.position }
         if me.isPitcher { return other.isPitcher && (other.position == .starter) == (me.position == .starter) }
         return !other.isPitcher && other.position.sport == me.position.sport
     }

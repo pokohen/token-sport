@@ -13,8 +13,8 @@ struct CareerHomeTab: View {
                 playerCard(career, me)
                 notices(career)
                 Card("훈련 포인트", trailing: "남은 훈련 \(max(0, career.sessionsLeft))/\(Balance.careerSessionsPerMatch)") {
-                    Text("\(game.funds.balance.formatted()) P").font(.title2.bold().monospacedDigit())
-                    KeyValueRow(key: "오늘 번 포인트 (오늘 쓴 토큰)", value: "\(model.todayTokens.formatted()) P")
+                    Text("\(Format.tokens(game.funds.balance)) P").font(.title2.bold().monospacedDigit())
+                    KeyValueRow(key: "오늘 번 포인트 (오늘 쓴 토큰)", value: "\(Format.tokens(model.todayTokens)) P")
                     KeyValueRow(key: "누적 포인트", value: "\(Format.tokens(game.funds.tokenIncome)) P")
                     Text("AI 코딩에 쓴 토큰이 그대로 훈련 포인트가 됩니다. 훈련 탭에서 능력치를 올리세요.").note()
                 }
@@ -29,6 +29,15 @@ struct CareerHomeTab: View {
                 }
                 NextMatchCard(game: game, goToMatch: goToMatch)
                 if let note = appearanceNote(me) { Text(note).note().frame(maxWidth: .infinity, alignment: .leading) }
+                if let visitor = game.careerScoutVisitor, !game.isMatchLive {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Image(systemName: "binoculars.fill").accessibilityHidden(true)
+                        Text("\(visitor.tier.displayName) \(visitor.name) 스카우트가 다음 경기를 직접 보러 옵니다.")
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .font(.callout.weight(.medium)).foregroundStyle(Theme.warn)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
             NewsCard(game: game)
         }
@@ -40,7 +49,7 @@ struct CareerHomeTab: View {
                 EmblemView(team: game.userTeam, size: 44)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(me.name).font(.headline)
-                    Text(me.position.sport == .football
+                    Text(me.position.sport != .baseball
                         ? "\(me.age)세 · \(me.position.label)"
                         : "\(me.age)세 · \(me.position.label) · \(me.throwsHand.rawValue)투\(me.bats.rawValue)타").note()
                     Text(career.isFreeAgent
@@ -51,7 +60,7 @@ struct CareerHomeTab: View {
                 Spacer()
                 VStack(alignment: .trailing) {
                     Text(me.grade).font(.title.bold())
-                    Text("능력 \(Int(me.ability))").note()
+                    Text("능력 \(String(format: "%.1f", me.ability))").note()
                 }
             }
             if let talent = game.careerTalent {
@@ -109,6 +118,10 @@ struct CareerHomeTab: View {
             if plan.starts { return "다음 경기에 선발로 나섭니다." }
             if let minute = plan.subMinute { return "다음 경기는 벤치에서 시작합니다. \(minute)분쯤 교체로 들어갑니다." }
             return "다음 경기는 벤치입니다. 골키퍼는 교체로 나오지 않습니다."
+        }
+        if let plan = game.careerBasketballPlan {
+            if plan.starts { return "다음 경기에 선발로 나섭니다." }
+            return "다음 경기는 벤치에서 시작합니다. \(plan.minutes ?? 0)분쯤 뜁니다 (감독 신뢰가 오르면 늘어납니다)."
         }
         switch me.position {
         case .starter:

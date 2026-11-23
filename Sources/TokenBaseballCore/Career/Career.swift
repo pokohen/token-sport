@@ -45,6 +45,8 @@ public struct CareerSetup: Equatable, Sendable {
     public static let pitcherPositions: [Position] = [.starter, .reliever]
     /// 축구 선수 모드의 포지션.
     public static let footballPositions: [Position] = Position.football
+    /// 농구 선수 모드의 포지션.
+    public static let basketballPositions: [Position] = Position.basketball
 
     public var sport: Sport { position.sport }
 }
@@ -83,6 +85,8 @@ public struct CareerGoal: Codable, Equatable, Sendable {
         case hits, homeRuns, wins, strikeouts, appearances
         // 축구
         case goals, points, cleanSheets, matches
+        // 농구
+        case basketPoints, rebounds, assists
     }
 
     public var kind: Kind
@@ -101,6 +105,9 @@ public struct CareerGoal: Codable, Equatable, Sendable {
         case .points: "공격 포인트 \(target)개 (골 + 도움)"
         case .cleanSheets: "무실점 \(target)경기"
         case .matches: "\(target)경기 출전"
+        case .basketPoints: "\(target)득점"
+        case .rebounds: "리바운드 \(target)개"
+        case .assists: "어시스트 \(target)개"
         }
     }
 
@@ -115,11 +122,14 @@ public struct CareerGoal: Codable, Equatable, Sendable {
         case .points: player.football?.points ?? 0
         case .cleanSheets: player.football?.cleanSheets ?? 0
         case .matches: player.football?.games ?? 0
+        case .basketPoints: player.basketball?.points ?? 0
+        case .rebounds: player.basketball?.rebounds ?? 0
+        case .assists: player.basketball?.assists ?? 0
         }
     }
 }
 
-/// 끝난 시즌 하나의 기록.
+/// 커리어의 한 시즌 기록. 시즌 도중에 구단을 옮겼으면 구단마다 한 줄씩 남는다.
 public struct CareerSeason: Codable, Equatable, Sendable {
     public var season: Int
     public var age: Int
@@ -129,6 +139,8 @@ public struct CareerSeason: Codable, Equatable, Sendable {
     public var pitching: PitchingLine
     /// 축구 선수의 시즌 기록. 야구 선수는 nil.
     public var football: FootballLine? = nil
+    /// 농구 선수의 시즌 기록. 다른 종목은 nil.
+    public var basketball: BasketballLine? = nil
     /// 평점이 매겨진 경기 수와 평점 합.
     public var ratedGames: Int
     public var ratingTotal: Double
@@ -148,6 +160,7 @@ public struct CareerRecord: Codable, Equatable, Sendable {
     public var batting: BattingLine
     public var pitching: PitchingLine
     public var football: FootballLine? = nil
+    public var basketball: BasketballLine? = nil
     public var ratedGames: Int
     public var ratingTotal: Double
     public var awards: [String]
@@ -226,6 +239,9 @@ public struct Career: Codable, Equatable, Sendable {
     public var criticalCount: Int?
     /// 이번 경기 사이에 명성 활동을 했는지. (예전 저장 파일에는 없어서 Optional이다.)
     public var activityDone: Bool?
+    /// 나를 지켜보는 스카우트들과, 다음 경기를 직접 보러 오는 스카우트의 구단. (예전 저장 파일에는 없다.)
+    public var scouts: [CareerScout]?
+    public var scoutVisit: TeamID?
     /// 타고난 재능: 처음 만들어졌을 때의 능력. (예전 저장 파일에는 없다.)
     public var startAbility: Double?
     /// 축구: 이번 경기에 선발이 아니면 교체로 들어갈 시간(분). 선발이거나 야구면 nil.
@@ -276,6 +292,20 @@ public enum CareerDrill {
             case .physical: return "웨이트 트레이닝"
             case .keeping: return "골키핑 훈련"
             case .stamina: return "러닝"
+            default: return key.label
+            }
+        }
+        if sport == .basketball {
+            switch key {
+            case .shooting: return "미들슛 연습"
+            case .three: return "3점슛 연습"
+            case .passing: return "패스 훈련"
+            case .dribbling: return "드리블 훈련"
+            case .tackling: return "수비 훈련"
+            case .rebounding: return "박스아웃 훈련"
+            case .speed: return "속공 훈련"
+            case .physical: return "웨이트 트레이닝"
+            case .stamina: return "셔틀런"
             default: return key.label
             }
         }

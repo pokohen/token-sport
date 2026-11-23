@@ -12,11 +12,11 @@ import Testing
     static let fixture = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent().appendingPathComponent("Fixtures/baseball-v2-save.json")
 
-    static let midSeason = "55d0ee2da0a1395c"
-    static let nextSeason = "699a848f3ba71e71"
+    static let midSeason = "f606a08f275e8bb3"
+    static let nextSeason = "1605d87e82aae8e8"
     /// 예전 엔진으로 만들어 둔 저장 파일의 지문 (파일 내용이 그대로인지), 그리고 그 파일을 지금 코드로 이어 갔을 때의 지문.
     static let fixtureMidSeason = "6ef3c215f702e2fa"
-    static let fixtureNextSeason = "5b20d9f9e1ba4154"
+    static let fixtureNextSeason = "286cbdf9812474d7"
 
     static func fingerprint(_ game: Game) -> String {
         var text = "\(game.rng.state)|\(game.season)|\(game.round)|\(game.phase)|\(game.funds.balance)|\(game.players.count)"

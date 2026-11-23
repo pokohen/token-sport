@@ -80,6 +80,10 @@ extension Game {
             return Self.careerFootballPerformance(
                 playerID: career.playerID, in: mine, conceded: theirs.goals, result: 0)
         }
+        if let liveBasketball {
+            let mine = liveBasketball.userIsHome ? liveBasketball.state.home : liveBasketball.state.away
+            return Self.careerBasketballPerformance(playerID: career.playerID, in: mine, result: 0)
+        }
         guard let live else { return nil }
         let mine = live.userIsHome ? live.state.home : live.state.away
         return Self.careerPerformance(playerID: career.playerID, in: mine, result: 0)
@@ -144,7 +148,8 @@ extension Game {
                 let cap = Balance.careerFameCap(teams[userTeamID].tier)
                 // 선발 투수는 나오는 경기가 적어서 한 경기가 더 크게 반영된다.
                 // 축구는 평점이 6점대에 몰려 있어서 기준을 낮추고 크게 반영한다.
-                let football = me.position.sport == .football
+                // 농구도 축구처럼 평점이 6점대에 몰린다.
+                let football = me.position.sport != .baseball
                 let rarity = me.position == .starter ? 3.0 : football ? 2.0 : 1.0
                 // 기세가 붙어 있으면 이름이 더 빨리 알려진다.
                 let momentum = (career.streak ?? 0) >= Balance.careerStreakLength ? Balance.careerMomentumFame : 1
@@ -167,6 +172,7 @@ extension Game {
             lines.append("연봉 ₩\(pay.formatted())")
         }
         if kind != .friendly { lines += settleCareerRival(&career, mine: performance, rival: rival) }
+        lines += updateCareerScouts(&career, me: me, performance: performance, kind: kind)
         lines += updateCareerForm(&career, performance: performance, kind: kind)
         self.career = career
         // 토큰으로 사서 치른 경기는 실전 경험으로 능력이 조금 오른다.
@@ -200,10 +206,16 @@ extension Game {
         delta += Double(detail.advances) * 0.05 + Double(detail.tackles) * 0.12 + Double(detail.clearances) * 0.12
         delta -= Double(detail.fouls) * 0.1 + Double(line.yellowCards) * 0.3 + Double(line.redCards) * 1.5
         if entry.natural == .goalkeeper {
-            delta += Double(line.saves) * 0.25 - Double(line.conceded) * 0.3
+            // 막아 낸 골: 비슷한 실력의 골키퍼라면 유효 슈팅의 36%쯤이 들어간다. 그보다 덜 먹은 만큼이 골키퍼의 몫이다.
+            // 바쁜 경기에서 선방만 많이 해도, 실점이 같은 비율로 따라오면 평점이 오르지 않는다.
+            let prevented = Double(line.saves) * Balance.careerKeeperShotGoalRate
+                - Double(line.conceded) * (1 - Balance.careerKeeperShotGoalRate)
+            delta += prevented * Balance.careerKeeperPreventedWeight
         }
-        // 무실점: 골키퍼와 수비수가 60분 이상 뛰었을 때.
-        if conceded == 0, minutes >= 60, entry.natural == .goalkeeper || entry.natural == .defender { delta += 0.5 }
+        // 무실점: 골키퍼와 수비수가 60분 이상 뛰었을 때. 팀이 강해서 슈팅을 받지 않은 날에도 평가받게 한다.
+        if conceded == 0, minutes >= 60 {
+            if entry.natural == .goalkeeper { delta += 0.8 } else if entry.natural == .defender { delta += 0.5 }
+        }
         delta += Double(result) * 0.2
         // 포지션마다 기록이 쌓이는 양이 달라서 기준을 맞춘다 (90분 뛴 평균 선수가 6.5 근처).
         delta += Balance.careerFootballBaseline(entry.natural)

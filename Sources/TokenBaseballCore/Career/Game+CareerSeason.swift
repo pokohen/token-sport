@@ -16,18 +16,54 @@ extension Game {
             players[me.id]?.batting = BattingLine()
             players[me.id]?.pitching = PitchingLine()
             if me.position.sport == .football { players[me.id]?.football = FootballLine() }
+            if me.position.sport == .basketball { players[me.id]?.basketball = BasketballLine() }
             players[me.id]?.abilityAtSeasonStart = me.ability
             players[me.id]?.isHot = false
             players[me.id]?.suspendedMatches = nil
         }
         self.career = career
+        refreshCareerScoutsForSeason()
         assignCareerGoal(announce: !career.isFreeAgent)
         if let line = refreshCareerRival(seasonStart: true) { post(line) }
         ensureCup()
     }
 
+    /// 끝까지 치른 시즌 수. 시즌 도중에 옮기면 한 시즌이 두 줄로 남고, 아직 끝나지 않은 시즌의 줄도 있으므로
+    /// 시즌 번호로 세고 진행 중인 시즌은 뺀다.
+    var careerSeasonsPlayed: Int {
+        guard let career else { return 0 }
+        var seasons = Set(career.history.map(\.season))
+        if !career.seasonClosed { seasons.remove(season) }
+        return seasons.count
+    }
+
+    /// 정규시즌에서 남은 몫 (시즌 시작 1, 마지막 경기 뒤 0).
+    var remainingSeasonShare: Double {
+        let total = max(1, roundsPerSeason)
+        return clamp(Double(total - round) / Double(total), 0, 1)
+    }
+
+    /// 시즌 도중에 구단을 옮길 때: 지금까지의 시즌 기록을 옛 구단의 한 줄로 커리어에 남기고, 시즌 기록을 비운다.
+    /// 새 리그의 기록 순위, 시상, 시즌 목표는 옮긴 뒤의 기록만 센다.
+    mutating func splitCareerSeason() {
+        guard var career, let me = players[career.playerID], let team = me.teamID else { return }
+        guard career.seasonRatedGames > 0 else { return }
+        career.history.append(CareerSeason(
+            season: season, age: me.age, teamName: teams[team].name, tier: teams[team].tier,
+            batting: me.batting, pitching: me.pitching, football: me.football, basketball: me.basketball,
+            ratedGames: career.seasonRatedGames, ratingTotal: career.seasonRatingTotal, awards: []))
+        career.seasonRatedGames = 0
+        career.seasonRatingTotal = 0
+        self.career = career
+        players[me.id]?.batting = BattingLine()
+        players[me.id]?.pitching = PitchingLine()
+        if me.position.sport == .football { players[me.id]?.football = FootballLine() }
+        if me.position.sport == .basketball { players[me.id]?.basketball = BasketballLine() }
+    }
+
     /// 이번 시즌 목표를 정한다: 지금 소속 구단의 리그와 내 능력에 맞춘다.
-    mutating func assignCareerGoal(announce: Bool) {
+    /// `remaining`: 시즌 도중에 받으면 남은 경기 몫만큼 목표를 줄인다.
+    mutating func assignCareerGoal(announce: Bool, remaining: Double = 1) {
         guard var career, !career.retired, let me = players[career.playerID] else { return }
         let tier = teams[userTeamID].tier
         // 내 능력이 리그 평균보다 얼마나 높은지에 따라 목표가 달라진다.
@@ -45,8 +81,18 @@ extension Game {
             career.goal = CareerGoal(kind: .matches, target: 24)
         case .goalkeeper:
             career.goal = CareerGoal(kind: .matches, target: 10)
+        case .pointGuard:
+            career.goal = CareerGoal(kind: .assists, target: 70 + clamp(edge * 3, -30, 60))
+        case .shootingGuard, .smallForward:
+            career.goal = CareerGoal(kind: .basketPoints, target: 130 + clamp(edge * 6, -50, 200))
+        case .powerForward, .center5:
+            career.goal = CareerGoal(kind: .rebounds, target: 130 + clamp(edge * 4, -40, 120))
         default:
             career.goal = CareerGoal(kind: .hits, target: 26 + clamp(edge, -6, 10))
+        }
+        if remaining < 1, var goal = career.goal {
+            goal.target = max(1, Int((Double(goal.target) * remaining).rounded()))
+            career.goal = goal
         }
         self.career = career
         if announce, let goal = career.goal { post("시즌 목표: \(goal.label).") }
@@ -58,7 +104,7 @@ extension Game {
         let won = awards.filter { $0.season == season && $0.isMine }
         career.history.append(CareerSeason(
             season: season, age: me.age, teamName: teams[userTeamID].name, tier: teams[userTeamID].tier,
-            batting: me.batting, pitching: me.pitching, football: me.football,
+            batting: me.batting, pitching: me.pitching, football: me.football, basketball: me.basketball,
             ratedGames: career.seasonRatedGames, ratingTotal: career.seasonRatingTotal,
             awards: won.map(\.title)))
         career.seasonClosed = true
@@ -134,6 +180,7 @@ extension Game {
             players[me.id]?.teamID = nil
         }
         self.career?.isFreeAgent = true
+        clearCareerScouts()
         let tryouts = makeCareerTryoutOffers()
         self.career?.offers = tryouts
         post("계약이 끝나 무소속이 되었습니다. 입단 제안 중 하나를 골라야 경기에 나설 수 있습니다.")
@@ -146,7 +193,7 @@ extension Game {
     public var careerRetireBlockedReason: String? {
         guard let career, !career.retired, players[career.playerID] != nil else { return "선수가 없습니다." }
         if isMatchLive { return "경기가 끝난 뒤에 은퇴할 수 있습니다." }
-        if career.history.count < Balance.careerRetireMinSeasons {
+        if careerSeasonsPlayed < Balance.careerRetireMinSeasons {
             return "한 시즌을 끝까지 치른 뒤부터 은퇴할 수 있습니다."
         }
         if phase != .offseason { return "은퇴는 시즌이 끝난 오프시즌에 할 수 있습니다." }
@@ -169,8 +216,10 @@ extension Game {
         var ratedGames = 0
         var ratingTotal = 0.0
         var football = FootballLine()
+        var basketball = BasketballLine()
         for season in career.history {
             football += season.football ?? FootballLine()
+            basketball += season.basketball ?? BasketballLine()
             batting += season.batting
             pitching += season.pitching
             ratedGames += season.ratedGames
@@ -180,17 +229,20 @@ extension Game {
             name: me.name, position: me.position, firstSeason: career.firstSeason, lastSeason: season,
             retiredAge: me.age, clubs: career.clubs, batting: batting, pitching: pitching,
             football: me.position.sport == .football ? football : nil,
+            basketball: me.position.sport == .basketball ? basketball : nil,
             ratedGames: ratedGames, ratingTotal: ratingTotal, awards: career.awards,
             peakAbility: career.peakAbility, bestTier: career.bestTier, earnings: career.earnings,
-            seasonsPlayed: career.history.count)
+            seasonsPlayed: careerSeasonsPlayed)
         careerHall = (careerHall ?? []) + [record]
         if let team = me.teamID { clearCareerLineup(team) }
         removePlayer(me.id)
         career.retired = true
         career.isFreeAgent = false
         career.offers = []
+        career.scouts = nil
+        career.scoutVisit = nil
         self.career = career
-        post("\(me.name) 은퇴. \(career.history.count)시즌의 커리어가 명예의 전당에 남습니다.")
+        post("\(me.name) 은퇴. \(careerSeasonsPlayed)시즌의 커리어가 명예의 전당에 남습니다.")
     }
 
     /// 은퇴 뒤 같은 세계에서 새 선수로 다시 시작한다.

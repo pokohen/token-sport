@@ -88,9 +88,11 @@ extension Game {
             prepareCareerLineup(kind: next.kind)
         }
         guard canField(userTeam) else {
-            throw GameError(sport == .football
-                ? "골키퍼 1명을 포함해 11명이 있어야 경기를 할 수 있습니다."
-                : "야수 9명과 투수 1명 이상이 있어야 경기를 할 수 있습니다.")
+            switch sport {
+            case .football: throw GameError("골키퍼 1명을 포함해 11명이 있어야 경기를 할 수 있습니다.")
+            case .basketball: throw GameError("선수 다섯 명이 있어야 경기를 할 수 있습니다.")
+            case .baseball: throw GameError("야수 9명과 투수 1명 이상이 있어야 경기를 할 수 있습니다.")
+            }
         }
 
         ensurePlayable(next.opponent)
@@ -100,6 +102,10 @@ extension Game {
         // 친선 경기 규칙은 두 구단 중 윗 리그를 따른다 (콜드게임은 시민 구단끼리만).
         if sport == .football {
             try startFootballMatch(next, home: home, away: away, tier: tier, now: now)
+            return
+        }
+        if sport == .basketball {
+            try startBasketballMatch(next, home: home, away: away, tier: tier, now: now)
             return
         }
         guard var state = makeMatch(home: home, away: away, kind: next.kind, tier: tier, seed: rng.next()) else {
@@ -130,6 +136,7 @@ extension Game {
     @discardableResult
     public mutating func stepMatch() -> [MatchEvent] {
         if liveFootball != nil { return stepFootballMatch() }
+        if liveBasketball != nil { return stepBasketballMatch() }
         guard var match = live else { return [] }
         let events = match.state.step()
         for index in match.others.indices where !match.others[index].isFinished {
@@ -333,7 +340,7 @@ extension Game {
     mutating func ensurePlayable(_ id: TeamID) {
         guard !teams[id].isUser else { return }
         func short() -> Bool {
-            if sport == .football { return !canField(teams[id]) }
+            if sport != .baseball { return !canField(teams[id]) }
             return LineupBuilder.build(team: teams[id], players: players) == nil
                 || roster(of: id).filter({ $0.isPitcher }).count < Balance.minPitchers
         }

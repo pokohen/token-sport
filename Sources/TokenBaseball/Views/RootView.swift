@@ -8,7 +8,7 @@ enum AppTab: String, CaseIterable {
     func icon(_ sport: Sport, career: Bool = false) -> String {
         switch self {
         case .home: "house.fill"
-        case .match: sport == .football ? "soccerball" : "baseball.fill"
+        case .match: sport == .football ? "soccerball" : sport == .basketball ? "basketball.fill" : "baseball.fill"
         case .league: "list.number"
         case .club: career ? "dumbbell.fill" : "building.2.fill"
         case .players: career ? "person.text.rectangle.fill" : "person.3.fill"

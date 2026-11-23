@@ -2,9 +2,10 @@ import AppKit
 import SwiftUI
 import TokenBaseballCore
 
-/// 도트로 그린 야구공과 축구공.
+/// 도트로 그린 야구공, 축구공, 농구공.
 ///
-/// 격자의 글자: `#` 테두리, `w` 흰 면, `r` 빨간 실밥(야구공), `k` 검은 조각(축구공), `.` 빈칸.
+/// 격자의 글자: `#` 테두리, `w` 흰 면, `r` 빨간 실밥(야구공), `k` 검은 조각(축구공),
+/// `o` 주황 면과 `l` 검은 줄(농구공), `.` 빈칸.
 enum BallSprite {
     static let baseball = [
         "....####....",
@@ -36,7 +37,28 @@ enum BallSprite {
         "....####....",
     ]
 
-    static func grid(_ sport: Sport) -> [String] { sport == .football ? football : baseball }
+    static let basketball = [
+        "....####....",
+        "..##olo###..",
+        ".#oolooolo#.",
+        ".#ooloooolo.",
+        "#loolooooll#",
+        "#olllllllll#",
+        "#llllllllol#",
+        "#oooloooloo#",
+        ".#oolooolo#.",
+        ".#olooolo##.",
+        "..##oloo##..",
+        "....####....",
+    ]
+
+    static func grid(_ sport: Sport) -> [String] {
+        switch sport {
+        case .baseball: baseball
+        case .football: football
+        case .basketball: basketball
+        }
+    }
 
     @MainActor private static var cache: [String: NSImage] = [:]
 
@@ -67,6 +89,8 @@ enum BallSprite {
                     case "w": color = template ? nil : .white
                     case "r": color = template ? .black : NSColor(red: 0.85, green: 0.15, blue: 0.15, alpha: 1)
                     case "k": color = template ? .black : NSColor(white: 0.1, alpha: 1)
+                    case "o": color = template ? nil : NSColor(red: 0.93, green: 0.49, blue: 0.13, alpha: 1)
+                    case "l": color = template ? .black : NSColor(white: 0.12, alpha: 1)
                     default: color = nil
                     }
                     guard let color else { continue }
@@ -91,6 +115,6 @@ struct BallIcon: View {
     var body: some View {
         Image(nsImage: BallSprite.image(sport, size: size))
             .interpolation(.none)
-            .accessibilityLabel(sport == .football ? "축구공" : "야구공")
+            .accessibilityLabel(sport == .football ? "축구공" : sport == .basketball ? "농구공" : "야구공")
     }
 }

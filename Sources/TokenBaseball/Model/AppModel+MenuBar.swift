@@ -48,13 +48,14 @@ extension AppModel {
     /// 지금 보여줄 훈련 모습.
     var drill: Sprites.Drill {
         guard let game, !game.isBankrupt else { return .rest }
-        if game.isMatchLive { return game.sport == .football ? .shooting : .batting }
+        if game.isMatchLive { return game.sport == .baseball ? .batting : game.sport == .football ? .shooting : .dribbling }
         // 토큰 사용이 일정 시간 없으면 쉰다.
         // (장부의 반영 시각은 토큰을 안 써도 계속 갱신되므로 기준으로 쓸 수 없다.)
         if now.timeIntervalSince(lastTokenAt ?? launchedAt) > 600 { return .rest }
         if let me = game.myPlayer {
             // 선수 모드: 내 선수가 하는 훈련만 보여 준다.
             let mine: [Sprites.Drill] = me.position == .goalkeeper ? [.keeping, .running, .weights]
+                : me.position.sport == .basketball ? [.dribbling, .running, .weights]
                 : me.position.sport == .football ? [.dribbling, .shooting, .running, .weights]
                 : me.isPitcher ? [.pitching, .running, .weights] : [.batting, .fielding, .running, .weights]
             return mine[(Int(now.timeIntervalSince1970) / 8) % mine.count]

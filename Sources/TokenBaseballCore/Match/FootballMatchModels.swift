@@ -47,6 +47,16 @@ public enum PlayStyle: String, Codable, CaseIterable, Sendable {
     /// 체력이 줄어드는 속도에 곱하는 값.
     var drain: Double { self == .defensive ? 1.2 : 1 }
 
+    /// 농구에서의 설명.
+    public var basketballSummary: String {
+        switch self {
+        case .balanced: "특별한 효과가 없습니다."
+        case .greedy: "슛을 더 많이 던집니다. 무리한 슛이 섞여 성공률이 조금 떨어지고, 도움과 수비 가담이 줄어듭니다."
+        case .link: "도움 기회가 늘고 슛이 줄어듭니다. 도움 하나가 평점에 더 크게 반영됩니다."
+        case .defensive: "스틸, 블록, 리바운드에 더 자주 나서지만 체력이 빨리 줄고 슛이 줄어듭니다."
+        }
+    }
+
     public var summary: String {
         switch self {
         case .balanced: "특별한 효과가 없습니다."
