@@ -141,6 +141,15 @@ public struct Attributes: Codable, Equatable, Sendable {
             case .rebounding: "리바운드"
             }
         }
+
+        /// 종목에 맞는 이름. 같은 능력치라도 야구는 주력, 축구와 농구는 스피드다. 농구의 슈팅은 슛이다.
+        public func label(for sport: Sport) -> String {
+            switch sport {
+            case .baseball: label
+            case .football: self == .speed ? "스피드" : label
+            case .basketball: self == .speed ? "스피드" : self == .shooting ? "슛" : label
+            }
+        }
     }
 
     public subscript(key: Key) -> Double {

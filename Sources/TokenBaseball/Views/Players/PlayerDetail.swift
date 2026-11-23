@@ -11,7 +11,7 @@ struct PlayerDetail: View {
             Text(player.origin + (player.traits.isEmpty ? "" : " · " + player.traits.map(\.rawValue).joined(separator: ", "))).note()
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), alignment: .leading, spacing: 2) {
                 ForEach(Attributes.weights(for: player.position).map(\.0), id: \.self) { key in
-                    Text("\(key.label) \(Int(player.attributes[key].rounded()))").font(.caption.monospacedDigit())
+                    Text("\(key.label(for: player.position.sport)) \(Int(player.attributes[key].rounded()))").font(.caption.monospacedDigit())
                 }
             }
             if let line = player.football {
