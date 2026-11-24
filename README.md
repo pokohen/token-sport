@@ -156,6 +156,7 @@ Sources/
     Season/              시즌 흐름: 정규시즌 끝, 승강 플레이오프, 컵대회, 오프시즌, 경기마다 도는 세계 시뮬레이션
     Match/               경기 엔진 (야구는 투구 단위, 축구는 20초 단위, 농구는 8초 단위)
     Career/              선수 모드 (내 선수, 훈련, 컨디션·라이벌, 명성 활동, 평점, 계약, 은퇴, 선수 모드 수치)
+    Esports/             e스포츠 1:1 대전 엔진 (종족, 능력치, 맵, 세트 하나). 아직 게임에 붙이지 않았다
     League/              리그, 팀, 일정, 순위, 축구·농구 선발 명단, 축구 전술·포메이션
     Players/             선수 생성, 능력·잠재력, 종목별 시즌 기록
     Club/                자금 장부, 구단 운영 (구단 경영)
@@ -179,7 +180,7 @@ Sources/
     Views/Settings/      설정 탭 (이름 바꾸기, 초기화)
     Views/Players/       선수 탭 (구단 경영)
 Tests/
-  TokenBaseballCoreTests/   Career/, Baseball/, Football/, Basketball/, Usage/ 와 공통 테스트
+  TokenBaseballCoreTests/   Career/, Baseball/, Football/, Basketball/, Esports/, Usage/ 와 공통 테스트
 ```
 
 기획 문서는 [docs](docs/README.md)에 있다.
