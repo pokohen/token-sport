@@ -7,8 +7,24 @@ struct LiveMatchView: View {
     /// 선수 모드: 내 선수 이름과 이 경기에서 지금까지의 평점.
     var myName: String? = nil
     var myPerformance: Game.CareerPerformance? = nil
+    /// 선수 모드: 내 선수 (아직 나오지 않았을 때의 안내를 자리에 맞게 쓰려고).
+    var myPlayer: Player? = nil
 
     private var state: MatchState { live.state }
+
+    /// 내 선수가 아직 나오지 않았을 때의 안내.
+    private var waiting: String {
+        guard let me = myPlayer else { return "아직 나오지 않았습니다" }
+        let mine = live.userIsHome ? state.home : state.away
+        switch me.position {
+        case .starter:
+            return mine.pitchers.first?.playerID == me.id ? "곧 마운드에 오릅니다" : "오늘은 등판하지 않는 날입니다"
+        case .reliever, .closer:
+            return "불펜에서 대기 중"
+        default:
+            return "아직 타석에 서지 않았습니다"
+        }
+    }
 
     var body: some View {
         VStack(spacing: 10) {
@@ -16,7 +32,7 @@ struct LiveMatchView: View {
                 scoreboard
             }
             if let myName {
-                MyPlayerLiveCard(name: myName, performance: myPerformance, waiting: "아직 나오지 않았습니다")
+                MyPlayerLiveCard(name: myName, performance: myPerformance, waiting: waiting)
             }
             Card {
                 HStack(alignment: .center, spacing: 16) {

@@ -10,7 +10,8 @@ struct MatchTab: View {
             if game.isMatchLive { MatchSpeedCard() }
             if let live = game.live {
                 LiveMatchView(
-                    live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance)
+                    live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance,
+                    myPlayer: game.myPlayer)
             } else if let live = game.liveFootball {
                 FootballLiveView(live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance)
             } else if let live = game.liveBasketball {
