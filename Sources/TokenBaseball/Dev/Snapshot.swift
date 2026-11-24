@@ -56,6 +56,7 @@ enum Snapshot {
                 BallIcon(sport: .baseball)
                 BallIcon(sport: .football)
                 BallIcon(sport: .basketball)
+                BallIcon(sport: .basketball)
                 BallIcon(sport: .basketball, size: 36)
                 ChargeMarks(sport: position.sport, charges: 2)
             }
@@ -109,6 +110,7 @@ enum Snapshot {
                 BallIcon(sport: .football, size: 36)
                 BallIcon(sport: .baseball)
                 BallIcon(sport: .football)
+                BallIcon(sport: .basketball)
                 ChargeMarks(sport: sport, charges: 2)
                 ForEach(Array(Sprites.Drill.allCases.enumerated()), id: \.offset) { _, drill in
                     Image(nsImage: Sprites.image(drill, frame: 0))

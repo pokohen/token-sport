@@ -57,7 +57,7 @@ extension AppModel {
             let mine: [Sprites.Drill] = switch me.position.sport {
             case .baseball: me.isPitcher ? [.pitching, .running, .weights] : [.batting, .fielding, .running, .weights]
             case .football: me.position == .goalkeeper ? [.keeping, .running, .weights] : [.dribbling, .shooting, .running, .weights]
-            case .basketball: [.dribbling, .running, .weights]
+            case .basketball: [.bouncing, .jumpShot, .running, .weights]
             }
             return mine[(Int(now.timeIntervalSince1970) / 8) % mine.count]
         }

@@ -67,7 +67,7 @@ extension Sport {
         switch self {
         case .baseball: .batting
         case .football: .shooting
-        case .basketball: .dribbling
+        case .basketball: .bouncing
         }
     }
 }
