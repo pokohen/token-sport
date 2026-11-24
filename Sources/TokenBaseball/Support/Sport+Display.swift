@@ -67,12 +67,21 @@ extension Sport {
         switch self {
         case .baseball: .batting
         case .football: .shooting
-        case .basketball: .dribbling
+        case .basketball: .bouncing
         }
     }
 }
 
 extension Player {
+    /// 경기 중 상단바 그림. 같은 종목이라도 자리에 따라 다르다.
+    var liveDrill: Sprites.Drill {
+        switch position.sport {
+        case .baseball: isPitcher ? .pitching : .batting
+        case .football: position == .goalkeeper ? .keeping : .shooting
+        case .basketball: .bouncing
+        }
+    }
+
     /// 던지는 손과 치는 손 ("우투좌타"). 야구 선수만 있다.
     var handedness: String? {
         switch position.sport {
