@@ -31,6 +31,8 @@ enum Snapshot {
         game.generateDemoCareerOffer()
         game.generateDemoCareerScouts()
         model.game = game
+        // 설정 탭과 초기화 카드가 이 선수의 저장 칸을 보여 주게 한다.
+        model.slot = SaveSlot.career(for: position.sport)
         model.todayTokens = 12_000_000
 
         render(OnboardingView(bankrupt: false, step: 1), model, directory, "01-onboarding-모드")

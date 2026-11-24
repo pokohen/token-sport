@@ -37,11 +37,12 @@ extension Sport {
         }
     }
 
-    /// 알림 설정에 적는 득점의 이름.
-    var scoreWord: String {
+    /// 알림 설정에 적는 알림 종류. 농구는 득점 알림이 없다.
+    var notificationKinds: String {
         switch self {
-        case .football: "골"
-        case .baseball, .basketball: "득점"
+        case .baseball: "경기 가능, 득점, 경기 종료"
+        case .football: "경기 가능, 골, 경기 종료"
+        case .basketball: "경기 가능, 경기 종료"
         }
     }
 
