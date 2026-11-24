@@ -201,7 +201,7 @@ public struct DuelMap: Codable, Equatable, Sendable {
         DuelMap(name: "푸른 고원", shape: .wide, favors: .protector),
         DuelMap(name: "잿빛 평원", shape: .open, favors: .human),
         DuelMap(name: "얼음 분지", shape: .wide, favors: nil),
-        DuelMap(name: "황혼 요새", shape: .narrow, favors: .human),
+        DuelMap(name: "붉은 성벽", shape: .narrow, favors: .human),
     ]
 
     /// "휴먼이 조금 유리한 맵입니다" 같은 한 줄 소개.

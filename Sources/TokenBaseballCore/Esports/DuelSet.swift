@@ -73,6 +73,8 @@ public struct DuelSet: Codable, Equatable, Sendable {
     var nextHarass = 14
     var nextSkirmish = 24
     var finalTick = 70
+    /// 한쪽이 크게 앞섰을 때 결전을 앞당길 수 있는 가장 이른 틱. 세트마다 다르게 정해 끝나는 시각이 한곳에 몰리지 않게 한다.
+    var earliestFinal = 40
 
     public init(first: DuelPlayer, second: DuelPlayer, map: DuelMap, stakes: DuelStakes = .regular, seed: UInt64) {
         self.map = map
@@ -82,6 +84,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
         self.nextHarass = rng.int(13...17)
         self.nextSkirmish = rng.int(16...22)
         self.finalTick = rng.int(62...85)
+        self.earliestFinal = rng.int(30...55)
         for index in 0..<2 { sides[index].form = 1 + clamp(rng.gaussian(), -2.5, 2.5) * 0.07 }
     }
 
@@ -386,7 +389,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
 
     /// 한쪽 병력이 압도적이면 결전을 앞당긴다.
     var isLopsided: Bool {
-        guard tick >= 35 else { return false }
+        guard tick >= earliestFinal else { return false }
         let big = max(sides[0].army, sides[1].army), small = min(sides[0].army, sides[1].army)
         return big >= 30 && big >= small * 2.2
     }

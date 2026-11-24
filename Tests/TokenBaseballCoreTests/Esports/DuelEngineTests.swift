@@ -139,7 +139,7 @@ import Testing
         }
     }
 
-    @Test func 중계_문구는_지어낸_이름만_쓴다() {
+    @Test func 중계에_맵_이름과_GG가_나오고_조사가_맞는다() {
         var set = DuelSet(first: Self.even(), second: DuelSample.player("나", .alien, .uniform(60), .gambit),
                           map: DuelMap.pool[0], seed: 9)
         var texts: [String] = []
