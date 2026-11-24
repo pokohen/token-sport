@@ -62,23 +62,24 @@ extension Sport {
         }
     }
 
-    /// 경기 중 상단바 훈련 그림.
-    var liveDrill: Sprites.Drill {
+    /// 구단 경영의 상단바 훈련 그림 (훈련소 3단계부터 웨이트가 더해진다).
+    /// 경기 중에는 훈련 그림 대신 공이 나온다 (→ MenuBarLabel).
+    var clubDrills: [Sprites.Drill] {
         switch self {
-        case .baseball: .batting
-        case .football: .shooting
-        case .basketball: .bouncing
+        case .baseball: [.batting, .pitching, .fielding, .running]
+        case .football: [.dribbling, .shooting, .keeping, .running]
+        case .basketball: [.bouncing, .jumpShot, .running]
         }
     }
 }
 
 extension Player {
-    /// 경기 중 상단바 그림. 같은 종목이라도 자리에 따라 다르다.
-    var liveDrill: Sprites.Drill {
+    /// 선수 모드의 상단바 훈련 그림: 내 선수가 하는 훈련만.
+    var trainingDrills: [Sprites.Drill] {
         switch position.sport {
-        case .baseball: isPitcher ? .pitching : .batting
-        case .football: position == .goalkeeper ? .keeping : .shooting
-        case .basketball: .bouncing
+        case .baseball: isPitcher ? [.pitching, .running, .weights] : [.batting, .fielding, .running, .weights]
+        case .football: position == .goalkeeper ? [.keeping, .running, .weights] : [.dribbling, .shooting, .running, .weights]
+        case .basketball: [.bouncing, .jumpShot, .running, .weights]
         }
     }
 

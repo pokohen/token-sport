@@ -44,6 +44,14 @@ extension Sport {
         }
     }
 
+    /// 무승부가 있는 종목. 농구는 연장을 끝까지 해서 무승부가 없다 (순위표에 "무" 칸을 두지 않는다).
+    public var hasDraws: Bool {
+        switch self {
+        case .baseball, .football: true
+        case .basketball: false
+        }
+    }
+
     /// 잉글랜드식 승강: 여러 팀이 바로 오르고, 플레이오프는 아랫 리그 팀끼리, 내 구단은 구장 등급으로 승격한다.
     /// 아니면 야구식: 1위 승격, 와일드카드와 승강 플레이오프, 내 구단은 신청해서 승격한다.
     public var usesEnglishPromotion: Bool {

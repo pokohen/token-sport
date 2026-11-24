@@ -89,7 +89,7 @@ struct CareerOfferProbe {
         func f(_ v: Double) -> String { String(format: "%.2f", v) }
         // `TB_POSITIONS=GK,SG`처럼 일부 포지션만 볼 수 있다.
         let only = env["TB_POSITIONS"].map { Set($0.split(separator: ",").map(String.init)) }
-        let positions = [Position.forward, .midfielder, .goalkeeper, .shortstop, .starter, .shootingGuard]
+        let positions = [Position.forward, .midfielder, .goalkeeper, .shortstop, .starter] + Position.basketball
         for position in positions where only?.contains(position.rawValue) ?? true {
             out += "\n\(position.rawValue):"
             for level in levels {
@@ -120,9 +120,9 @@ struct CareerOfferProbe {
                         let l = career.history.last?.football ?? me.football ?? FootballLine()
                         let g = Double(max(1, l.games))
                         a += Double(l.goals) / g; b += Double(l.assists) / g; c += Double(l.shots) / g
-                    case .shootingGuard:
+                    case .pointGuard, .shootingGuard, .smallForward, .powerForward, .center5:
                         let l = career.history.last?.basketball ?? me.basketball ?? BasketballLine()
-                        a += l.pointsPerGame; b += l.reboundsPerGame; c += l.minutesPerGame
+                        a += l.pointsPerGame; b += l.reboundsPerGame; c += l.assistsPerGame
                     case .starter:
                         let l = career.history.last?.pitching ?? me.pitching
                         a += l.era; b += Double(l.wins); c += Double(l.strikeouts)
@@ -135,7 +135,7 @@ struct CareerOfferProbe {
                 out += "  [\(Int(level)): 평점 \(f(rating / n)) · \(f(a / n)) / \(f(b / n)) / \(f(c / n))]"
             }
         }
-        print("STARPROBE (FW·MF: 경기당 골/도움/슈팅, GK: 무실점 경기/경기당 선방/경기당 실점, SS: 타율/홈런/OPS, SP: 평균자책점/승/탈삼진, SG: 득점/리바운드/분)\(out)")
+        print("STARPROBE (FW·MF: 경기당 골/도움/슈팅, GK: 무실점 경기/경기당 선방/경기당 실점, SS: 타율/홈런/OPS, SP: 평균자책점/승/탈삼진, 농구 PG·SG·SF·PF·CE: 경기당 득점/리바운드/어시스트)\(out)")
     }
 
     func scoutText(_ game: Game) -> String {

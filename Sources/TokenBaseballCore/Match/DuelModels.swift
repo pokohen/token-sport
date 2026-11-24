@@ -232,11 +232,3 @@ public struct DuelPlayer: Codable, Equatable, Sendable {
 
     public var overall: Double { skills.overall(race) }
 }
-
-extension String {
-    /// 받침에 맞춰 주격 조사를 붙인다: "김하늘이", "이수가".
-    var withSubject: String {
-        guard let last = unicodeScalars.last, (0xAC00...0xD7A3).contains(last.value) else { return self + "이(가)" }
-        return self + ((last.value - 0xAC00) % 28 == 0 ? "가" : "이")
-    }
-}

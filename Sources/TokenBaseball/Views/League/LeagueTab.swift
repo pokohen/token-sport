@@ -42,7 +42,7 @@ struct LeagueTab: View {
                 Text("팀")
                 Spacer()
                 Text("승").frame(width: 24)
-                Text("무").frame(width: 24)
+                if game.sport.hasDraws { Text("무").frame(width: 24) }
                 Text("패").frame(width: 24)
                 if game.sport.ranksByPoints {
                     Text("득실").frame(width: 32, alignment: .trailing)
@@ -62,7 +62,7 @@ struct LeagueTab: View {
                         Text(team.name).fontWeight(team.isUser ? .bold : .regular).lineLimit(1)
                         Spacer()
                         Text("\(row.wins)").frame(width: 24)
-                        Text("\(row.draws)").frame(width: 24)
+                        if game.sport.hasDraws { Text("\(row.draws)").frame(width: 24) }
                         Text("\(row.losses)").frame(width: 24)
                         if game.sport.ranksByPoints {
                             Text("\(row.goalDifference > 0 ? "+" : "")\(row.goalDifference)").frame(width: 32, alignment: .trailing)
