@@ -40,7 +40,9 @@ struct CareerTrainingTab: View {
                     KeyValueRow(key: "시즌 시작 때보다", value: String(format: "%+.1f", me.ability - me.abilityAtSeasonStart))
                     KeyValueRow(key: "최고 능력", value: "\(Int(career.peakAbility))")
                     KeyValueRow(key: "지금까지 훈련", value: "\(career.trainingCount)회 (크리티컬 \(career.criticalCount ?? 0)회)")
-                    Text("어떤 훈련이든 능력은 같은 양만큼 오릅니다. 훈련하지 않아도 경기를 뛰면 조금씩 큽니다. \(Balance.declineStartAge(me.position))세부터는 시즌마다 능력치가 크게 떨어집니다.").note()
+                    Text(me.position.sport == .duel
+                        ? "어떤 훈련이든 능력은 같은 양만큼 오릅니다. 어릴수록 많이 오릅니다 (지금 \(me.age)세: \(String(format: "%g", Balance.duelAgeFactor(me.age)))배). 컨트롤은 \(Balance.earlyDeclineAge(me.position))세부터 조금씩, \(Balance.declineStartAge(me.position))세부터 많이 떨어지고, 운영과 판단은 나이가 들어도 조금씩 오릅니다."
+                        : "어떤 훈련이든 능력은 같은 양만큼 오릅니다. 훈련하지 않아도 경기를 뛰면 조금씩 큽니다. \(Balance.declineStartAge(me.position))세부터는 시즌마다 능력치가 크게 떨어집니다.").note()
                 }
             }
         }

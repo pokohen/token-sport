@@ -140,12 +140,14 @@ extension Game {
             // 친선 경기는 절반만 반영한다.
             let weight = kind == .friendly ? 0.5 : 1.0
             let before = career.trust
-            career.trust = clamp(
-                career.trust + Self.careerTrustChange(rating: performance.rating, minutes: performance.minutes) * weight,
-                0, 100)
-            let moved = Int((career.trust - before).rounded())
-            // e스포츠에는 감독 신뢰가 보이지 않는다 (재계약 판단에만 쓴다). 명성은 팬 수에서 계산한다.
+            // e스포츠에는 감독 신뢰가 없다 (출전은 실력 순, 재계약은 실력 순위와 평점). 명성은 팬 수에서 계산한다.
             let duel = me.position.sport == .duel
+            if !duel {
+                career.trust = clamp(
+                    career.trust + Self.careerTrustChange(rating: performance.rating, minutes: performance.minutes) * weight,
+                    0, 100)
+            }
+            let moved = Int((career.trust - before).rounded())
             if moved != 0, !duel { lines.append("감독 신뢰 \(moved > 0 ? "+" : "")\(moved)") }
             if kind != .friendly, !duel {
                 let cap = Balance.careerFameCap(teams[userTeamID].tier)

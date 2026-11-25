@@ -117,3 +117,42 @@ import Testing
         #expect((career.fans ?? 0) > 100)
     }
 }
+
+extension DuelCareerTests {
+    @Test func 서른다섯_시즌을_마치면_은퇴하고_명예의_전당에_팬과_칭호가_남는다() throws {
+        var game = TestCareer.make(.human, seed: 26)
+        let id = try #require(game.career?.playerID)
+        game.players[id]?.age = 35
+        game.career?.fans = 250_000
+        var auto = CareerAuto()
+        var count = 0
+        while game.career?.retired == false, count < 200 {
+            try auto.playOne(&game)
+            count += 1
+        }
+        let record = try #require(game.careerHall?.last)
+        #expect(record.retiredAge == 36)
+        #expect(record.duel != nil)
+        #expect((record.fans ?? 0) > 0)
+        #expect(record.honor == "무관의 스타")
+    }
+
+    @Test func 팀을_옮겨도_네_경기에_한_번은_나온다() throws {
+        var game = TestCareer.make(.alien, seed: 27)
+        var auto = CareerAuto()
+        for _ in 0..<6 { try auto.playOne(&game) }
+        let id = try #require(game.career?.playerID)
+        // 다른 팀으로 옮긴다: 옛 팀의 경기 번호가 남아 있어도 보장은 새 팀 기준으로 센다.
+        let target = try #require(game.teams(in: .citizenAmateur).first { $0.id != game.userTeamID })
+        game.career?.offers = [CareerOffer(id: 999, kind: .transfer, teamID: target.id, salary: 1_000_000, years: 1, role: .prospect, matchesLeft: 5)]
+        try game.acceptCareerOffer(999)
+        #expect(game.userTeamID == target.id)
+        var appeared = 0
+        for _ in 0..<8 {
+            try auto.playOne(&game)
+            if game.career?.lastRating != nil { appeared += 1 }
+        }
+        #expect(game.players[id]?.teamID == target.id)
+        #expect(appeared >= 2)
+    }
+}

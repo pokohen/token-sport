@@ -122,6 +122,8 @@ extension Game {
             clearCareerScouts()
             players[me.id]?.contract = Contract(salary: offer.salary, seasonsLeft: offer.years)
             self.career?.trust = Balance.careerStartTrust
+            // e스포츠: 세트 보장은 새 팀의 경기 수로 센다 (옛 팀의 경기 번호가 남아 있으면 한참 나오지 못한다).
+            if me.position.sport == .duel { players[me.id]?.lastStartGame = -99 }
             // 시즌 목표는 새 구단 기준으로, 남은 경기만큼 다시 받는다.
             if midSeason { assignCareerGoal(announce: true, remaining: remainingSeasonShare) }
             post("\(club.tier.displayName(for: sport)) \(club.name)(으)로 옮겼습니다. \(offer.years)시즌, 연봉 ₩\(offer.salary.formatted()). 예상 입지: \(offer.role.rawValue).")
@@ -167,7 +169,7 @@ extension Game {
         guard tradeWindowOpen else { throw GameError("이적 기간이 아닙니다.") }
         guard !career.transferRequested else { throw GameError("이번 이적 기간에 이미 요청했습니다.") }
         self.career?.transferRequested = true
-        self.career?.trust = max(0, career.trust - 10)
+        if career.fans == nil { self.career?.trust = max(0, career.trust - 10) }
         // 소문이 돈다: 지켜보던 구단들의 관심이 오르고, 제안의 문턱이 낮아지고, 새 스카우트가 더 잘 온다.
         if var scouts = self.career?.scouts {
             for index in scouts.indices {

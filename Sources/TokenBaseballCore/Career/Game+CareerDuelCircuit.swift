@@ -220,6 +220,7 @@ extension Game {
 
         var gained = tournament.fansPerWin * wins
         if won { gained += tournament.fansPerWin * 2 }
+        gained = Int(Double(gained) * Balance.duelFanRoom(career.fans ?? 0))
         career.fans = (career.fans ?? 0) + gained
         let prize = won ? tournament.prize : wins == rounds - 1 ? tournament.prize / 2 : wins == rounds - 2 ? tournament.prize / 4 : 0
         if prize > 0 { funds.earn(price(prize), .prize) }

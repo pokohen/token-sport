@@ -16,20 +16,29 @@ import Testing
                 var rows: [String] = []
                 var season = 1
                 var guardCount = 0
-                while game.season <= 8, guardCount < 900, game.career?.retired == false {
+                while guardCount < 3_000, game.career?.retired == false {
                     guardCount += 1
                     guard game.nextMatch() != nil || game.career?.isFreeAgent == true else { break }
+                    if game.career?.isFreeAgent == true, game.career?.offers.isEmpty == true, game.phase == .regular {
+                        rows.append("무소속, 제안 없음"); break
+                    }
                     if game.career?.isFreeAgent == true { auto.manage(&game); continue }
                     try auto.playOne(&game)
                     if game.season != season, let last = game.career?.history.last {
                         season = game.season
                         let line = last.duel ?? DuelLine()
-                        rows.append("\(last.age)세 \(last.tier.rawValue)부 능력\(Int(game.myPlayer?.ability ?? 0)) 평점\(String(format: "%.2f", last.averageRating ?? 0)) 세트\(line.setWins)-\(line.setLosses) 팬\(fansText(game.career?.fans ?? 0))")
+                        let title = game.duelTitle.map { " [\($0)]" } ?? ""
+                        rows.append("\(last.age)세 \(last.tier.rawValue)부 능력\(Int(game.myPlayer?.ability ?? 0)) 평점\(String(format: "%.2f", last.averageRating ?? 0)) 세트\(line.setWins)-\(line.setLosses) 팬\(fansText(game.career?.fans ?? 0))\(title)")
                     }
                 }
+                if game.career?.retired == true { rows.append("은퇴 (\(game.careerHall?.last?.retiredAge ?? 0)세)") }
                 out += "\n\(position.label) \(tokens == 0 ? "경기만" : "훈련 전부"):\n  " + rows.joined(separator: "\n  ")
             }
         }
         print("DUELCAREER\(out)")
+        // 출력이 길면 테스트 로그에서 잘리므로 파일로도 남긴다.
+        if let path = ProcessInfo.processInfo.environment["TB_PROBE_OUT"] {
+            try out.write(toFile: path, atomically: true, encoding: .utf8)
+        }
     }
 }

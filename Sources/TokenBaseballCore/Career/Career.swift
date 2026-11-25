@@ -176,6 +176,9 @@ public struct CareerRecord: Codable, Equatable, Sendable {
     public var earnings: Int
     /// 끝까지 치른 시즌 수. (예전 기록에는 없어서 시즌 번호로 어림한다.)
     public var seasonsPlayed: Int? = nil
+    /// e스포츠: 은퇴할 때의 팬 수와 칭호.
+    public var fans: Int? = nil
+    public var duelTitle: String? = nil
 
     public var averageRating: Double? { ratedGames == 0 ? nil : ratingTotal / Double(ratedGames) }
 
@@ -183,7 +186,8 @@ public struct CareerRecord: Codable, Equatable, Sendable {
 
     /// 명예의 전당에 적히는 칭호: 얼마나 높이 올라갔고 무엇을 받았는지로 정한다.
     public var honor: String {
-        switch bestTier {
+        if let duelTitle { return duelTitle }
+        return switch bestTier {
         case .pro: awards.isEmpty ? "1부 스타" : "전설"
         case .semiPro, .amateur: awards.isEmpty ? "프로 선수" : "프로 스타"
         default: awards.isEmpty ? "동네 스타" : "시민 리그의 영웅"
