@@ -3,12 +3,15 @@ import Foundation
 /// 종목. 구단을 만들 때 고르고, 세이브는 종목별로 따로 둔다.
 public enum Sport: String, Codable, CaseIterable, Sendable {
     case baseball, football, basketball
+    /// e스포츠 1:1 대전 (선수 모드만 있다). 아직 앱에서 고를 수 없다 (→ docs/10-esports.md).
+    case duel
 
     public var label: String {
         switch self {
         case .baseball: "야구"
         case .football: "축구"
         case .basketball: "농구"
+        case .duel: "e스포츠"
         }
     }
 
@@ -17,6 +20,7 @@ public enum Sport: String, Codable, CaseIterable, Sendable {
         case .baseball: "⚾"
         case .football: "⚽"
         case .basketball: "🏀"
+        case .duel: "🎮"
         }
     }
 
@@ -26,6 +30,7 @@ public enum Sport: String, Codable, CaseIterable, Sendable {
         case .baseball: "야구단"
         case .football: "축구단"
         case .basketball: "농구단"
+        case .duel: "게임단"
         }
     }
 }
@@ -40,7 +45,7 @@ extension Sport {
     public var ranksByPoints: Bool {
         switch self {
         case .football: true
-        case .baseball, .basketball: false
+        case .baseball, .basketball, .duel: false
         }
     }
 
@@ -48,7 +53,8 @@ extension Sport {
     public var hasDraws: Bool {
         switch self {
         case .baseball, .football: true
-        case .basketball: false
+        // 1:1 대전은 세트를 끝까지 해서 승패가 난다.
+        case .basketball, .duel: false
         }
     }
 
@@ -57,7 +63,7 @@ extension Sport {
     public var usesEnglishPromotion: Bool {
         switch self {
         case .football: true
-        case .baseball, .basketball: false
+        case .baseball, .basketball, .duel: false
         }
     }
 
@@ -65,7 +71,8 @@ extension Sport {
     /// 야구는 투수와 야수로 나눈다.
     public var groupsByPosition: Bool {
         switch self {
-        case .football, .basketball: true
+        // 1:1 대전은 종족이 포지션 자리에 있다 (라이벌은 같은 종족).
+        case .football, .basketball, .duel: true
         case .baseball: false
         }
     }
@@ -74,7 +81,8 @@ extension Sport {
     public var careerRatingBaseline: Double {
         switch self {
         case .baseball: 6.5
-        case .football, .basketball: 6.3
+        // 1:1 대전의 평점은 선수 모드를 붙인 뒤 시뮬레이션으로 맞춘다.
+        case .football, .basketball, .duel: 6.3
         }
     }
 
@@ -82,7 +90,7 @@ extension Sport {
     public var careerFameWeight: Double {
         switch self {
         case .baseball: 1.0
-        case .football, .basketball: 2.0
+        case .football, .basketball, .duel: 2.0
         }
     }
 }

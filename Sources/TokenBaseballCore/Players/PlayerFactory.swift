@@ -21,6 +21,9 @@ public enum PlayerFactory {
                 attributes[key] = clamp(ability * share + rng.gaussian() * 4, 1, 70)
             case .basketball:
                 attributes[key] = clamp(ability * 0.6 + rng.gaussian() * 4, 1, 75)
+            case .duel:
+                // 다섯 능력치를 모두 쓰므로 여기로 오지 않는다.
+                attributes[key] = ability
             case .baseball where position.isPitcher:
                 // 투수의 타격·수비 능력치 (지명타자 제도라 타석에는 서지 않는다)
                 attributes[key] = clamp(ability * 0.4 + rng.gaussian() * 3, 1, 60)
@@ -61,7 +64,7 @@ public enum PlayerFactory {
     public static func make(id: PlayerID, spec: Spec, _ rng: inout SeededRNG) -> Player {
         let tier = spec.tier
         let ability = rng.double(spec.ability ?? Balance.abilityRange(tier))
-        let age = rng.int(spec.age ?? Balance.ageRange(tier))
+        let age = rng.int(spec.age ?? Balance.ageRange(tier, sport: spec.position.sport))
 
         var potential: Double
         if let range = spec.potential {
@@ -132,6 +135,9 @@ public enum PlayerFactory {
             return zip(Position.basketball, Balance.basketballShape(tier)).flatMap { position, count in
                 Array(repeating: position, count: count)
             }
+        case .duel:
+            // 세 종족이 섞인 여섯 명 (→ docs/10-esports.md "팀 리그").
+            return Position.duel + Position.duel
         case .baseball:
             break
         }

@@ -18,7 +18,9 @@ extension Game {
             for id in team.roster {
                 guard var player = players[id] else { continue }
                 player.age += 1
-                if player.age >= Balance.declineStartAge(player.position) {
+                if player.position.sport == .duel {
+                    ageDuelPlayer(&player)
+                } else if player.age >= Balance.declineStartAge(player.position) {
                     // 체력·주력부터 떨어진다.
                     for key in Attributes.Key.all(for: player.position.sport) {
                         let drop = key == .stamina || key == .speed ? rng.double(2.5...5) : rng.double(0.5...2)
@@ -58,6 +60,7 @@ extension Game {
                 let performance = switch player.position.sport {
                 case .football: Self.footballPerformance(player) * 1.3
                 case .basketball: Self.basketballPerformance(player)
+                case .duel: 0.0
                 case .baseball: player.isPitcher
                     ? Double(player.pitching.wins + player.pitching.saves) / 15
                     : max(0, player.batting.ops - 0.7)
@@ -66,7 +69,7 @@ extension Game {
                 // 축구는 계약 기간 동안 연봉이 그대로다 (재계약할 때 오른다). 야구는 시즌마다 연봉 협상을 한다.
                 let yearlyRaise = switch player.position.sport {
                 case .football: false
-                case .baseball, .basketball: true
+                case .baseball, .basketball, .duel: true
                 }
                 if yearlyRaise {
                     player.contract.salary = Int(Double(player.contract.salary) * (1 + rng.double(Balance.raiseBase) + bonus))
@@ -146,6 +149,18 @@ extension Game {
         }
     }
 
+    /// e스포츠 선수의 나이: 손(컨트롤)은 26세부터 조금씩, 30세부터 많이 떨어진다.
+    /// 운영과 판단은 경험으로 30세가 넘어도 천천히 오른다 (→ docs/10-esports.md "나이와 성장").
+    mutating func ageDuelPlayer(_ player: inout Player) {
+        let early = Balance.earlyDeclineAge(player.position), late = Balance.declineStartAge(player.position)
+        guard player.age >= early else { return }
+        let drop = player.age >= late ? rng.double(2...4) : rng.double(0.5...1.5)
+        player.attributes.control = max(1, player.attributes.control - drop)
+        player.attributes.macro = min(99, player.attributes.macro + rng.double(0...0.6))
+        player.attributes.judgment = min(99, player.attributes.judgment + rng.double(0...0.6))
+        if player.age >= late { player.potential = max(player.ability, player.potential - 1) }
+    }
+
     /// 신인 드래프트 (3부 이상): 지난 시즌 순위 역순으로 지명한다.
     mutating func runDraft() {
         draftDone = true
@@ -153,7 +168,7 @@ extension Game {
         case .football:
             runYouthIntake()
             return
-        case .baseball, .basketball:
+        case .baseball, .basketball, .duel:
             break
         }
         for tier in [LeagueTier.pro, .semiPro, .amateur] {
@@ -278,7 +293,7 @@ extension Game {
         case .football:
             fillUserMinimumSquad()
             return
-        case .baseball, .basketball:
+        case .baseball, .basketball, .duel:
             break
         }
         var added: [String] = []

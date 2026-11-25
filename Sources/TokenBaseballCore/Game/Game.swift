@@ -99,6 +99,7 @@ public struct Game: Codable, Equatable, Sendable {
         switch sport {
         case .football: FootballLineupBuilder.build(team: team, players: players) != nil
         case .basketball: BasketballLineupBuilder.build(team: team, players: players) != nil
+        case .duel: DuelLineupBuilder.build(team: team, players: players) != nil
         case .baseball: LineupBuilder.build(team: team, players: players) != nil
         }
     }
@@ -127,6 +128,7 @@ public struct Game: Codable, Equatable, Sendable {
         switch sport {
         case .football: FootballLineupBuilder.strength(team: teams[team], players: players)
         case .basketball: BasketballLineupBuilder.strength(team: teams[team], players: players)
+        case .duel: DuelLineupBuilder.strength(team: teams[team], players: players)
         case .baseball: LineupBuilder.strength(team: teams[team], players: players)
         }
     }
@@ -154,7 +156,7 @@ public struct Game: Codable, Equatable, Sendable {
         switch sport {
         case .football:
             return round < Balance.footballSummerWindowRounds || Balance.footballWinterWindow.contains(round)
-        case .baseball, .basketball:
+        case .baseball, .basketball, .duel:
             return round < Balance.tradeDeadlineRound
         }
     }

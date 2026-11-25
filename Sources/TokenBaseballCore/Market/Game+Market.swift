@@ -133,6 +133,7 @@ extension Game {
         guard canSpare(id) else {
             let need = switch sport {
             case .football: "골키퍼 1명을 포함해 \(Balance.footballStarters)명은 남아 있어야 합니다."
+            case .duel: "선수 \(DuelLineupBuilder.setsPerMatch)명은 남아 있어야 합니다."
             case .baseball, .basketball: "야수 \(Balance.minBatters)명, 투수 \(Balance.minPitchers)명은 남아 있어야 합니다."
             }
             throw GameError(need)

@@ -130,6 +130,8 @@ struct CareerTab: View {
                 case .football:
                     let quota = game.formation(of: team).slots.filter { $0 == me.position }.count
                     Text("포메이션 \(game.formation(of: team).label): \(me.position.label) 선발은 \(quota)명입니다. 감독 신뢰가 높으면 능력이 조금 낮아도 선발로 나옵니다.").note()
+                case .duel:
+                    Text("팀 경기는 세트마다 한 명씩 나갑니다. 팀에서 가장 잘하는 선수가 에이스 결정전에 나갑니다.").note()
                 case .baseball:
                     EmptyView()
                 }

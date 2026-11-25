@@ -79,6 +79,7 @@ extension Game {
         guard let me = myPlayer else { return "연속 기록" }
         switch me.position.sport {
         case .basketball: return "연속 두 자릿수 득점"
+        case .duel: return "연속 세트 승리"
         case .football: return me.position == .goalkeeper ? "연속 무실점" : "연속 공격포인트"
         case .baseball: return me.isPitcher ? "연속 무자책" : "연속 안타"
         }

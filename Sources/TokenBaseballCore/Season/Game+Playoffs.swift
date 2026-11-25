@@ -63,7 +63,7 @@ extension Game {
         switch sport {
         case .football:
             return teams[id].stadiumLevel >= Balance.promotionStadiumLevel(from: teams[id].tier)
-        case .baseball, .basketball:
+        case .baseball, .basketball, .duel:
             return appliedForPromotion
         }
     }
@@ -117,7 +117,7 @@ extension Game {
                 default:
                     pendingMoves.append(TierMove(team: four[0], to: upper))
                 }
-            case .baseball, .basketball:
+            case .baseball, .basketball, .duel:
                 if contenders.count >= 2 {
                     series.append(PlayoffSeries(
                         upperTier: upper, upperTeam: contenders[0], lowerTeam: contenders[1],

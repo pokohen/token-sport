@@ -308,6 +308,15 @@ public enum CareerDrill {
             case .stamina: return "셔틀런"
             default: return key.label
             }
+        case .duel:
+            switch key {
+            case .control: return "래더"
+            case .macro: return "빌드 반복 연습"
+            case .strategy: return "리플레이 분석"
+            case .judgment: return "연습 경기"
+            case .mental: return "멘탈 코칭"
+            default: return key.label
+            }
         case .baseball:
             break
         }

@@ -7,6 +7,8 @@ extension Game {
         switch sport {
         case .football:
             return mates.count >= Balance.footballStarters && mates.contains { $0.position == .goalkeeper }
+        case .duel:
+            return mates.count >= DuelLineupBuilder.setsPerMatch
         case .baseball, .basketball:
             return mates.filter { !$0.isPitcher }.count >= Balance.minBatters
                 && mates.filter { $0.isPitcher }.count >= Balance.minPitchers

@@ -8,6 +8,7 @@ extension Sport {
         case .baseball: "baseball.fill"
         case .football: "soccerball"
         case .basketball: "basketball.fill"
+        case .duel: "computermouse.fill"
         }
     }
 
@@ -17,6 +18,7 @@ extension Sport {
         case .baseball: "야구공"
         case .football: "축구공"
         case .basketball: "농구공"
+        case .duel: "마우스"
         }
     }
 
@@ -25,7 +27,8 @@ extension Sport {
         switch self {
         case .baseball: "득점!"
         case .football: "골!"
-        case .basketball: nil
+        // e스포츠는 세트가 끝날 때만 알린다.
+        case .basketball, .duel: nil
         }
     }
 
@@ -33,7 +36,7 @@ extension Sport {
     var pausesOnScore: Bool {
         switch self {
         case .baseball, .football: true
-        case .basketball: false
+        case .basketball, .duel: false
         }
     }
 
@@ -42,14 +45,14 @@ extension Sport {
         switch self {
         case .baseball: "경기 가능, 득점, 경기 종료"
         case .football: "경기 가능, 골, 경기 종료"
-        case .basketball: "경기 가능, 경기 종료"
+        case .basketball, .duel: "경기 가능, 경기 종료"
         }
     }
 
     /// 선수 모드 경기 전에 플레이 스타일을 고른다.
     var hasPlayStyles: Bool {
         switch self {
-        case .football, .basketball: true
+        case .football, .basketball, .duel: true
         case .baseball: false
         }
     }
@@ -60,6 +63,7 @@ extension Sport {
         switch self {
         case .baseball: "KBO 및 각 구단과 무관한"
         case .football, .basketball: "실제 리그·구단과 무관한"
+        case .duel: "실제 게임·리그·게임단과 무관한"
         }
     }
 
@@ -70,6 +74,8 @@ extension Sport {
         case .baseball: [.batting, .pitching, .fielding, .running]
         case .football: [.dribbling, .shooting, .keeping, .running]
         case .basketball: [.bouncing, .jumpShot, .running]
+        // 1:1 대전은 구단 모드가 없다. 전용 그림은 화면 단계에서 그린다 (다른 종목 그림을 빌리지 않는다).
+        case .duel: []
         }
     }
 }
@@ -81,6 +87,8 @@ extension Player {
         case .baseball: isPitcher ? [.pitching, .running, .weights] : [.batting, .fielding, .running, .weights]
         case .football: position == .goalkeeper ? [.keeping, .running, .weights] : [.dribbling, .shooting, .running, .weights]
         case .basketball: [.bouncing, .jumpShot, .running, .weights]
+        // 전용 그림(손풀기, 리플레이)은 화면 단계에서 그린다 (→ docs/10-esports.md "화면").
+        case .duel: []
         }
     }
 
@@ -88,7 +96,7 @@ extension Player {
     var handedness: String? {
         switch position.sport {
         case .baseball: "\(throwsHand.rawValue)투\(bats.rawValue)타"
-        case .football, .basketball: nil
+        case .football, .basketball, .duel: nil
         }
     }
 }

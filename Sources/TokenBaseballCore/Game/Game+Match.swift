@@ -91,6 +91,7 @@ extension Game {
             switch sport {
             case .football: throw GameError("골키퍼 1명을 포함해 11명이 있어야 경기를 할 수 있습니다.")
             case .basketball: throw GameError("선수 다섯 명이 있어야 경기를 할 수 있습니다.")
+            case .duel: throw GameError("선수 세 명이 있어야 경기를 할 수 있습니다.")
             case .baseball: throw GameError("야수 9명과 투수 1명 이상이 있어야 경기를 할 수 있습니다.")
             }
         }
@@ -107,6 +108,9 @@ extension Game {
         case .basketball:
             try startBasketballMatch(next, home: home, away: away, tier: tier, now: now)
             return
+        case .duel:
+            // 중계가 있는 경기는 선수 모드를 붙이는 단계에서 만든다. 아직 앱에서 고를 수 없는 종목이다.
+            throw GameError("e스포츠 경기는 아직 준비 중입니다.")
         case .baseball:
             break
         }

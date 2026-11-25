@@ -33,6 +33,9 @@ extension Game {
             return QuietResult(
                 homeScore: match.home.points, awayScore: match.away.points,
                 homeWon: match.result == .homeWin, shootout: false)
+        case .duel:
+            guard let score = quietDuelMatch(home: home, away: away, seed: seed) else { return nil }
+            return QuietResult(homeScore: score.home, awayScore: score.away, homeWon: score.home > score.away, shootout: false)
         case .baseball:
             break
         }
@@ -58,6 +61,8 @@ extension Game {
             guard var match = makeBasketballMatch(home: home, away: away, seed: seed) else { return nil }
             match.runToEnd()
             return match.result == .homeWin
+        case .duel:
+            return quietDuelMatch(home: home, away: away, seed: seed).map { $0.home > $0.away }
         case .baseball:
             break
         }

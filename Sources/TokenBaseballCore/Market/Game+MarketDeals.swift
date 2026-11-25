@@ -9,6 +9,8 @@ extension Game {
         let market = Balance.marketSalary(ability: player.ability)
         let performance = switch player.position.sport {
         case .football: Self.footballPerformance(player)
+        // 1:1 대전의 기록은 선수 모드를 붙이는 단계에서 만든다.
+        case .duel: 0.0
         case .baseball, .basketball: player.isPitcher
             ? Double(player.pitching.wins + player.pitching.saves) / 20
             : max(0, player.batting.ops - 0.7) * 0.5
@@ -49,7 +51,7 @@ extension Game {
         // 축구의 무소속 선수는 이적 기간 밖에도 계약할 수 있다.
         let anytime = switch sport {
         case .football: true
-        case .baseball, .basketball: false
+        case .baseball, .basketball, .duel: false
         }
         guard phase == .offseason || anytime else {
             throw GameError("FA 영입은 오프시즌 이적 시장에서만 할 수 있습니다.")

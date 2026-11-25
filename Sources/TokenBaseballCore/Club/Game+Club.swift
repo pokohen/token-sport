@@ -12,6 +12,7 @@ public enum Promotion: String, Codable, CaseIterable, Sendable {
     public func label(_ sport: Sport) -> String {
         switch sport {
         case .football: self == .youthClinic ? "유소년 축구 교실" : rawValue
+        case .duel: self == .youthClinic ? "유소년 게임 교실" : rawValue
         case .baseball, .basketball: rawValue
         }
     }

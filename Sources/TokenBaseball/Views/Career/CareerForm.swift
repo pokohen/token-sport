@@ -11,12 +11,17 @@ struct CareerForm: View {
         switch sport {
         case .football: football
         case .basketball: basketball
+        case .duel: duel
         case .baseball: baseball
         }
     }
 
     private var basketball: some View {
         positionForm(CareerSetup.basketballPositions, columns: 3, fallback: .shootingGuard)
+    }
+
+    private var duel: some View {
+        positionForm(Position.duel, columns: 3, fallback: .human)
     }
 
     private var football: some View {

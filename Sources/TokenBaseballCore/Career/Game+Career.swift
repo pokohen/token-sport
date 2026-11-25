@@ -229,6 +229,9 @@ extension Game {
         case .basketball:
             prepareCareerBasketballLineup()
             return
+        case .duel:
+            // 세트 배정은 선수 모드를 붙이는 단계에서 만든다 (→ docs/10-esports.md 만드는 순서 4).
+            return
         case .baseball:
             break
         }
