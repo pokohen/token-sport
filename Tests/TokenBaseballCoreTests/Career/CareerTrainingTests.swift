@@ -6,9 +6,6 @@ import Testing
     @Test func 훈련_포인트를_써서_능력치를_올린다() throws {
         var game = TestCareer.make(.shortstop)
         #expect(Set(game.careerTrainableKeys) == [.contact, .power, .eye, .speed, .fielding, .arm])
-        // 시작 포인트(10만)로는 첫 훈련을 할 수 없다.
-        #expect(throws: GameError.self) { try game.trainCareer(.contact) }
-
         TestGame.addTokens(&game, 10_000_000, id: "a", at: TestGame.hours(1))
         let before = try #require(game.myPlayer)
         let cost = game.careerTrainingCost(.contact)
@@ -22,6 +19,15 @@ import Testing
         #expect(after.ability > before.ability)
         #expect(game.funds.balance == balance - cost)
         #expect(game.funds.seasonExpense[FundsLedger.Category.training.rawValue] == cost)
+    }
+
+    @Test func 포인트가_모자라면_훈련할_수_없다() throws {
+        var game = TestCareer.make(.shortstop)
+        let before = try #require(game.myPlayer)
+        // 비용보다 1 적게 남긴다.
+        game.funds.spend(game.funds.balance - game.careerTrainingCost(.contact) + 1, .training)
+        #expect(throws: GameError.self) { try game.trainCareer(.contact) }
+        #expect(game.myPlayer?.attributes == before.attributes)
     }
 
     @Test func 경기_사이에_정해진_횟수만_훈련한다() throws {
@@ -126,6 +132,6 @@ import Testing
         // 값이 오를수록 계속 비싸진다.
         let costs = stride(from: 1.0, through: 99.0, by: 1).map { Balance.careerTrainingCost(value: $0) }
         #expect(zip(costs, costs.dropFirst()).allSatisfy { $0 <= $1 })
-        #expect(Balance.careerTrainingCost(value: 25) == 250_000)
+        #expect(Balance.careerTrainingCost(value: 25) == 125_000)
     }
 }
