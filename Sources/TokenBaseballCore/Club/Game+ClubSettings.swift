@@ -90,8 +90,7 @@ extension Game {
         switch sport {
         case .football: return footballLeaders(tier, count: count)
         case .basketball: return basketballLeaders(tier, count: count)
-        // 1:1 대전의 기록 순위는 선수 모드를 붙이는 단계에서 만든다.
-        case .duel: return []
+        case .duel: return duelLeaders(tier, count: count)
         case .baseball: break
         }
         let everyone = teams(in: tier).flatMap { roster(of: $0.id) }

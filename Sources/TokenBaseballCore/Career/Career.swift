@@ -257,6 +257,12 @@ public struct Career: Codable, Equatable, Sendable {
     public var fans: Int?
     /// e스포츠: 경기 전에 고른 플레이 스타일. nil이면 균형.
     public var duelStyle: DuelStyle?
+    /// e스포츠: 개인 대회 단계별 우승 횟수 (0번이 월드 그랜드 파이널, 5번이 동네 PC방 대회).
+    public var duelWins: [Int]?
+    /// e스포츠: 팬이 모자라도 다음 한 번 나갈 수 있게 초대받은 대회 (`DuelTournament.rawValue`).
+    public var duelInvite: Int?
+    /// e스포츠: 지금까지 나간 개인 대회 (최근 60개).
+    public var duelEvents: [DuelEventRecord]?
 
     init(playerID: PlayerID, season: Int) {
         self.playerID = playerID

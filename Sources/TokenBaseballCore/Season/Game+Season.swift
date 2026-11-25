@@ -143,7 +143,7 @@ extension Game {
             giveBasketballAwards()
             return
         case .duel:
-            // 1:1 대전의 시상은 선수 모드를 붙이는 단계에서 만든다.
+            giveDuelAwards()
             return
         case .baseball:
             break
