@@ -21,6 +21,15 @@ import Testing
         #expect(game.funds.seasonExpense[FundsLedger.Category.training.rawValue] == cost)
     }
 
+    @Test func 포인트가_모자라면_훈련할_수_없다() throws {
+        var game = TestCareer.make(.shortstop)
+        let before = try #require(game.myPlayer)
+        // 비용보다 1 적게 남긴다.
+        game.funds.spend(game.funds.balance - game.careerTrainingCost(.contact) + 1, .training)
+        #expect(throws: GameError.self) { try game.trainCareer(.contact) }
+        #expect(game.myPlayer?.attributes == before.attributes)
+    }
+
     @Test func 경기_사이에_정해진_횟수만_훈련한다() throws {
         var game = TestCareer.make(.starter)
         #expect(Set(game.careerTrainableKeys) == [.stuff, .control, .breaking, .stamina])
