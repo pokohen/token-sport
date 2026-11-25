@@ -16,6 +16,8 @@ struct MatchTab: View {
                 FootballLiveView(live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance)
             } else if let live = game.liveBasketball {
                 BasketballLiveView(live: live, myName: game.myPlayer?.name, myPerformance: game.careerLivePerformance)
+            } else if let live = game.liveDuel {
+                DuelLiveView(live: live, me: game.myPlayer, myPerformance: game.careerLivePerformance)
             } else {
                 if let result = game.lastResult { LastResultCard(result: result) }
                 NextMatchCard(game: game)

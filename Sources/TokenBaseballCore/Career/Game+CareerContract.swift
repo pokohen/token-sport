@@ -71,7 +71,7 @@ extension Game {
             id: newCareerOfferID(), kind: .transfer, teamID: team, salary: salary,
             years: rng.int(1...3), role: careerRole(on: team), matchesLeft: 1)
         self.career?.offers.append(offer)
-        post("\(teams[team].tier.displayName) \(teams[team].name)에서 이적 제안이 왔습니다. 다음 경기가 끝나기 전에 답하세요.")
+        post("\(teams[team].tier.displayName(for: sport)) \(teams[team].name)에서 이적 제안이 왔습니다. 다음 경기가 끝나기 전에 답하세요.")
     }
 
     /// 무소속이 됐을 때 받는 입단 제안. 지금 능력에 맞는 리그의 구단 두세 곳이다.
@@ -124,7 +124,7 @@ extension Game {
             self.career?.trust = Balance.careerStartTrust
             // 시즌 목표는 새 구단 기준으로, 남은 경기만큼 다시 받는다.
             if midSeason { assignCareerGoal(announce: true, remaining: remainingSeasonShare) }
-            post("\(club.tier.displayName) \(club.name)(으)로 옮겼습니다. \(offer.years)시즌, 연봉 ₩\(offer.salary.formatted()). 예상 입지: \(offer.role.rawValue).")
+            post("\(club.tier.displayName(for: sport)) \(club.name)(으)로 옮겼습니다. \(offer.years)시즌, 연봉 ₩\(offer.salary.formatted()). 예상 입지: \(offer.role.rawValue).")
         }
         self.career?.offers = []
         self.career?.transferRequested = false

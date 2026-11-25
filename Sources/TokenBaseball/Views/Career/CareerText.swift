@@ -22,6 +22,14 @@ enum CareerText {
         return "\(line.games)경기 평균 \(average(line.pointsPerGame))점 \(average(line.reboundsPerGame))리바운드 \(average(line.assistsPerGame))도움"
     }
 
+    /// "세트 12승 5패 (71%) · 에이스 결정전 3승 1패".
+    static func duel(_ line: DuelLine) -> String {
+        guard line.sets > 0 else { return "아직 세트 기록이 없습니다" }
+        var text = "세트 \(line.setWins)승 \(line.setLosses)패 (\(Int((line.winRate * 100).rounded()))%)"
+        if line.aceWins + line.aceLosses > 0 { text += " · 에이스 결정전 \(line.aceWins)승 \(line.aceLosses)패" }
+        return text
+    }
+
     /// 종목과 포지션에 맞는 기록 한 줄.
     static func record(
         _ me: Player, batting: BattingLine, pitching: PitchingLine, football: FootballLine?,
@@ -31,8 +39,7 @@ enum CareerText {
         case .basketball: return CareerText.basketball(basketball ?? BasketballLine())
         case .football: return CareerText.football(football ?? FootballLine(), keeper: me.position == .goalkeeper)
         case .baseball: return me.isPitcher ? CareerText.pitching(pitching) : CareerText.batting(batting)
-        // 1:1 대전의 기록(세트 승패, 종족전)은 선수 모드를 붙이는 단계에서 만든다.
-        case .duel: return "—"
+        case .duel: return CareerText.duel(me.duel ?? DuelLine())
         }
     }
 

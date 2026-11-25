@@ -14,7 +14,7 @@ struct CareerOfferRow: View {
                 EmblemView(team: team, size: 24)
                 VStack(alignment: .leading) {
                     Text(team.name).font(.callout.weight(.medium))
-                    Text("\(kindLabel) · \(team.tier.displayName) · \(game.rank(of: team.id))위").note()
+                    Text("\(kindLabel) · \(team.tier.displayName(for: game.sport)) · \(game.rank(of: team.id))위").note()
                 }
                 Spacer()
             }

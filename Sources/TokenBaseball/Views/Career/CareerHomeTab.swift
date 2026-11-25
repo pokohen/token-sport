@@ -24,7 +24,7 @@ struct CareerHomeTab: View {
                             key: goal.label,
                             value: goal.achieved.map { $0 ? "달성" : "실패" } ?? "\(goal.progress(of: me)) / \(goal.target)",
                             valueColor: goal.achieved == true ? Theme.win : goal.achieved == false ? Theme.loss : .primary)
-                        Text("채우면 감독 신뢰 +10, 명성 +3. 채우지 못하면 감독 신뢰 −5.").note()
+                        if game.sport != .duel { Text("채우면 감독 신뢰 +10, 명성 +3. 채우지 못하면 감독 신뢰 −5.").note() }
                     }
                 }
                 NextMatchCard(game: game, goToMatch: goToMatch)
@@ -32,7 +32,7 @@ struct CareerHomeTab: View {
                 if let visitor = game.careerScoutVisitor, !game.isMatchLive {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Image(systemName: "binoculars.fill").accessibilityHidden(true)
-                        Text("\(visitor.tier.displayName) \(visitor.name) 스카우트가 다음 경기를 직접 보러 옵니다.")
+                        Text("\(visitor.tier.displayName(for: game.sport)) \(visitor.name) 스카우트가 다음 경기를 직접 보러 옵니다.")
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .font(.callout.weight(.medium)).foregroundStyle(Theme.warn)
@@ -52,7 +52,7 @@ struct CareerHomeTab: View {
                     Text(["\(me.age)세", me.position.label, me.handedness].compactMap { $0 }.joined(separator: " · ")).note()
                     Text(career.isFreeAgent
                         ? "무소속 · \(game.season)시즌"
-                        : "\(game.userTeam.name) · \(game.userTier.displayName)").note()
+                        : "\(game.userTeam.name) · \(game.userTier.displayName(for: game.sport))").note()
                     Text("\(game.season)시즌 · \(game.phaseText)").note()
                 }
                 Spacer()
@@ -66,8 +66,19 @@ struct CareerHomeTab: View {
                     key: "타고난 재능",
                     value: talent.rawValue + (career.startAbility.map { " · 타고난 능력 \(Int($0))" } ?? ""))
             }
-            Meter(label: "감독 신뢰", value: career.trust, color: career.trust < Balance.careerRenewalTrust ? Theme.loss : .accentColor)
-            Meter(label: "명성", value: career.fame, color: Theme.warn)
+            if let fans = career.fans {
+                // e스포츠: 감독 신뢰 대신 팬 수. 명성은 팬 수에서 나온다.
+                KeyValueRow(key: "팬", value: fansText(fans))
+                if let title = game.duelTitle { KeyValueRow(key: "칭호", value: title, valueColor: Theme.warn) }
+                if let next = game.nextDuelTournament {
+                    KeyValueRow(
+                        key: "다음 개인 대회 (\(next.round)라운드 뒤)",
+                        value: next.eligible ? next.tournament.baseName : "\(next.tournament.baseName) · 팬 \(fansText(next.tournament.requiredFans)) 필요")
+                }
+            } else {
+                Meter(label: "감독 신뢰", value: career.trust, color: career.trust < Balance.careerRenewalTrust ? Theme.loss : .accentColor)
+                Meter(label: "명성", value: career.fame, color: Theme.warn)
+            }
             form(career)
             if let rating = career.lastRating, let line = career.lastLine {
                 KeyValueRow(key: "지난 경기", value: "평점 \(String(format: "%.1f", rating)) · \(line)")
@@ -100,7 +111,7 @@ struct CareerHomeTab: View {
             notice("무소속입니다. 입단 제안 중 하나를 골라야 경기에 나설 수 있습니다.", Theme.loss)
         } else if !career.offers.isEmpty {
             notice("답할 계약 제안이 \(career.offers.count)건 있습니다.", Theme.warn)
-        } else if career.trust < Balance.careerRenewalTrust, game.myPlayer?.contract.seasonsLeft ?? 9 <= 1 {
+        } else if career.fans == nil, career.trust < Balance.careerRenewalTrust, game.myPlayer?.contract.seasonsLeft ?? 9 <= 1 {
             notice("감독 신뢰가 낮습니다. 계약이 끝나면 재계약 제안을 받지 못할 수 있습니다.", Theme.warn)
         }
     }
@@ -120,6 +131,13 @@ struct CareerHomeTab: View {
         if let plan = game.careerBasketballPlan {
             if plan.starts { return "다음 경기에 선발로 나섭니다." }
             return "다음 경기는 벤치에서 시작합니다. \(plan.minutes ?? 0)분쯤 뜁니다 (감독 신뢰가 오르면 늘어납니다)."
+        }
+        if let plan = game.careerDuelPlan {
+            guard let index = plan.setIndex else {
+                return "다음 경기는 출전 순서에 들지 못했습니다. 네 경기에 한 번은 세트를 받습니다."
+            }
+            return plan.isAce ? "다음 경기에 에이스로 1세트에 나갑니다. 1 : 1이면 에이스 결정전에도 나갑니다."
+                : "다음 경기 \(index + 1)세트에 나갑니다."
         }
         switch me.position {
         case .starter:

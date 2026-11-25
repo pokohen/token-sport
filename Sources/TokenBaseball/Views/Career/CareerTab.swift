@@ -69,7 +69,7 @@ struct CareerTab: View {
     }
 
     private func season(_ career: Career, _ me: Player) -> some View {
-        Card("이번 시즌", trailing: game.userTier.displayName) {
+        Card("이번 시즌", trailing: game.userTier.displayName(for: game.sport)) {
             KeyValueRow(key: "기록", value: CareerText.record(
                 me, batting: me.batting, pitching: me.pitching, football: me.football, basketball: me.basketball))
             if let line = me.basketball {
@@ -97,7 +97,7 @@ struct CareerTab: View {
             KeyValueRow(
                 key: "평균 평점",
                 value: CareerText.rating(totals.ratedGames == 0 ? nil : totals.ratingTotal / Double(totals.ratedGames)))
-            KeyValueRow(key: "가장 높이 오른 리그", value: career.bestTier.displayName)
+            KeyValueRow(key: "가장 높이 오른 리그", value: career.bestTier.displayName(for: game.sport))
             if !career.clubs.isEmpty { Text(career.clubs.joined(separator: " → ")).note() }
             if !career.awards.isEmpty { Text("수상: " + career.awards.joined(separator: " · ")).note() }
             if !career.history.isEmpty {

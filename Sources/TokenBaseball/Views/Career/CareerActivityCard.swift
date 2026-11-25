@@ -9,17 +9,23 @@ struct CareerActivityCard: View {
 
     var body: some View {
         let cap = Balance.careerFameCap(game.userTier)
-        return Card("명성 활동", trailing: "명성 \(Int(career.fame)) / 이 리그 한도 \(Int(cap))") {
-            Text("훈련 포인트를 들여 명성을 올립니다. 경기 사이에 한 번 할 수 있고, 명성이 높을수록 더 큰 구단에서 제안이 옵니다.").note()
+        let duel = career.fans != nil
+        return Card(duel ? "팬 활동" : "명성 활동",
+                    trailing: duel ? "팬 \(fansText(career.fans ?? 0))" : "명성 \(Int(career.fame)) / 이 리그 한도 \(Int(cap))") {
+            Text(duel
+                ? "훈련 포인트를 들여 팬을 늘립니다. 경기 사이에 한 번 할 수 있습니다. 팬은 경기와 개인 대회로 버는 것이 가장 큽니다."
+                : "훈련 포인트를 들여 명성을 올립니다. 경기 사이에 한 번 할 수 있고, 명성이 높을수록 더 큰 구단에서 제안이 옵니다.").note()
             ForEach(CareerActivity.allCases, id: \.self) { activity in
                 let blocked = game.careerActivityBlockedReason(activity)
                 HStack(spacing: 8) {
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(activity.label).font(.callout.weight(.medium))
-                        Text(activity.detail).note()
+                        Text(activity.label(for: game.sport)).font(.callout.weight(.medium))
+                        Text(activity.detail(for: game.sport)).note()
                     }
                     Spacer()
-                    Button("명성 +\(String(format: "%.1f", game.careerActivityGain(activity))) · \(Format.tokens(game.careerActivityCost(activity))) P") {
+                    let gain = game.careerActivityFans(activity).map { "팬 +\(fansText($0))" }
+                        ?? "명성 +\(String(format: "%.1f", game.careerActivityGain(activity)))"
+                    Button("\(gain) · \(Format.tokens(game.careerActivityCost(activity))) P") {
                         model.perform { try $0.doCareerActivity(activity) }
                     }
                     .disabled(blocked != nil)
@@ -27,7 +33,7 @@ struct CareerActivityCard: View {
                 }
             }
             if let reason = CareerActivity.allCases.compactMap({ game.careerActivityBlockedReason($0) }).first,
-               career.activityDone == true || career.isFreeAgent || career.fame >= cap {
+               career.activityDone == true || career.isFreeAgent || (!duel && career.fame >= cap) {
                 Text(reason).note()
             }
         }

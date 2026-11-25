@@ -193,7 +193,7 @@ public struct DuelMap: Codable, Equatable, Sendable {
     }
 
     /// 지을 수 있는 확장 수 (본진 포함).
-    var maxBases: Int {
+    public var maxBases: Int {
         switch shape {
         case .narrow: 4
         case .wide: 5

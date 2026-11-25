@@ -105,9 +105,9 @@ extension Game {
             awards: won.map(\.title)))
         career.seasonClosed = true
         for award in won {
-            career.awards.append("\(season)시즌 \(award.tier.displayName) \(award.title)")
+            career.awards.append("\(season)시즌 \(award.tier.displayName(for: sport)) \(award.title)")
             career.fame = min(100, career.fame + Balance.careerFameAward)
-            post("\(award.tier.displayName) \(award.title) 수상! (\(award.detail)) 명성 +\(Int(Balance.careerFameAward)).")
+            post("\(award.tier.displayName(for: sport)) \(award.title) 수상! (\(award.detail)) 명성 +\(Int(Balance.careerFameAward)).")
         }
         if var goal = career.goal {
             let done = goal.progress(of: me) >= goal.target
@@ -134,9 +134,9 @@ extension Game {
                 players[me.id] = me
             }
             if to < career.bestTier { self.career?.bestTier = to }
-            post("\(teams[userTeamID].name) 승격! 다음 시즌은 \(to.displayName) 리그에서 뜁니다.")
+            post("\(teams[userTeamID].name) 승격! 다음 시즌은 \(to.leagueName(for: sport))에서 뜁니다.")
         } else {
-            post("\(teams[userTeamID].name) 강등. 다음 시즌은 \(to.displayName) 리그에서 뜁니다.")
+            post("\(teams[userTeamID].name) 강등. 다음 시즌은 \(to.leagueName(for: sport))에서 뜁니다.")
         }
     }
 
@@ -266,7 +266,7 @@ extension Game {
         charges = max(charges, 1)
         chargeAnchor = now
         careerStartSeason()
-        post("\(name), \(teams[club].name)에 입단! \(LeagueTier.citizenAmateur.displayName) 리그에서 새 커리어를 시작합니다.")
+        post("\(name), \(teams[club].name)에 입단! \(LeagueTier.citizenAmateur.leagueName(for: sport))에서 새 커리어를 시작합니다.")
         postCareerTalent()
     }
 

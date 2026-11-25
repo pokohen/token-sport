@@ -37,13 +37,18 @@ public enum LeagueTier: Int, Codable, CaseIterable, Comparable, Sendable {
             case .semiPro: "챌린저 리그"
             case .amateur: "아카데미 리그"
             case .citizenPro: "대학·클럽 리그"
-            case .citizenSemiPro: "지역 아마추어"
+            case .citizenSemiPro: "지역 아마추어 리그"
             case .citizenAmateur: "PC방 리그"
             }
         }
     }
 
     public func displayName(for sport: Sport) -> String { "\(rawValue)부 \(name(for: sport))" }
+
+    /// 문장 속 리그 이름: "6부 시민 아마추어 리그", e스포츠는 이름에 "리그"가 이미 있어 "6부 PC방 리그".
+    public func leagueName(for sport: Sport) -> String {
+        sport == .duel ? displayName(for: sport) : "\(displayName) 리그"
+    }
 
     /// 시민 리그(4~6부)인지.
     public var isCitizen: Bool { rawValue >= 4 }

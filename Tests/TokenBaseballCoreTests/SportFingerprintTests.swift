@@ -15,7 +15,7 @@ import Testing
         "career-FW": "b4316833e76fec35",
         "career-GK": "5162157a27709435",
         "career-SG": "5f37a5c57527848f",
-        "career-PT": "a382d43b77292f46",
+        "career-PT": "2d05dfe7e6e94a9f",
     ]
 
     /// 모든 선수, 구단, 순위, 소식, 커리어를 정해진 순서로 이어 붙여 해시한다.
