@@ -9,8 +9,7 @@ extension Game {
         let market = Balance.marketSalary(ability: player.ability)
         let performance = switch player.position.sport {
         case .football: Self.footballPerformance(player)
-        // 1:1 대전의 기록은 선수 모드를 붙이는 단계에서 만든다.
-        case .duel: 0.0
+        case .duel: Self.duelPerformance(player)
         case .baseball, .basketball: player.isPitcher
             ? Double(player.pitching.wins + player.pitching.saves) / 20
             : max(0, player.batting.ops - 0.7) * 0.5

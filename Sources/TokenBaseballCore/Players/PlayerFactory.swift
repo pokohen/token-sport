@@ -112,6 +112,7 @@ public enum PlayerFactory {
             pitching: PitchingLine(),
             football: sport == .football ? FootballLine() : nil,
             basketball: sport == .basketball ? BasketballLine() : nil,
+            duel: sport == .duel ? DuelLine() : nil,
             lastStartGame: -99,
             abilityAtSeasonStart: ability,
             isHot: false

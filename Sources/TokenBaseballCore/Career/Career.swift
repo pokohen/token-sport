@@ -87,6 +87,8 @@ public struct CareerGoal: Codable, Equatable, Sendable {
         case goals, points, cleanSheets, matches
         // 농구
         case basketPoints, rebounds, assists
+        // e스포츠
+        case setWins
     }
 
     public var kind: Kind
@@ -108,6 +110,7 @@ public struct CareerGoal: Codable, Equatable, Sendable {
         case .basketPoints: "\(target)득점"
         case .rebounds: "리바운드 \(target)개"
         case .assists: "어시스트 \(target)개"
+        case .setWins: "세트 \(target)승"
         }
     }
 
@@ -125,6 +128,7 @@ public struct CareerGoal: Codable, Equatable, Sendable {
         case .basketPoints: player.basketball?.points ?? 0
         case .rebounds: player.basketball?.rebounds ?? 0
         case .assists: player.basketball?.assists ?? 0
+        case .setWins: player.duel?.setWins ?? 0
         }
     }
 }
@@ -141,6 +145,8 @@ public struct CareerSeason: Codable, Equatable, Sendable {
     public var football: FootballLine? = nil
     /// 농구 선수의 시즌 기록. 다른 종목은 nil.
     public var basketball: BasketballLine? = nil
+    /// e스포츠 1:1 대전 선수의 시즌 기록. 다른 종목은 nil.
+    public var duel: DuelLine? = nil
     /// 평점이 매겨진 경기 수와 평점 합.
     public var ratedGames: Int
     public var ratingTotal: Double
@@ -161,6 +167,7 @@ public struct CareerRecord: Codable, Equatable, Sendable {
     public var pitching: PitchingLine
     public var football: FootballLine? = nil
     public var basketball: BasketballLine? = nil
+    public var duel: DuelLine? = nil
     public var ratedGames: Int
     public var ratingTotal: Double
     public var awards: [String]
@@ -246,6 +253,10 @@ public struct Career: Codable, Equatable, Sendable {
     public var startAbility: Double?
     /// 축구: 이번 경기에 선발이 아니면 교체로 들어갈 시간(분). 선발이거나 야구면 nil.
     var subMinute: Int?
+    /// e스포츠: 팬 수. 명성은 여기서 계산한다 (→ `Balance.duelFame`). 다른 종목은 nil.
+    public var fans: Int?
+    /// e스포츠: 경기 전에 고른 플레이 스타일. nil이면 균형.
+    public var duelStyle: DuelStyle?
 
     init(playerID: PlayerID, season: Int) {
         self.playerID = playerID

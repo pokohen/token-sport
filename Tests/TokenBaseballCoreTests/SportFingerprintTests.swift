@@ -3,7 +3,7 @@ import Testing
 @testable import TokenBaseballCore
 
 /// 종목마다 같은 시드로 한 시즌 반을 돌린 뒤의 상태를 지문으로 남긴다.
-/// 야구 구단은 `GoldenTests`가 지키고, 여기서는 축구 구단과 선수 모드 다섯 가지(야구 타자·투수, 축구 공격수·골키퍼, 농구)를 지킨다.
+/// 야구 구단은 `GoldenTests`가 지키고, 여기서는 축구 구단과 선수 모드 여섯 가지(야구 타자·투수, 축구 공격수·골키퍼, 농구, e스포츠)를 지킨다.
 /// 종목 분기를 정리하는 것처럼 "동작은 그대로"여야 하는 변경 뒤에 지문이 하나라도 달라지면 동작이 바뀐 것이다.
 ///
 /// 동작을 일부러 바꿨다면 `TB_RECORD_GOLDEN=1 swift test --filter SportFingerprintTests`로 지문을 출력해 아래 값을 고친다.
@@ -15,6 +15,7 @@ import Testing
         "career-FW": "b4316833e76fec35",
         "career-GK": "5162157a27709435",
         "career-SG": "5f37a5c57527848f",
+        "career-PT": "6b467679d40dfe18",
     ]
 
     /// 모든 선수, 구단, 순위, 소식, 커리어를 정해진 순서로 이어 붙여 해시한다.
@@ -58,7 +59,7 @@ import Testing
         try Self.check("football-club", game)
     }
 
-    @Test(arguments: [Position.shortstop, .starter, .forward, .goalkeeper, .shootingGuard])
+    @Test(arguments: [Position.shortstop, .starter, .forward, .goalkeeper, .shootingGuard, .protector])
     func 선수_모드(_ position: Position) throws {
         var game = TestCareer.make(position, seed: 20_261_124)
         var auto = CareerAuto()

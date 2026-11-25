@@ -354,6 +354,8 @@ public struct Player: Codable, Identifiable, Equatable, Sendable {
     public var football: FootballLine? = nil
     /// 농구 선수의 이번 시즌 기록. 다른 종목 선수는 nil.
     public var basketball: BasketballLine? = nil
+    /// e스포츠 1:1 대전 선수의 이번 시즌 기록. 다른 종목 선수는 nil.
+    public var duel: DuelLine? = nil
     /// 마지막으로 선발 등판했을 때의 팀 경기 번호.
     public var lastStartGame: Int
     /// 시즌을 시작할 때의 능력 (연봉 인상 계산용).
@@ -420,7 +422,8 @@ extension Player {
         switch position.sport {
         case .football: football = FootballLine()
         case .basketball: basketball = BasketballLine()
-        case .baseball, .duel: break
+        case .duel: duel = DuelLine()
+        case .baseball: break
         }
     }
 }

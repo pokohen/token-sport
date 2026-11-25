@@ -84,6 +84,7 @@ extension Game {
             let mine = liveBasketball.userIsHome ? liveBasketball.state.home : liveBasketball.state.away
             return Self.careerBasketballPerformance(playerID: career.playerID, in: mine, result: 0)
         }
+        if let liveDuel { return Self.careerDuelPerformance(playerID: career.playerID, in: liveDuel.state) }
         guard let live else { return nil }
         let mine = live.userIsHome ? live.state.home : live.state.away
         return Self.careerPerformance(playerID: career.playerID, in: mine, result: 0)
@@ -143,8 +144,10 @@ extension Game {
                 career.trust + Self.careerTrustChange(rating: performance.rating, minutes: performance.minutes) * weight,
                 0, 100)
             let moved = Int((career.trust - before).rounded())
-            if moved != 0 { lines.append("감독 신뢰 \(moved > 0 ? "+" : "")\(moved)") }
-            if kind != .friendly {
+            // e스포츠에는 감독 신뢰가 보이지 않는다 (재계약 판단에만 쓴다). 명성은 팬 수에서 계산한다.
+            let duel = me.position.sport == .duel
+            if moved != 0, !duel { lines.append("감독 신뢰 \(moved > 0 ? "+" : "")\(moved)") }
+            if kind != .friendly, !duel {
                 let cap = Balance.careerFameCap(teams[userTeamID].tier)
                 // 선발 투수는 나오는 경기가 적어서 한 경기가 더 크게 반영된다.
                 // 평점이 6점대에 몰린 종목(축구, 농구)은 기준을 낮추고 크게 반영한다.

@@ -34,8 +34,11 @@ extension Game {
                 homeScore: match.home.points, awayScore: match.away.points,
                 homeWon: match.result == .homeWin, shootout: false)
         case .duel:
-            guard let score = quietDuelMatch(home: home, away: away, seed: seed) else { return nil }
-            return QuietResult(homeScore: score.home, awayScore: score.away, homeWon: score.home > score.away, shootout: false)
+            guard var match = makeDuelMatch(home: home, away: away, kind: kind, seed: seed) else { return nil }
+            match.runToEnd()
+            applyDuel(match, tier: tier, countsForStandings: false)
+            return QuietResult(
+                homeScore: match.home.sets, awayScore: match.away.sets, homeWon: match.homeWon, shootout: false)
         case .baseball:
             break
         }
@@ -62,7 +65,8 @@ extension Game {
             match.runToEnd()
             return match.result == .homeWin
         case .duel:
-            return quietDuelMatch(home: home, away: away, seed: seed).map { $0.home > $0.away }
+            let bestOf = kind == .playoff ? 5 : DuelLineupBuilder.setsPerMatch
+            return quietDuelMatch(home: home, away: away, bestOf: bestOf, seed: seed).map { $0.home > $0.away }
         case .baseball:
             break
         }

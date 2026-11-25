@@ -109,8 +109,8 @@ extension Game {
             try startBasketballMatch(next, home: home, away: away, tier: tier, now: now)
             return
         case .duel:
-            // 중계가 있는 경기는 선수 모드를 붙이는 단계에서 만든다. 아직 앱에서 고를 수 없는 종목이다.
-            throw GameError("e스포츠 경기는 아직 준비 중입니다.")
+            try startDuelMatch(next, home: home, away: away, tier: tier, now: now)
+            return
         case .baseball:
             break
         }
@@ -143,6 +143,7 @@ extension Game {
     public mutating func stepMatch() -> [MatchEvent] {
         if liveFootball != nil { return stepFootballMatch() }
         if liveBasketball != nil { return stepBasketballMatch() }
+        if liveDuel != nil { return stepDuelMatch() }
         guard var match = live else { return [] }
         let events = match.state.step()
         for index in match.others.indices where !match.others[index].isFinished {

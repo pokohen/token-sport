@@ -62,7 +62,7 @@ extension Game {
                 let performance = switch player.position.sport {
                 case .football: Self.footballPerformance(player) * 1.3
                 case .basketball: Self.basketballPerformance(player)
-                case .duel: 0.0
+                case .duel: Self.duelPerformance(player)
                 case .baseball: player.isPitcher
                     ? Double(player.pitching.wins + player.pitching.saves) / 15
                     : max(0, player.batting.ops - 0.7)
