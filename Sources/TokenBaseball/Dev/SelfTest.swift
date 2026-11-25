@@ -77,6 +77,22 @@ enum SelfTest {
         playOne(model, label: "농구 선수 2")
         check("농구 선수: 기록", (model.game?.myPlayer?.basketball?.games ?? 0) == 2
             && model.game?.career?.lastRating != nil)
+        // 2-2. e스포츠 선수 만들기 → 훈련 → 경기
+        model.createCareer(CareerSetup(name: "점검 게이머", position: .alien, hometown: "인천", points: [.control: 2, .macro: 2, .mental: 1]))
+        check("e스포츠 선수: 만들어짐", model.game?.myPlayer?.name == "점검 게이머", model.message ?? "")
+        check("e스포츠 선수: 칸", model.slot == .duelPlayer && exists("save-esports-duel.json"))
+        check("e스포츠 선수: 세계", model.game?.sport == .duel && model.game?.teams.count == 60
+            && model.game?.players.values.allSatisfy { $0.position.sport == .duel } == true)
+        check("e스포츠 선수: 팬 0명", model.game?.career?.fans == 0)
+        playOne(model, label: "e스포츠 선수 1")
+        if let key = model.game?.careerTrainableKeys.first {
+            let before = model.game?.myPlayer?.ability ?? 0
+            model.perform { try $0.trainCareer(key) }
+            check("e스포츠 선수: 훈련", (model.game?.myPlayer?.ability ?? 0) > before, model.message ?? "")
+        }
+        model.perform { $0.setCareerDuelStyle(.rush) }
+        playOne(model, label: "e스포츠 선수 2")
+        check("e스포츠 선수: 결과", model.game?.lastResult.map { max($0.myRuns, $0.theirRuns) == 2 } == true)
         check("축구 선수 저장은 그대로", exists("save-football-player.json"))
 
         // 3. 야구 구단으로 전환 (없음 → 창단)
@@ -125,7 +141,7 @@ enum SelfTest {
         model = AppModel(store: store, sources: UsageSources())
         check("구단 모드로 껐어도 선수 모드로 연다", model.slot == .baseballPlayer && model.game?.myPlayer?.name == "점검 투수")
         check("구단 저장 파일은 그대로", exists("save-football.json") && exists("save.json"))
-        check("고를 수 있는 모드는 선수 셋", model.selectableSlots == [.baseballPlayer, .footballPlayer, .basketballPlayer])
+        check("고를 수 있는 모드는 선수 넷", model.selectableSlots == [.baseballPlayer, .footballPlayer, .basketballPlayer, .duelPlayer])
 
         // 8. 경기 도중에 껐다 켰을 때
         model.switchSlot(to: .footballPlayer)

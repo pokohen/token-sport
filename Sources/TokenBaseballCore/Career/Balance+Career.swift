@@ -129,16 +129,16 @@ extension Balance {
     /// 세트를 이길 때마다 리그만큼 느는 팬 (6부 → 1부).
     public static func duelFanBase(_ tier: LeagueTier) -> Int {
         switch tier {
-        case .citizenAmateur: 4
-        case .citizenSemiPro: 10
-        case .citizenPro: 25
-        case .amateur: 70
-        case .semiPro: 220
-        case .pro: 700
+        case .citizenAmateur: 35
+        case .citizenSemiPro: 45
+        case .citizenPro: 100
+        case .amateur: 250
+        case .semiPro: 700
+        case .pro: 1_800
         }
     }
     /// 세트를 이길 때마다 지금 팬의 이만큼이 더 는다 (팬이 팬을 부른다).
-    public static let duelFanShare = 0.008
+    public static let duelFanShare = 0.012
     /// 세 경기 넘게 지면 경기마다 팬이 이만큼 준다.
     public static let duelFanSlumpLoss = 0.01
     /// 오프시즌마다 줄어드는 팬 몫.
@@ -227,7 +227,7 @@ extension Balance {
     /// 그 리그에서 뛰는 동안 명성이 오를 수 있는 한도.
     public static func careerFameCap(_ tier: LeagueTier) -> Double {
         switch tier {
-        case .citizenAmateur: 20
+        case .citizenAmateur: 35
         case .citizenSemiPro: 30
         case .citizenPro: 40
         case .amateur: 55
