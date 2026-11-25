@@ -235,7 +235,7 @@ extension Balance {
     /// 그 리그에서 뛰는 동안 명성이 오를 수 있는 한도.
     public static func careerFameCap(_ tier: LeagueTier) -> Double {
         switch tier {
-        case .citizenAmateur: 35
+        case .citizenAmateur: 20
         case .citizenSemiPro: 30
         case .citizenPro: 40
         case .amateur: 55
