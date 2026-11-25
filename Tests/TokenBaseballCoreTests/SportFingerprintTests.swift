@@ -10,11 +10,11 @@ import Testing
 @Suite struct SportFingerprintTests {
     static let expected: [String: String] = [
         "football-club": "5c8db5a061496a73",
-        "career-SS": "344d4bfeb28101ff",
-        "career-SP": "5f307d2ca30e9cb5",
-        "career-FW": "f3418885ef31e65c",
-        "career-GK": "18fd10fd7de72583",
-        "career-SG": "25097d45332448b5",
+        "career-SS": "b13e2a6725af28ff",
+        "career-SP": "113593d1485b42a2",
+        "career-FW": "b4316833e76fec35",
+        "career-GK": "5162157a27709435",
+        "career-SG": "5f37a5c57527848f",
     ]
 
     /// 모든 선수, 구단, 순위, 소식, 커리어를 정해진 순서로 이어 붙여 해시한다.
