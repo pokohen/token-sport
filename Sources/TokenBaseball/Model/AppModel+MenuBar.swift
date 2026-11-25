@@ -53,6 +53,8 @@ extension AppModel {
         if now.timeIntervalSince(lastTokenAt ?? launchedAt) > 600 { return .rest }
         var drills = game.myPlayer?.trainingDrills ?? game.sport.clubDrills
         if game.myPlayer == nil, game.userTeam.trainingLevel >= 3 { drills.append(.weights) }
+        // 전용 그림이 아직 없는 종목(e스포츠)은 쉬는 모습만 보인다.
+        guard !drills.isEmpty else { return .rest }
         return drills[(Int(now.timeIntervalSince1970) / 8) % drills.count]
     }
 }

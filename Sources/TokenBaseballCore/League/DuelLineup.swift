@@ -12,11 +12,12 @@ public enum DuelLineupBuilder {
         return roster.sorted { ($0.ability, -$0.id) > ($1.ability, -$1.id) }.map(\.id)
     }
 
-    /// 팀의 힘: 세트에 나설 세 명의 능력. 에이스가 마지막 세트에도 나가므로 조금 더 무겁다.
+    /// 팀의 힘: 세트에 나설 세 명의 능력. 앞의 두 세트는 에이스가 아닌 두 명이 나가고, 에이스는 1 : 1이 될 때만
+    /// 에이스 결정전에 나간다 (→ `Game.quietDuelMatch`). 그래서 에이스가 조금 가볍다.
     public static func strength(team: Team, players: [PlayerID: Player]) -> Double {
         guard let order = build(team: team, players: players) else { return 0 }
         let top = order.prefix(setsPerMatch).compactMap { players[$0]?.ability }
-        let weights = [0.4, 0.3, 0.3]
+        let weights = [0.3, 0.35, 0.35]
         return zip(top, weights).reduce(0) { $0 + $1.0 * $1.1 }
     }
 }

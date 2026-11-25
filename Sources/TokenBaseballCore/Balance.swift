@@ -385,6 +385,9 @@ public enum Balance {
         }
     }
 
+    /// e스포츠 선수는 이 나이의 시즌을 마치면 반드시 은퇴한다.
+    public static let duelRetirementAge = 35
+
     /// e스포츠: 어릴 때 많이 크고, 나이가 들수록 적게 큰다 (→ docs/10-esports.md "나이와 성장").
     /// 다른 종목처럼 한도 나이에 갑자기 멈추지 않고 서서히 줄어든다. 선수 모드 훈련 효과에도 곱한다.
     public static func duelAgeFactor(_ age: Int) -> Double {
@@ -420,7 +423,7 @@ public enum Balance {
 
     /// 은퇴를 생각하기 시작하는 나이. 골키퍼는 3년 늦다.
     public static func retirementAge(_ tier: LeagueTier, position: Position) -> Int {
-        // e스포츠는 전성기가 이르다. 35세 시즌이 끝나면 반드시 은퇴한다.
+        // e스포츠는 전성기가 이르다. 35세 시즌이 끝나면 반드시 은퇴한다 (`duelRetirementAge`).
         if position.sport == .duel { return tier.isCitizen ? 33 : 30 }
         return retirementAge(tier) + (position == .goalkeeper && !tier.isCitizen ? 3 : 0)
     }

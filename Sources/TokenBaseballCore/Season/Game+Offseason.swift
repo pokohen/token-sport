@@ -44,7 +44,9 @@ extension Game {
 
                 let start = Balance.retirementAge(team.tier, position: player.position)
                 // 선수 모드의 내 선수는 스스로 은퇴를 정한다.
-                if player.age >= start, !isMyPlayer(id), rng.chance(min(1, 0.12 * Double(player.age - start + 1))) {
+                // e스포츠는 35세 시즌이 끝나면 반드시 은퇴한다.
+                let mustRetire = player.position.sport == .duel && player.age > Balance.duelRetirementAge
+                if player.age >= start, !isMyPlayer(id), mustRetire || rng.chance(min(1, 0.12 * Double(player.age - start + 1))) {
                     if team.isUser { retired.append(player.name) }
                     removePlayer(id)
                 }

@@ -58,7 +58,10 @@ import Testing
         let game = Self.make(seed: 3)
         let everyone = game.players.values.filter { $0.id != game.career?.playerID }
         #expect(everyone.allSatisfy { !NameGenerator.blockedEsports.contains($0.name) })
+        #expect(game.teams.allSatisfy { team in NameGenerator.esportsAvoided.allSatisfy { !team.name.contains($0) } })
         #expect(everyone.allSatisfy { (16...31).contains($0.age) })
+        // 내 선수는 16세에 시작한다.
+        #expect(game.myPlayer?.age == 16)
         #expect(game.teams(in: .pro).allSatisfy { $0.name.hasSuffix("게이밍") })
         #expect(game.teams(in: .citizenAmateur).allSatisfy { $0.name.contains("PC방") })
         #expect(LeagueTier.citizenAmateur.displayName(for: .duel) == "6부 PC방 리그")
@@ -133,5 +136,16 @@ extension DuelWorldTests {
         young.attributes = before
         game.ageDuelPlayer(&young)
         #expect(young.attributes == before)
+    }
+}
+
+extension DuelWorldTests {
+    @Test func 서른다섯_시즌을_마치면_반드시_은퇴한다() {
+        var game = Self.make(seed: 11)
+        let me = game.career!.playerID
+        let veterans = game.players.values.filter { $0.id != me }.prefix(20).map(\.id)
+        for id in veterans { game.players[id]?.age = Balance.duelRetirementAge }
+        game.startOffseason()
+        #expect(veterans.allSatisfy { game.players[$0]?.teamID == nil || game.players[$0] == nil })
     }
 }

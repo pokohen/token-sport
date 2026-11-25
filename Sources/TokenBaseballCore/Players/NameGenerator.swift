@@ -84,7 +84,11 @@ public enum NameGenerator {
         "공업고 학생", "휴학생", "PC방 아르바이트생",
     ]
     /// 6부 PC방 리그의 PC방 이름. 실제 프랜차이즈 이름은 쓰지 않는다.
-    static let pcBangWords = ["번개", "별빛", "은하수", "초록", "한빛", "새벽", "달빛", "무지개", "하늘", "골목", "역전", "모퉁이"]
+    static let pcBangWords = ["번개", "별빛", "은하수", "초록", "새벽", "달빛", "무지개", "하늘", "골목", "역전", "모퉁이", "꿈나무"]
+    /// e스포츠 팀 이름에 쓰지 않는 말: 옛 프로게임단 이름을 떠올리게 하는 것 (한빛, 폭스).
+    static let esportsAvoided: Set<String> = ["한빛", "여우"]
+    static var esportsMascots: [String] { mascots.filter { !esportsAvoided.contains($0) } }
+    static var esportsSchoolWords: [String] { schoolWords.filter { !esportsAvoided.contains($0) } }
 
     public static func playerName(_ rng: inout SeededRNG, sport: Sport) -> String {
         while true {
@@ -236,11 +240,11 @@ public enum NameGenerator {
                 let name: String
                 switch tier {
                 case .pro, .semiPro:
-                    name = "\(city) \(rng.pick(mascots)) 게이밍"
+                    name = "\(city) \(rng.pick(esportsMascots)) 게이밍"
                 case .amateur:
-                    name = rng.chance(0.5) ? "\(city) \(rng.pick(mascots)) 아카데미" : "\(city) \(rng.pick(industryWords)) 게임단"
+                    name = rng.chance(0.5) ? "\(city) \(rng.pick(esportsMascots)) 아카데미" : "\(city) \(rng.pick(industryWords)) 게임단"
                 case .citizenPro:
-                    name = rng.chance(0.5) ? "\(rng.pick(schoolWords))대학교 e스포츠부" : "\(city) 게이밍 클럽"
+                    name = rng.chance(0.5) ? "\(rng.pick(esportsSchoolWords))대학교 e스포츠부" : "\(city) 게이밍 클럽"
                 case .citizenSemiPro:
                     name = rng.chance(0.6) ? "\(city) 아마추어 게임단" : "\(city) 게임 동호회"
                 case .citizenAmateur:
