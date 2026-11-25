@@ -124,7 +124,7 @@ extension Balance {
     public static let careerRenewalTrust = 30.0
     public static let careerFameAward = 8.0
     /// 한계 돌파 훈련: 잠재력을 +1 올리는 데 드는 훈련 포인트.
-    public static let careerBreakthroughCost = 30_000_000
+    public static let careerBreakthroughCost = 15_000_000
     /// 구단을 옮긴 뒤 이 경기 수가 지나야 다른 구단의 제안이 다시 온다.
     public static let careerOfferCooldown = 10
     /// 축구 평점의 포지션별 기준 보정. 시뮬레이션으로 맞춘다.
@@ -166,15 +166,15 @@ extension Balance {
         case .pro: 0.05
         }
     }
-    /// 리그별 훈련 비용 배수: 윗 리그일수록 훈련 한 번이 비싸다 (6부 0.5배 → 1부 2.0배).
+    /// 리그별 훈련 비용 배수: 윗 리그일수록 훈련 한 번이 비싸다 (6부 0.5배 → 1부 1.4배).
     public static func careerTrainingCostFactor(_ tier: LeagueTier) -> Double {
         switch tier {
         case .citizenAmateur: 0.5
-        case .citizenSemiPro: 0.7
-        case .citizenPro: 1.0
-        case .amateur: 1.3
-        case .semiPro: 1.6
-        case .pro: 2.0
+        case .citizenSemiPro: 0.65
+        case .citizenPro: 0.8
+        case .amateur: 1.0
+        case .semiPro: 1.2
+        case .pro: 1.4
         }
     }
     /// 훈련이 "크리티컬"로 터질 확률과, 터졌을 때 오르는 양의 배수. 포인트는 똑같이 든다.
@@ -184,11 +184,11 @@ extension Balance {
     public static let careerExtraSessionCost = 1.5
 
     /// 능력치 하나를 +1 올리는 데 드는 훈련 포인트.
-    /// 훈련할 때마다 그 능력치의 다음 비용이 6%쯤 오른다 (25에서 25만, 50에서 116만, 70에서 397만, 85에서 1,000만).
+    /// 훈련할 때마다 그 능력치의 다음 비용이 6%쯤 오른다 (25에서 12.5만, 50에서 58만, 70에서 199만, 85에서 500만).
     public static func careerTrainingCost(value: Double) -> Int {
-        let cost = 250_000 * exp((value - 25) * 0.0615)
+        let cost = 125_000 * exp((value - 25) * 0.0615)
         // 훈련 한 번에 오르는 양이 작아서, 값이 조금 올라도 비용이 따라 오르는 것이 보이게 천 단위로 끊는다.
-        return max(100_000, Int(cost / 1_000) * 1_000)
+        return max(50_000, Int(cost / 1_000) * 1_000)
     }
 
     /// 그 리그에서 뛰는 동안 명성이 오를 수 있는 한도.

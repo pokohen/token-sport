@@ -6,9 +6,6 @@ import Testing
     @Test func 훈련_포인트를_써서_능력치를_올린다() throws {
         var game = TestCareer.make(.shortstop)
         #expect(Set(game.careerTrainableKeys) == [.contact, .power, .eye, .speed, .fielding, .arm])
-        // 시작 포인트(10만)로는 첫 훈련을 할 수 없다.
-        #expect(throws: GameError.self) { try game.trainCareer(.contact) }
-
         TestGame.addTokens(&game, 10_000_000, id: "a", at: TestGame.hours(1))
         let before = try #require(game.myPlayer)
         let cost = game.careerTrainingCost(.contact)
@@ -126,6 +123,6 @@ import Testing
         // 값이 오를수록 계속 비싸진다.
         let costs = stride(from: 1.0, through: 99.0, by: 1).map { Balance.careerTrainingCost(value: $0) }
         #expect(zip(costs, costs.dropFirst()).allSatisfy { $0 <= $1 })
-        #expect(Balance.careerTrainingCost(value: 25) == 250_000)
+        #expect(Balance.careerTrainingCost(value: 25) == 125_000)
     }
 }
