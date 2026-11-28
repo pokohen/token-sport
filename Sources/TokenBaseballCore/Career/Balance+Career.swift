@@ -115,8 +115,39 @@ extension Balance {
         }
     }
     public static func careerForcedRetirementAge(_ position: Position) -> Int {
-        careerForcedRetirementAge + (position == .goalkeeper ? 3 : 0)
+        // e스포츠는 35세 시즌을 마치면 은퇴한다 (나이는 오프시즌이 시작될 때 먹는다).
+        if position.sport == .duel { return duelRetirementAge + 1 }
+        return careerForcedRetirementAge + (position == .goalkeeper ? 3 : 0)
     }
+    // MARK: e스포츠 1:1 대전
+
+    /// 세트 평점의 기준 이동: 이기면 +, 지면 −. 나머지는 병력·일꾼 교환, 빠른 완승, 역전, 상대 실력으로 정한다.
+    public static let careerDuelWinShift = 0.9
+    public static let careerDuelLossShift = -0.7
+    /// 내 선수가 출전 순서에 들지 못해도 이 경기 수가 지나면 한 세트를 받는다.
+    public static let careerDuelGuaranteedEvery = 4
+    /// 세트를 이길 때마다 리그만큼 느는 팬 (6부 → 1부).
+    public static func duelFanBase(_ tier: LeagueTier) -> Int {
+        switch tier {
+        case .citizenAmateur: 4
+        case .citizenSemiPro: 10
+        case .citizenPro: 25
+        case .amateur: 70
+        case .semiPro: 220
+        case .pro: 700
+        }
+    }
+    /// 세트를 이길 때마다 지금 팬의 이만큼이 더 는다 (팬이 팬을 부른다).
+    public static let duelFanShare = 0.008
+    /// 세 경기 넘게 지면 경기마다 팬이 이만큼 준다.
+    public static let duelFanSlumpLoss = 0.01
+    /// 오프시즌마다 줄어드는 팬 몫.
+    public static let duelFanSeasonDecay = 0.05
+    /// 팬 수로 낸 명성 (0~100): 100명 ≈ 29, 1만 명 ≈ 57, 100만 명 ≈ 86, 1,000만 명 = 100.
+    public static func duelFame(fans: Int) -> Double {
+        min(100, log10(Double(max(0, fans)) + 1) / 7 * 100)
+    }
+
     /// 스스로 은퇴하려면 끝까지 치른 시즌이 이만큼 있어야 한다.
     public static let careerRetireMinSeasons = 1
     public static let careerForcedRetirementAge = 38

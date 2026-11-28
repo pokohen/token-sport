@@ -70,6 +70,10 @@ extension Game {
         if let liveBasketball, let score = liveScore {
             return "🏀 \(score.mine):\(score.theirs) \(liveBasketball.state.clockLabel)"
         }
+        if let liveDuel, let score = liveScore {
+            let clock = liveDuel.state.current.map { " \(liveDuel.state.records.count + 1)세트 \($0.clockLabel)" } ?? ""
+            return "🎮 \(score.mine):\(score.theirs)\(clock)"
+        }
         if let lastResult, !lastResult.acknowledged {
             return "\(sport.symbol) 경기 종료 \(lastResult.label)"
         }
@@ -133,6 +137,11 @@ extension Game {
             return liveBasketball.userIsHome
                 ? (liveBasketball.state.home.points, liveBasketball.state.away.points)
                 : (liveBasketball.state.away.points, liveBasketball.state.home.points)
+        }
+        if let liveDuel {
+            return liveDuel.userIsHome
+                ? (liveDuel.state.home.sets, liveDuel.state.away.sets)
+                : (liveDuel.state.away.sets, liveDuel.state.home.sets)
         }
         return nil
     }

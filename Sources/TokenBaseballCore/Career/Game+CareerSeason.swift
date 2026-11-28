@@ -48,7 +48,7 @@ extension Game {
         career.history.append(CareerSeason(
             season: season, age: me.age, teamName: teams[team].name, tier: teams[team].tier,
             batting: me.batting, pitching: me.pitching, football: me.football, basketball: me.basketball,
-            ratedGames: career.seasonRatedGames, ratingTotal: career.seasonRatingTotal, awards: []))
+            duel: me.duel, ratedGames: career.seasonRatedGames, ratingTotal: career.seasonRatingTotal, awards: []))
         career.seasonRatedGames = 0
         career.seasonRatingTotal = 0
         self.career = career
@@ -81,6 +81,8 @@ extension Game {
             career.goal = CareerGoal(kind: .basketPoints, target: 130 + clamp(edge * 6, -50, 200))
         case .powerForward, .center5:
             career.goal = CareerGoal(kind: .rebounds, target: 130 + clamp(edge * 4, -40, 120))
+        case .human, .alien, .protector:
+            career.goal = CareerGoal(kind: .setWins, target: 14 + clamp(edge / 2, -8, 12))
         default:
             career.goal = CareerGoal(kind: .hits, target: 26 + clamp(edge, -6, 10))
         }
@@ -99,7 +101,7 @@ extension Game {
         career.history.append(CareerSeason(
             season: season, age: me.age, teamName: teams[userTeamID].name, tier: teams[userTeamID].tier,
             batting: me.batting, pitching: me.pitching, football: me.football, basketball: me.basketball,
-            ratedGames: career.seasonRatedGames, ratingTotal: career.seasonRatingTotal,
+            duel: me.duel, ratedGames: career.seasonRatedGames, ratingTotal: career.seasonRatingTotal,
             awards: won.map(\.title)))
         career.seasonClosed = true
         for award in won {
@@ -143,7 +145,9 @@ extension Game {
         guard var career, !career.retired, let me = players[career.playerID] else { return }
         career.transferRequested = false
         career.fame *= 1 - Balance.fameSeasonDecay
+        if let fans = career.fans { career.fans = Int(Double(fans) * (1 - Balance.duelFanSeasonDecay)) }
         self.career = career
+        syncDuelFame()
 
         if me.age >= Balance.careerForcedRetirementAge(me.position) {
             finishCareer()
@@ -211,9 +215,11 @@ extension Game {
         var ratingTotal = 0.0
         var football = FootballLine()
         var basketball = BasketballLine()
+        var duel = DuelLine()
         for season in career.history {
             football += season.football ?? FootballLine()
             basketball += season.basketball ?? BasketballLine()
+            duel += season.duel ?? DuelLine()
             batting += season.batting
             pitching += season.pitching
             ratedGames += season.ratedGames
@@ -224,6 +230,7 @@ extension Game {
             retiredAge: me.age, clubs: career.clubs, batting: batting, pitching: pitching,
             football: me.position.sport == .football ? football : nil,
             basketball: me.position.sport == .basketball ? basketball : nil,
+            duel: me.position.sport == .duel ? duel : nil,
             ratedGames: ratedGames, ratingTotal: ratingTotal, awards: career.awards,
             peakAbility: career.peakAbility, bestTier: career.bestTier, earnings: career.earnings,
             seasonsPlayed: careerSeasonsPlayed)

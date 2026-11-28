@@ -23,7 +23,12 @@ extension Game {
     }
 
     /// 지금 리그에서 훈련 한 번에 오르는 능력(CA). 윗 리그일수록 크다. 무소속이면 마지막 구단의 리그를 따른다.
-    public var careerTrainingStep: Double { Balance.careerTrainingStep(userTier) }
+    /// e스포츠는 나이가 어릴수록 크게 오르고 나이가 들수록 적게 오른다 (`Balance.duelAgeFactor`).
+    public var careerTrainingStep: Double {
+        let step = Balance.careerTrainingStep(userTier)
+        guard let me = myPlayer, me.position.sport == .duel else { return step }
+        return step * Balance.duelAgeFactor(me.age)
+    }
 
     /// 지금 리그의 훈련 비용 배수. 윗 리그일수록 비싸다.
     public var careerTrainingCostFactor: Double { Balance.careerTrainingCostFactor(userTier) }

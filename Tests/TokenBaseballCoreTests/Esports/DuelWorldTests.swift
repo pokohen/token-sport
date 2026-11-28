@@ -111,11 +111,9 @@ import Testing
         #expect(max(long.home, long.away) == 3)
     }
 
-    @Test func 앱에서는_아직_고를_수_없고_경기는_준비_중() {
-        var game = Self.make()
+    @Test func 저장_칸은_따로_있다() {
         #expect(SaveSlot.career(for: .duel) == .duelPlayer)
         #expect(SaveSlot.duelPlayer.rawValue == "esports-duel")
-        #expect(throws: GameError.self) { try game.startMatch(now: TestGame.hours(1)) }
     }
 }
 

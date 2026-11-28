@@ -77,6 +77,8 @@ extension Game {
         players[player.id] = player
 
         career = Career(playerID: player.id, season: season)
+        // e스포츠 선수는 팬 0명으로 시작한다.
+        if player.position.sport == .duel { career?.fans = 0 }
         career?.peakAbility = player.ability
         career?.startAbility = talent
         joinCareerClub(team)

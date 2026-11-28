@@ -137,6 +137,7 @@ extension Game {
         live = nil
         liveFootball = nil
         liveBasketball = nil
+        liveDuel = nil
         offers = []
         proposals = []
         counters = []
