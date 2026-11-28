@@ -14,6 +14,7 @@ enum Snapshot {
         renderCareer(model: model, to: directory.appendingPathComponent("career-football", isDirectory: true), position: .forward)
         renderCareer(model: model, to: directory.appendingPathComponent("career-keeper", isDirectory: true), position: .goalkeeper)
         renderCareer(model: model, to: directory.appendingPathComponent("career-basketball", isDirectory: true), position: .shootingGuard)
+        renderCareer(model: model, to: directory.appendingPathComponent("career-esports", isDirectory: true), position: .protector)
     }
 
     /// 선수 모드 화면.
@@ -45,7 +46,7 @@ enum Snapshot {
         render(ResetCard(game: game, pending: .slot).padding(12), model, directory, "5-초기화-확인")
         try? game.startMatch(now: now.addingTimeInterval(10 * 3600))
         // 축구는 교체로 들어간 뒤의 장면이 나오도록 후반까지 돌린다.
-        for _ in 0..<(position.sport == .football ? 255 : position.sport == .basketball ? 200 : 140) { game.stepMatch() }
+        for _ in 0..<(position.sport == .football ? 255 : position.sport == .basketball ? 200 : position.sport == .duel ? 75 : 140) { game.stepMatch() }
         model.game = game
         try? SaveStore(fileURL: directory.appendingPathComponent("demo-save.json")).save(GameSave(game: game))
         render(TabContent(tab: .match, game: game).padding(12), model, directory, "3-중계")

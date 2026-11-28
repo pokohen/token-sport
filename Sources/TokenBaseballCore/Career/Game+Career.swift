@@ -47,7 +47,7 @@ extension Game {
         game.createCareerPlayer(setup, team: club)
         game.startSeasonSchedules()
         game.careerStartSeason()
-        game.post("\(setup.name), \(game.teams[club].name)에 입단! \(LeagueTier.citizenAmateur.displayName) 리그에서 커리어를 시작합니다.")
+        game.post("\(setup.name), \(game.teams[club].name)에 입단! \(LeagueTier.citizenAmateur.leagueName(for: game.sport))에서 커리어를 시작합니다.")
         game.postCareerTalent()
         return game
     }

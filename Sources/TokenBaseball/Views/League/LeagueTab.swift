@@ -17,11 +17,12 @@ struct LeagueTab: View {
             .pickerStyle(.segmented)
             .labelsHidden()
 
-            Card(shown.displayName, trailing: "강도 범위 \(Int(Balance.strengthRange(shown).lowerBound))~\(Int(Balance.strengthRange(shown).upperBound))") {
+            Card(shown.displayName(for: game.sport), trailing: "강도 범위 \(Int(Balance.strengthRange(shown).lowerBound))~\(Int(Balance.strengthRange(shown).upperBound))") {
                 standings
             }
             if shown == game.userTier { promotion }
             if let cup = game.cup { CupCard(game: game, cup: cup) }
+            if game.sport == .duel, let career = game.career, !career.retired { DuelCircuitCard(game: game, career: career) }
             leaders
             awards
         }

@@ -70,6 +70,15 @@ public struct DuelSet: Codable, Equatable, Sendable {
     public internal(set) var finalBattles = 0
     public internal(set) var log: [MatchEvent] = []
 
+    /// 싸움이 난 곳 (미니맵에 점으로 그린다): 가운데, 또는 한쪽 선수(0, 1)의 진영.
+    public enum Spot: Codable, Equatable, Sendable {
+        case center
+        case base(Int)
+    }
+    /// 마지막으로 싸움이 난 곳과 그 틱. 아직 싸움이 없었으면 nil.
+    public internal(set) var fightSpot: Spot?
+    public internal(set) var fightTick: Int?
+
     var nextHarass = 14
     var nextSkirmish = 24
     var finalTick = 70
@@ -292,6 +301,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
 
     mutating func earlyAttack(by attacker: Int, _ events: inout [MatchEvent]) {
         let defender = 1 - attacker
+        mark(.base(defender))
         let defense: Double = switch sides[defender].build {
         case .standard: 1.25
         case .aggressive: 1.0
@@ -340,6 +350,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
             let killed = min(sides[1 - index].workers * 0.3,
                              rng.double(1...3) * (0.7 + me.control / 165) * (1.3 - them.judgment / 200))
             guard killed >= 1 else { continue }
+            mark(.base(1 - index))
             sides[1 - index].workers -= killed
             sides[1 - index].workersLost += killed
             sides[index].workersKilled += killed
@@ -355,6 +366,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
     @discardableResult
     mutating func skirmish(_ events: inout [MatchEvent]) -> Bool {
         guard sides[0].army > 5, sides[1].army > 5 else { return false }
+        mark(.center)
         let power0 = power(0), power1 = power(1)
         let expected = 1 / (1 + pow(power1 / power0, 1.3))
         // 불리한 쪽은 판단이 좋으면 싸움을 피한다.
@@ -372,6 +384,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
         say(&events, .play, "중앙에서 교전! \(sides[won].player.name.withSubject) 이득을 봅니다 · \(scoreboard)")
         // 크게 이기면 그대로 밀고 들어가 일꾼과 확장을 친다.
         if margin > 0.65 {
+            mark(.base(lost))
             let killed = sides[lost].workers * (margin - 0.6) * 0.6
             sides[lost].workers -= killed
             sides[lost].workersLost += killed
@@ -396,6 +409,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
 
     mutating func finalBattle(_ events: inout [MatchEvent]) {
         finalBattles += 1
+        mark(.center)
         say(&events, .inning, "병력이 맞부딪힙니다! \(scoreboard)")
         let share = fightShare(power(0, final: true), power(1, final: true), noise: 0.65)
         trade(share: share, scale: 0.85)
@@ -404,6 +418,7 @@ public struct DuelSet: Codable, Equatable, Sendable {
         let margin = [2.0, 1.6, 1.3][min(finalBattles - 1, 2)]
         if finalBattles >= 4 || sides[won].army >= max(8, sides[lost].army * margin)
             || sides[lost].army + sides[lost].workers < 4 {
+            mark(.base(lost))
             say(&events, .score, "\(sides[lost].player.name)의 병력이 녹았습니다. 본진까지 밀립니다")
             finish(winner: won, by: .battle, &events)
             return
@@ -432,6 +447,11 @@ public struct DuelSet: Codable, Equatable, Sendable {
             let ratio = sides[index].value / max(sides[1 - index].value, 0.01)
             if ratio < 1 { sides[index].worstDeficit = max(sides[index].worstDeficit, 1 - ratio) }
         }
+    }
+
+    mutating func mark(_ spot: Spot) {
+        fightSpot = spot
+        fightTick = tick
     }
 
     func say(_ events: inout [MatchEvent], _ kind: MatchEvent.Kind, _ text: String) {

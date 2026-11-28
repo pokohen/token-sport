@@ -152,7 +152,7 @@ extension Game {
                     })]
                     let start = 20 + career.fame / 4 + rng.double(0...15) + (careerRole(on: pick) == .starter ? 8 : 0)
                     scouts.append(CareerScout(teamID: pick, interest: min(60, start)))
-                    lines.append("\(teams[pick].tier.displayName) \(teams[pick].name)의 스카우트가 지켜보기 시작했습니다.")
+                    lines.append("\(teams[pick].tier.displayName(for: sport)) \(teams[pick].name)의 스카우트가 지켜보기 시작했습니다.")
                 }
             }
         }

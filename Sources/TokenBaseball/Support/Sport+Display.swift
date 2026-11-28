@@ -87,8 +87,8 @@ extension Player {
         case .baseball: isPitcher ? [.pitching, .running, .weights] : [.batting, .fielding, .running, .weights]
         case .football: position == .goalkeeper ? [.keeping, .running, .weights] : [.dribbling, .shooting, .running, .weights]
         case .basketball: [.bouncing, .jumpShot, .running, .weights]
-        // 전용 그림(손풀기, 리플레이)은 화면 단계에서 그린다 (→ docs/10-esports.md "화면").
-        case .duel: []
+        // 손풀기(컨트롤·운영), 리플레이 분석(전략·판단). 다른 종목 그림은 빌리지 않는다.
+        case .duel: [.keyboard, .replay, .keyboard, .replay]
         }
     }
 
