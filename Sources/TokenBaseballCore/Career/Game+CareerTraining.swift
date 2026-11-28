@@ -63,17 +63,17 @@ extension Game {
 
     /// 지금 이 훈련을 할 수 없는 이유. 할 수 있으면 nil.
     public func careerTrainingBlockedReason(_ key: Attributes.Key) -> String? {
-        guard let career, !career.retired, let me = players[career.playerID] else { return "선수가 없습니다." }
+        guard let career, !career.retired, let me = players[career.playerID] else { return String(localized: "선수가 없습니다.") }
         guard Attributes.weights(for: me.position).contains(where: { $0.0 == key }) else {
-            return "이 포지션에서는 올릴 수 없는 능력치입니다."
+            return String(localized: "이 포지션에서는 올릴 수 없는 능력치입니다.")
         }
         if me.age >= Balance.careerTrainingAgeLimit(me.position) {
-            return "\(Balance.careerTrainingAgeLimit(me.position))세부터는 훈련으로 능력치를 올릴 수 없습니다."
+            return String(localized: "\(Balance.careerTrainingAgeLimit(me.position))세부터는 훈련으로 능력치를 올릴 수 없습니다.")
         }
-        if careerSessionsExhausted { return "다음 경기를 치르면 다시 훈련할 수 있습니다." }
-        if me.attributes[key] >= 99 { return "이미 최고치입니다." }
+        if careerSessionsExhausted { return String(localized: "다음 경기를 치르면 다시 훈련할 수 있습니다.") }
+        if me.attributes[key] >= 99 { return String(localized: "이미 최고치입니다.") }
         if me.potential - me.ability < 0.01 {
-            return "한계에 닿았습니다. 지금은 더 오르지 않습니다."
+            return String(localized: "한계에 닿았습니다. 지금은 더 오르지 않습니다.")
         }
         let cost = careerTrainingCost(key)
         if let reason = insufficientFundsReason(cost) { return reason }
@@ -121,12 +121,12 @@ extension Game {
     }
 
     public var careerBreakthroughBlockedReason: String? {
-        guard let career, !career.retired, let me = players[career.playerID] else { return "선수가 없습니다." }
+        guard let career, !career.retired, let me = players[career.playerID] else { return String(localized: "선수가 없습니다.") }
         if me.age >= Balance.careerTrainingAgeLimit(me.position) {
-            return "\(Balance.careerTrainingAgeLimit(me.position))세부터는 한계를 넓힐 수 없습니다."
+            return String(localized: "\(Balance.careerTrainingAgeLimit(me.position))세부터는 한계를 넓힐 수 없습니다.")
         }
-        if careerSessionsExhausted { return "다음 경기를 치르면 다시 훈련할 수 있습니다." }
-        if me.potential >= 99 { return "더 넓힐 한계가 없습니다." }
+        if careerSessionsExhausted { return String(localized: "다음 경기를 치르면 다시 훈련할 수 있습니다.") }
+        if me.potential >= 99 { return String(localized: "더 넓힐 한계가 없습니다.") }
         return insufficientFundsReason(careerBreakthroughCost)
     }
 

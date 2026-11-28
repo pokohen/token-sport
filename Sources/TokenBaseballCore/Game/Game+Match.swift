@@ -75,24 +75,24 @@ extension Game {
     /// 경기 시작. 경기 기회를 하나 쓰고 실시간 중계를 연다.
     public mutating func startMatch(now: Date) throws {
         refreshCharges(now: now)
-        guard !isBankrupt else { throw GameError("구단이 해체되었습니다. 새 구단을 만들어 주세요.") }
-        guard !isMatchLive else { throw GameError("진행 중인 경기가 끝나야 다음 경기를 시작할 수 있습니다.") }
-        guard charges > 0 else { throw GameError("아직 경기 기회가 없습니다.") }
+        guard !isBankrupt else { throw GameError(String(localized: "구단이 해체되었습니다. 새 구단을 만들어 주세요.")) }
+        guard !isMatchLive else { throw GameError(String(localized: "진행 중인 경기가 끝나야 다음 경기를 시작할 수 있습니다.")) }
+        guard charges > 0 else { throw GameError(String(localized: "아직 경기 기회가 없습니다.")) }
         if let career {
-            guard !career.retired else { throw GameError("은퇴했습니다. 새 선수를 만들어 주세요.") }
-            guard !career.isFreeAgent else { throw GameError("무소속입니다. 입단할 구단을 먼저 골라 주세요.") }
+            guard !career.retired else { throw GameError(String(localized: "은퇴했습니다. 새 선수를 만들어 주세요.")) }
+            guard !career.isFreeAgent else { throw GameError(String(localized: "무소속입니다. 입단할 구단을 먼저 골라 주세요.")) }
         }
-        guard let next = nextMatch() else { throw GameError("지금은 치를 경기가 없습니다.") }
+        guard let next = nextMatch() else { throw GameError(String(localized: "지금은 치를 경기가 없습니다.")) }
         if isCareer {
             ensurePlayable(userTeamID)
             prepareCareerLineup(kind: next.kind)
         }
         guard canField(userTeam) else {
             switch sport {
-            case .football: throw GameError("골키퍼 1명을 포함해 11명이 있어야 경기를 할 수 있습니다.")
-            case .basketball: throw GameError("선수 다섯 명이 있어야 경기를 할 수 있습니다.")
-            case .duel: throw GameError("선수 세 명이 있어야 경기를 할 수 있습니다.")
-            case .baseball: throw GameError("야수 9명과 투수 1명 이상이 있어야 경기를 할 수 있습니다.")
+            case .football: throw GameError(String(localized: "골키퍼 1명을 포함해 11명이 있어야 경기를 할 수 있습니다."))
+            case .basketball: throw GameError(String(localized: "선수 다섯 명이 있어야 경기를 할 수 있습니다."))
+            case .duel: throw GameError(String(localized: "선수 세 명이 있어야 경기를 할 수 있습니다."))
+            case .baseball: throw GameError(String(localized: "야수 9명과 투수 1명 이상이 있어야 경기를 할 수 있습니다."))
             }
         }
 
@@ -115,7 +115,7 @@ extension Game {
             break
         }
         guard var state = makeMatch(home: home, away: away, kind: next.kind, tier: tier, seed: rng.next()) else {
-            throw GameError("경기를 시작할 수 없습니다.")
+            throw GameError(String(localized: "경기를 시작할 수 없습니다."))
         }
         if isCareer { applyCareerForm(&state, userIsHome: next.userIsHome) }
 

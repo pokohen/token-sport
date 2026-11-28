@@ -206,10 +206,10 @@ public struct Game: Codable, Equatable, Sendable {
 
     /// 지금 추가 경기를 살 수 없는 이유. 살 수 있으면 nil.
     public var extraMatchBlockedReason: String? {
-        if isBankrupt { return "구단이 해체되었습니다." }
-        if isMatchLive { return "진행 중인 경기가 끝나야 합니다." }
-        if charges > 0 { return "경기 기회가 남아 있습니다." }
-        if nextMatch() == nil { return "지금은 치를 경기가 없습니다." }
+        if isBankrupt { return String(localized: "구단이 해체되었습니다.") }
+        if isMatchLive { return String(localized: "진행 중인 경기가 끝나야 합니다.") }
+        if charges > 0 { return String(localized: "경기 기회가 남아 있습니다.") }
+        if nextMatch() == nil { return String(localized: "지금은 치를 경기가 없습니다.") }
         return insufficientFundsReason(extraMatchCost)
     }
 
@@ -230,7 +230,7 @@ public struct Game: Codable, Equatable, Sendable {
 
     /// 지금 결과 바로 보기를 할 수 없는 이유. 할 수 있으면 nil.
     public var skipMatchBlockedReason: String? {
-        if !isMatchLive { return "진행 중인 경기가 없습니다." }
+        if !isMatchLive { return String(localized: "진행 중인 경기가 없습니다.") }
         return insufficientFundsReason(skipMatchCost)
     }
 

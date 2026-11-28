@@ -22,15 +22,15 @@ extension Game {
     /// 재계약 제안. 계약 마지막 시즌 중 아무 때나, 그리고 오프시즌이 끝나기 전까지 할 수 있다.
     public mutating func proposeRenewal(_ id: PlayerID, salary: Int, years: Int) throws {
         guard let player = players[id], player.teamID == userTeamID else {
-            throw GameError("내 팀 선수가 아닙니다.")
+            throw GameError(String(localized: "내 팀 선수가 아닙니다."))
         }
-        guard isExpiring(player) else { throw GameError("계약 마지막 시즌인 선수만 재계약할 수 있습니다.") }
+        guard isExpiring(player) else { throw GameError(String(localized: "계약 마지막 시즌인 선수만 재계약할 수 있습니다.")) }
         guard phase == .offseason || player.contract.seasonsLeft > 0 else {
-            throw GameError("협상 기간이 끝났습니다. 선수의 역제안을 받아들일지만 정할 수 있습니다.")
+            throw GameError(String(localized: "협상 기간이 끝났습니다. 선수의 역제안을 받아들일지만 정할 수 있습니다."))
         }
-        guard (1...3).contains(years), salary > 0 else { throw GameError("조건이 올바르지 않습니다.") }
+        guard (1...3).contains(years), salary > 0 else { throw GameError(String(localized: "조건이 올바르지 않습니다.")) }
         guard !proposals.contains(where: { $0.playerID == id }) else {
-            throw GameError("이미 제안을 보냈습니다. 다음 경기 뒤에 답이 옵니다.")
+            throw GameError(String(localized: "이미 제안을 보냈습니다. 다음 경기 뒤에 답이 옵니다."))
         }
         counters.removeAll { $0.playerID == id }
         proposals.append(Proposal(
@@ -53,14 +53,14 @@ extension Game {
         case .baseball, .basketball, .duel: false
         }
         guard phase == .offseason || anytime else {
-            throw GameError("FA 영입은 오프시즌 이적 시장에서만 할 수 있습니다.")
+            throw GameError(String(localized: "FA 영입은 오프시즌 이적 시장에서만 할 수 있습니다."))
         }
         guard let player = players[id], player.teamID == nil, freeAgents.contains(id) else {
-            throw GameError("FA 선수가 아닙니다.")
+            throw GameError(String(localized: "FA 선수가 아닙니다."))
         }
-        guard (1...3).contains(years), salary > 0 else { throw GameError("조건이 올바르지 않습니다.") }
+        guard (1...3).contains(years), salary > 0 else { throw GameError(String(localized: "조건이 올바르지 않습니다.")) }
         guard !proposals.contains(where: { $0.playerID == id }) else {
-            throw GameError("이미 제안을 보냈습니다. 다음 경기 뒤에 답이 옵니다.")
+            throw GameError(String(localized: "이미 제안을 보냈습니다. 다음 경기 뒤에 답이 옵니다."))
         }
         try checkForeignLimit(player)
         try checkCanSpend(0)
@@ -70,13 +70,13 @@ extension Game {
 
     /// 다른 구단 선수에게 이적 제안을 넣는다.
     public mutating func proposeTransfer(_ id: PlayerID, fee: Int) throws {
-        guard tradeWindowOpen else { throw GameError("지금은 이적 시장이 닫혀 있습니다.") }
+        guard tradeWindowOpen else { throw GameError(String(localized: "지금은 이적 시장이 닫혀 있습니다.")) }
         guard let player = players[id], let team = player.teamID, team != userTeamID else {
-            throw GameError("다른 구단 선수가 아닙니다.")
+            throw GameError(String(localized: "다른 구단 선수가 아닙니다."))
         }
-        guard fee > 0 else { throw GameError("이적료를 입력해 주세요.") }
+        guard fee > 0 else { throw GameError(String(localized: "이적료를 입력해 주세요.")) }
         guard !proposals.contains(where: { $0.playerID == id }) else {
-            throw GameError("이미 제안을 보냈습니다. 다음 경기 뒤에 답이 옵니다.")
+            throw GameError(String(localized: "이미 제안을 보냈습니다. 다음 경기 뒤에 답이 옵니다."))
         }
         try checkCanSpend(fee)
         proposals.append(Proposal(
@@ -99,7 +99,7 @@ extension Game {
     /// 역제안을 받아들인다.
     public mutating func acceptCounter(_ id: Int) throws {
         guard let counter = counters.first(where: { $0.id == id }), let player = players[counter.playerID] else {
-            throw GameError("제안을 찾을 수 없습니다.")
+            throw GameError(String(localized: "제안을 찾을 수 없습니다."))
         }
         counters.removeAll { $0.id == id }
         players[player.id]?.contract = Contract(
@@ -120,12 +120,12 @@ extension Game {
 
     public mutating func respond(to offerID: Int, _ response: OfferResponse) throws {
         guard let index = offers.firstIndex(where: { $0.id == offerID }) else {
-            throw GameError("오퍼를 찾을 수 없습니다.")
+            throw GameError(String(localized: "오퍼를 찾을 수 없습니다."))
         }
         let offer = offers[index]
         guard let player = players[offer.playerID], player.teamID == userTeamID else {
             offers.remove(at: index)
-            throw GameError("이미 팀을 떠난 선수입니다.")
+            throw GameError(String(localized: "이미 팀을 떠난 선수입니다."))
         }
         let buyer = teams[offer.fromTeam]
 
@@ -134,7 +134,7 @@ extension Game {
             offers.remove(at: index)
             post("\(buyer.name)의 \(player.name) 오퍼를 거절했습니다.")
         case .askMore:
-            guard !offer.raised else { throw GameError("이미 한 번 올려 달라고 했습니다.") }
+            guard !offer.raised else { throw GameError(String(localized: "이미 한 번 올려 달라고 했습니다.")) }
             if rng.chance(0.5) {
                 offers[index].fee = Int(Double(offer.fee) * rng.double(1.15...1.3) / 1_000) * 1_000
                 offers[index].raised = true
@@ -144,10 +144,10 @@ extension Game {
                 post("\(buyer.name)이(가) \(player.name) 오퍼를 거두었습니다.")
             }
         case .accept:
-            guard !isMatchLive else { throw GameError("경기 중에는 선수를 보낼 수 없습니다.") }
+            guard !isMatchLive else { throw GameError(String(localized: "경기 중에는 선수를 보낼 수 없습니다.")) }
             if offer.swapPlayerID == nil {
                 // 선수를 팔고 나서도 경기를 치를 인원은 남아야 한다.
-                guard canSpare(player.id) else { throw GameError("이 선수를 보내면 경기를 치를 인원이 모자랍니다.") }
+                guard canSpare(player.id) else { throw GameError(String(localized: "이 선수를 보내면 경기를 치를 인원이 모자랍니다.")) }
             }
             offers.remove(at: index)
             add(player.id, to: buyer.id)

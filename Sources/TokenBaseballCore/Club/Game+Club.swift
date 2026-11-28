@@ -74,12 +74,12 @@ extension Game {
 
     /// 위기 중에는 시설 업그레이드와 영입을 할 수 없다.
     func checkCanSpend(_ cost: Int) throws {
-        guard !isBankrupt else { throw GameError("구단이 해체되었습니다.") }
+        guard !isBankrupt else { throw GameError(String(localized: "구단이 해체되었습니다.")) }
         guard crisisMatchesLeft == nil else {
-            throw GameError("재정 위기 중에는 시설 업그레이드와 영입을 할 수 없습니다.")
+            throw GameError(String(localized: "재정 위기 중에는 시설 업그레이드와 영입을 할 수 없습니다."))
         }
         guard funds.balance >= cost else {
-            throw GameError("자금이 모자랍니다. ₩\(cost.formatted())이 필요합니다.")
+            throw GameError(String(localized: "자금이 모자랍니다. ₩\(cost.formatted())이 필요합니다."))
         }
     }
 
@@ -149,15 +149,15 @@ extension Game {
 
     /// 파산 뒤 새 시민 구단을 만든다. 세계(CPU 팀, 리그 기록)는 그대로 이어진다.
     public mutating func foundNewClub(setup: ClubSetup, now: Date) throws {
-        guard isBankrupt else { throw GameError("지금은 새 구단을 만들 수 없습니다.") }
+        guard isBankrupt else { throw GameError(String(localized: "지금은 새 구단을 만들 수 없습니다.")) }
         let name = setup.name.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { throw GameError("팀 이름을 입력해 주세요.") }
-        guard !teams.contains(where: { $0.name == name }) else { throw GameError("이미 있는 팀 이름입니다.") }
+        guard !name.isEmpty else { throw GameError(String(localized: "팀 이름을 입력해 주세요.")) }
+        guard !teams.contains(where: { $0.name == name }) else { throw GameError(String(localized: "이미 있는 팀 이름입니다.")) }
 
         // 6부에서 가장 성적이 나쁜 CPU 구단 자리를 이어받는다.
         let tier = LeagueTier.citizenAmateur
         guard let slot = rankedStandings(tier).last(where: { !teams[$0.teamID].isUser })?.teamID else {
-            throw GameError("새 구단이 들어갈 자리가 없습니다.")
+            throw GameError(String(localized: "새 구단이 들어갈 자리가 없습니다."))
         }
         for id in teams[slot].roster { moveToFreeAgency(id) }
         var team = Team(id: slot, name: name, city: setup.city, tier: tier, isUser: true, season: season)
@@ -208,7 +208,7 @@ extension Game {
     }
 
     public mutating func upgrade(_ facility: Facility) throws {
-        guard let cost = upgradeCost(facility) else { throw GameError("이미 최고 레벨입니다.") }
+        guard let cost = upgradeCost(facility) else { throw GameError(String(localized: "이미 최고 레벨입니다.")) }
         try checkCanSpend(cost)
         funds.spend(cost, .facility)
         switch facility {
@@ -235,10 +235,10 @@ extension Game {
     }
 
     public func promotionBlockedReason(_ promotion: Promotion) -> String? {
-        if promotion == .tv, userTier > .amateur { return "3부 이상에서 할 수 있습니다." }
+        if promotion == .tv, userTier > .amateur { return String(localized: "3부 이상에서 할 수 있습니다.") }
         if promotion == .festival {
-            if phase != .regular { return "시즌 중에만 참가할 수 있습니다." }
-            if (promotionUses[promotion.rawValue] ?? 0) >= 1 { return "이번 시즌에 이미 참가했습니다." }
+            if phase != .regular { return String(localized: "시즌 중에만 참가할 수 있습니다.") }
+            if (promotionUses[promotion.rawValue] ?? 0) >= 1 { return String(localized: "이번 시즌에 이미 참가했습니다.") }
         }
         return nil
     }
@@ -264,16 +264,16 @@ extension Game {
 
     public mutating func applyForPromotion() throws {
         guard !sport.usesEnglishPromotion else {
-            throw GameError("축구는 신청이 필요 없습니다. 순위와 구장 등급으로 승격이 정해집니다.")
+            throw GameError(String(localized: "축구는 신청이 필요 없습니다. 순위와 구장 등급으로 승격이 정해집니다."))
         }
-        guard let requirement = promotionRequirement else { throw GameError("이미 최상위 리그입니다.") }
-        guard phase == .regular else { throw GameError("정규시즌 중에만 신청할 수 있습니다.") }
-        guard !appliedForPromotion else { throw GameError("이미 신청했습니다.") }
+        guard let requirement = promotionRequirement else { throw GameError(String(localized: "이미 최상위 리그입니다.")) }
+        guard phase == .regular else { throw GameError(String(localized: "정규시즌 중에만 신청할 수 있습니다.")) }
+        guard !appliedForPromotion else { throw GameError(String(localized: "이미 신청했습니다.")) }
         guard round < Balance.applicationDeadlineRound else {
-            throw GameError("신청 마감(\(Balance.applicationDeadlineRound)라운드)이 지났습니다.")
+            throw GameError(String(localized: "신청 마감(\(Balance.applicationDeadlineRound)라운드)이 지났습니다."))
         }
         guard userTeam.fame >= requirement.fame else {
-            throw GameError("인지도가 모자랍니다. \(Int(requirement.fame)) 이상이어야 합니다.")
+            throw GameError(String(localized: "인지도가 모자랍니다. \(Int(requirement.fame)) 이상이어야 합니다."))
         }
         try checkCanSpend(requirement.fee)
         funds.spend(requirement.fee, .fee)

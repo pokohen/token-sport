@@ -13,16 +13,16 @@ extension Game {
 
     func checkRosterRoom() throws {
         guard userTeam.roster.count < rosterLimit(userTier) else {
-            throw GameError("로스터가 가득 찼습니다 (\(rosterLimit(userTier))명). 선수를 내보내야 영입할 수 있습니다.")
+            throw GameError(String(localized: "로스터가 가득 찼습니다 (\(rosterLimit(userTier))명). 선수를 내보내야 영입할 수 있습니다."))
         }
     }
 
     func checkForeignLimit(_ player: Player) throws {
         guard player.isForeign else { return }
-        guard userTier <= .semiPro else { throw GameError("외국인 선수는 1~2부에서만 영입할 수 있습니다.") }
+        guard userTier <= .semiPro else { throw GameError(String(localized: "외국인 선수는 1~2부에서만 영입할 수 있습니다.")) }
         let count = roster(of: userTeamID).filter(\.isForeign).count
         guard count < Balance.foreignPlayerLimit else {
-            throw GameError("외국인 선수는 팀당 \(Balance.foreignPlayerLimit)명까지입니다.")
+            throw GameError(String(localized: "외국인 선수는 팀당 \(Balance.foreignPlayerLimit)명까지입니다."))
         }
     }
 
@@ -33,7 +33,7 @@ extension Game {
     /// 돈을 내고 테스트를 열면 지역 선수 후보 3~5명이 온다.
     public mutating func holdTryout() throws {
         guard !candidates.contains(where: { $0.source == .tryout }) else {
-            throw GameError("지난 테스트 후보가 아직 남아 있습니다.")
+            throw GameError(String(localized: "지난 테스트 후보가 아직 남아 있습니다."))
         }
         let cost = tryoutFee
         try checkCanSpend(cost)
@@ -67,10 +67,10 @@ extension Game {
 
     /// 지역을 정해 스카우트를 보낸다. 몇 경기 뒤 후보 목록이 온다.
     public mutating func sendScout(_ region: ScoutRegion) throws {
-        guard userTeam.scoutLevel >= 1 else { throw GameError("스카우트 시설이 필요합니다.") }
-        guard scoutTrip == nil else { throw GameError("스카우트가 이미 나가 있습니다.") }
+        guard userTeam.scoutLevel >= 1 else { throw GameError(String(localized: "스카우트 시설이 필요합니다.")) }
+        guard scoutTrip == nil else { throw GameError(String(localized: "스카우트가 이미 나가 있습니다.")) }
         if region == .overseas, userTier > .semiPro {
-            throw GameError("해외 스카우트는 1~2부에서만 보낼 수 있습니다.")
+            throw GameError(String(localized: "해외 스카우트는 1~2부에서만 보낼 수 있습니다."))
         }
         let cost = scoutCost(region)
         try checkCanSpend(cost)
@@ -107,7 +107,7 @@ extension Game {
     public mutating func sign(candidate id: Int) throws {
         guard let candidate = candidates.first(where: { $0.id == id }),
               let player = players[candidate.playerID]
-        else { throw GameError("후보를 찾을 수 없습니다.") }
+        else { throw GameError(String(localized: "후보를 찾을 수 없습니다.")) }
         try checkRosterRoom()
         try checkForeignLimit(player)
         let fee = price(candidate.fee)
@@ -127,14 +127,14 @@ extension Game {
 
     public mutating func release(_ id: PlayerID) throws {
         guard let player = players[id], player.teamID == userTeamID else {
-            throw GameError("내 팀 선수가 아닙니다.")
+            throw GameError(String(localized: "내 팀 선수가 아닙니다."))
         }
-        guard !isMatchLive else { throw GameError("경기 중에는 방출할 수 없습니다.") }
+        guard !isMatchLive else { throw GameError(String(localized: "경기 중에는 방출할 수 없습니다.")) }
         guard canSpare(id) else {
             let need = switch sport {
-            case .football: "골키퍼 1명을 포함해 \(Balance.footballStarters)명은 남아 있어야 합니다."
-            case .duel: "선수 \(DuelLineupBuilder.setsPerMatch)명은 남아 있어야 합니다."
-            case .baseball, .basketball: "야수 \(Balance.minBatters)명, 투수 \(Balance.minPitchers)명은 남아 있어야 합니다."
+            case .football: String(localized: "골키퍼 1명을 포함해 \(Balance.footballStarters)명은 남아 있어야 합니다.")
+            case .duel: String(localized: "선수 \(DuelLineupBuilder.setsPerMatch)명은 남아 있어야 합니다.")
+            case .baseball, .basketball: String(localized: "야수 \(Balance.minBatters)명, 투수 \(Balance.minPitchers)명은 남아 있어야 합니다.")
             }
             throw GameError(need)
         }

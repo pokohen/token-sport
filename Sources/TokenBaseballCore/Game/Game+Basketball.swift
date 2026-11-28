@@ -22,7 +22,7 @@ extension Game {
         _ next: NextMatch, home: TeamID, away: TeamID, tier: LeagueTier, now: Date
     ) throws {
         guard var state = makeBasketballMatch(home: home, away: away, seed: rng.next()) else {
-            throw GameError("경기를 시작할 수 없습니다.")
+            throw GameError(String(localized: "경기를 시작할 수 없습니다."))
         }
         if isCareer { decorateCareerBasketball(&state, userIsHome: next.userIsHome) }
         // 같은 라운드의 내 리그 다른 경기는 함께 돌아가며 "타 구장 소식"으로 보인다.
@@ -244,12 +244,12 @@ extension Game {
             }
         }
         return [
-            ("득점", board { line($0).pointsPerGame }),
-            ("리바운드", board { line($0).reboundsPerGame }),
-            ("어시스트", board { line($0).assistsPerGame }),
-            ("스틸", board { per(line($0).steals, $0) }),
-            ("블록", board { per(line($0).blocks, $0) }),
-            ("3점슛", board { per(line($0).threesMade, $0) }),
+            (String(localized: "득점", table: "Leaders"), board { line($0).pointsPerGame }),
+            (String(localized: "리바운드", table: "Leaders"), board { line($0).reboundsPerGame }),
+            (String(localized: "어시스트", table: "Leaders"), board { line($0).assistsPerGame }),
+            (String(localized: "스틸", table: "Leaders"), board { per(line($0).steals, $0) }),
+            (String(localized: "블록", table: "Leaders"), board { per(line($0).blocks, $0) }),
+            (String(localized: "3점슛", table: "Leaders"), board { per(line($0).threesMade, $0) }),
         ]
     }
 }

@@ -24,7 +24,7 @@ extension Game {
             guard chosen.count == Balance.footballStarters, Set(ids).count == chosen.count,
                   chosen.allSatisfy({ $0.teamID == userTeamID }),
                   chosen.contains(where: { $0.position == .goalkeeper })
-            else { throw GameError("골키퍼 1명을 포함해 내 팀 선수 11명을 골라야 합니다.") }
+            else { throw GameError(String(localized: "골키퍼 1명을 포함해 내 팀 선수 11명을 골라야 합니다.")) }
             teams[userTeamID].lineupOverride = ids
             return
         case .baseball, .basketball, .duel:
@@ -32,7 +32,7 @@ extension Game {
         }
         guard chosen.count == 9, Set(ids).count == 9,
               chosen.allSatisfy({ $0.teamID == userTeamID && !$0.isPitcher })
-        else { throw GameError("내 팀 야수 9명을 골라야 합니다.") }
+        else { throw GameError(String(localized: "내 팀 야수 9명을 골라야 합니다.")) }
         teams[userTeamID].lineupOverride = ids
     }
 
@@ -40,10 +40,10 @@ extension Game {
         if let id {
             if let player = players[id], player.teamID == userTeamID, player.position == .starter,
                userTeam.gamesPlayed - player.lastStartGame <= Balance.starterRest(userTier) {
-                throw GameError("\(player.name)은(는) 아직 쉬어야 합니다. 선발은 등판 뒤 \(Balance.starterRest(userTier))경기를 쉽니다.")
+                throw GameError(String(localized: "\(player.name)은(는) 아직 쉬어야 합니다. 선발은 등판 뒤 \(Balance.starterRest(userTier))경기를 쉽니다."))
             }
             guard let player = players[id], player.teamID == userTeamID, player.isPitcher else {
-                throw GameError("내 팀 투수를 골라야 합니다.")
+                throw GameError(String(localized: "내 팀 투수를 골라야 합니다."))
             }
         }
         teams[userTeamID].starterOverride = id
@@ -70,9 +70,9 @@ extension Game {
     /// 팀 이름은 언제든 바꿀 수 있다 (다른 팀 이름도).
     public mutating func renameTeam(_ id: TeamID, to newName: String) throws {
         let name = newName.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { throw GameError("팀 이름을 입력해 주세요.") }
+        guard !name.isEmpty else { throw GameError(String(localized: "팀 이름을 입력해 주세요.")) }
         guard !teams.contains(where: { $0.name == name && $0.id != id }) else {
-            throw GameError("이미 있는 팀 이름입니다.")
+            throw GameError(String(localized: "이미 있는 팀 이름입니다."))
         }
         teams[id].name = name
     }
@@ -107,23 +107,23 @@ extension Game {
             }
         }
         return [
-            ("타율", rows(batters.sorted { ($0.batting.average, -$0.id) > ($1.batting.average, -$1.id) }) {
+            (String(localized: "타율", table: "Leaders"), rows(batters.sorted { ($0.batting.average, -$0.id) > ($1.batting.average, -$1.id) }) {
                 String(format: "%.3f", $0.batting.average)
             }),
-            ("홈런", rows(batters.sorted { ($0.batting.homeRuns, -$0.id) > ($1.batting.homeRuns, -$1.id) }) {
+            (String(localized: "홈런", table: "Leaders"), rows(batters.sorted { ($0.batting.homeRuns, -$0.id) > ($1.batting.homeRuns, -$1.id) }) {
                 "\($0.batting.homeRuns)"
             }),
-            ("타점", rows(batters.sorted { ($0.batting.runsBattedIn, -$0.id) > ($1.batting.runsBattedIn, -$1.id) }) {
+            (String(localized: "타점", table: "Leaders"), rows(batters.sorted { ($0.batting.runsBattedIn, -$0.id) > ($1.batting.runsBattedIn, -$1.id) }) {
                 "\($0.batting.runsBattedIn)"
             }),
-            ("다승", rows(pitchers.sorted { ($0.pitching.wins, -$0.id) > ($1.pitching.wins, -$1.id) }) {
+            (String(localized: "다승", table: "Leaders"), rows(pitchers.sorted { ($0.pitching.wins, -$0.id) > ($1.pitching.wins, -$1.id) }) {
                 "\($0.pitching.wins)"
             }),
-            ("평균자책점", rows(pitchers.filter { $0.position == .starter }
+            (String(localized: "평균자책점", table: "Leaders"), rows(pitchers.filter { $0.position == .starter }
                 .sorted { ($0.pitching.era, $0.id) < ($1.pitching.era, $1.id) }) {
                 String(format: "%.2f", $0.pitching.era)
             }),
-            ("탈삼진", rows(pitchers.sorted { ($0.pitching.strikeouts, -$0.id) > ($1.pitching.strikeouts, -$1.id) }) {
+            (String(localized: "탈삼진", table: "Leaders"), rows(pitchers.sorted { ($0.pitching.strikeouts, -$0.id) > ($1.pitching.strikeouts, -$1.id) }) {
                 "\($0.pitching.strikeouts)"
             }),
         ]
