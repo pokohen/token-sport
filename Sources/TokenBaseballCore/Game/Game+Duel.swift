@@ -225,3 +225,50 @@ public struct LiveDuelMatch: Codable, Equatable, Sendable {
     public var userIsHome: Bool
     public var tier: LeagueTier
 }
+
+// MARK: 시상과 기록 순위
+
+extension Game {
+    mutating func giveDuelAwards() {
+        for tier in LeagueTier.allCases {
+            let everyone = teams(in: tier).flatMap { roster(of: $0.id) }
+            func line(_ player: Player) -> DuelLine { player.duel ?? DuelLine() }
+            let regulars = everyone.filter { line($0).sets >= roundsPerSeason / 3 }
+            func record(_ title: String, _ player: Player?, _ detail: (Player) -> String) {
+                guard let player, let teamID = player.teamID else { return }
+                awards.append(AwardRecord(
+                    season: season, tier: tier, title: title, playerName: player.name,
+                    teamName: teams[teamID].name, detail: detail(player),
+                    isMine: isCareer ? isMyPlayer(player.id) : teamID == userTeamID))
+            }
+            func rate(_ player: Player) -> String { "세트 \(line(player).setWins)승 \(line(player).setLosses)패" }
+            record("MVP", regulars.max { (line($0).winRate, line($0).setWins, $0.id) < (line($1).winRate, line($1).setWins, $1.id) }) {
+                "\(rate($0)), 승률 \(Int((line($0).winRate * 100).rounded()))%"
+            }
+            record("다승왕", everyone.max { (line($0).setWins, -line($0).setLosses, $0.id) < (line($1).setWins, -line($1).setLosses, $1.id) }) { rate($0) }
+            let aces = everyone.filter { line($0).aceWins > 0 }
+            record("에이스 결정전의 강자", aces.max { (line($0).aceWins, -line($0).aceLosses, $0.id) < (line($1).aceWins, -line($1).aceLosses, $1.id) }) {
+                "에이스 결정전 \(line($0).aceWins)승 \(line($0).aceLosses)패"
+            }
+        }
+    }
+
+    func duelLeaders(_ tier: LeagueTier, count: Int) -> [(title: String, rows: [Leader])] {
+        let everyone = teams(in: tier).flatMap { roster(of: $0.id) }
+        func line(_ player: Player) -> DuelLine { player.duel ?? DuelLine() }
+        func board(_ pool: [Player], _ value: (Player) -> Double, _ text: (Player) -> String) -> [Leader] {
+            pool.sorted { (value($0), -$0.id) > (value($1), -$1.id) }.prefix(count).compactMap { player in
+                guard let teamID = player.teamID else { return nil }
+                return Leader(
+                    playerName: player.name, teamName: teams[teamID].name, value: text(player),
+                    isMine: isCareer ? isMyPlayer(player.id) : teamID == userTeamID)
+            }
+        }
+        let regulars = everyone.filter { line($0).sets >= max(1, round / 3) }
+        return [
+            ("세트 승", board(everyone, { Double(line($0).setWins) }, { "\(line($0).setWins)승" })),
+            ("세트 승률", board(regulars, { line($0).winRate }, { "\(Int((line($0).winRate * 100).rounded()))%" })),
+            ("에이스 결정전", board(everyone.filter { line($0).aceWins > 0 }, { Double(line($0).aceWins) }, { "\(line($0).aceWins)승" })),
+        ]
+    }
+}

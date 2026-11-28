@@ -42,7 +42,10 @@ extension Game {
                     post("이번 시즌 후 계약이 끝나는 선수: \(leaving.joined(separator: ", ")). 재계약하지 않으면 떠납니다.")
                 }
             }
-            if isCareer {
+            // e스포츠는 컵대회 자리에 개인 대회가 열린다.
+            if isCareer, sport == .duel {
+                runDuelTournamentsIfDue()
+            } else if isCareer {
                 if round >= roundsPerSeason { finishCupQuietly() } else { openCupRoundIfDue() }
             }
             if round >= roundsPerSeason { endRegularSeason() }

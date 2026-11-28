@@ -83,7 +83,7 @@ extension Game {
 
     /// 선수 모드에서 이번 시즌 컵대회가 없으면 만든다.
     mutating func ensureCup() {
-        guard isCareer, cup?.season != season else { return }
+        guard isCareer, sport != .duel, cup?.season != season else { return }
         var fresh = Cup(season: season)
         // 1부에서 가장 강한 팀들은 1라운드를 쉰다 (60팀이면 네 팀이 쉬어 32팀, 120팀이면 여덟 팀이 쉬어 64팀이 남는다).
         let seeds = teams(in: .pro).sorted { (strength(of: $0.id), -$0.id) > (strength(of: $1.id), -$1.id) }
