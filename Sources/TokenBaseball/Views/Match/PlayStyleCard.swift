@@ -8,7 +8,7 @@ struct PlayStyleCard: View {
 
     var body: some View {
         let style = game.career?.style ?? .balanced
-        Card(String(localized: "플레이 스타일"), trailing: game.myPlayer?.position.label) {
+        Card(String(localized: "플레이 스타일"), trailing: game.myPlayer?.position.localizedLabel) {
             if game.sport == .duel {
                 duel
             } else if game.myPlayer?.position == .goalkeeper {
@@ -17,11 +17,11 @@ struct PlayStyleCard: View {
                 Picker("플레이 스타일", selection: Binding(
                     get: { style },
                     set: { value in model.perform { $0.setCareerStyle(value) } })) {
-                    ForEach(PlayStyle.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    ForEach(PlayStyle.allCases, id: \.self) { Text($0.localizedName).tag($0) }
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
-                Text(game.sport == .basketball ? style.basketballSummary : style.summary).note()
+                Text(game.sport == .basketball ? style.localizedBasketballSummary : style.localizedSummary).note()
             }
             Text(game.sport == .duel
                 ? "세트 배정은 감독이 정합니다. 경기 중에는 개입하지 않습니다."
@@ -38,7 +38,7 @@ struct PlayStyleCard: View {
         Picker("플레이 스타일", selection: Binding(
             get: { style },
             set: { value in model.perform { $0.setCareerDuelStyle(value) } })) {
-            ForEach(DuelStyle.allCases, id: \.self) { Text($0.label).tag($0) }
+            ForEach(DuelStyle.allCases, id: \.self) { Text($0.localizedLabel).tag($0) }
         }
         .pickerStyle(.segmented)
         .labelsHidden()

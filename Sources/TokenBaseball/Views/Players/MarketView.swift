@@ -25,7 +25,7 @@ struct MarketView: View {
                 Card(String(localized: "보낸 제안")) {
                     ForEach(game.proposals) { proposal in
                         HStack {
-                            Text("\(proposal.kind.rawValue) · \(game.players[proposal.playerID]?.name ?? "")").font(.callout)
+                            Text("\(proposal.kind.localizedName) · \(game.players[proposal.playerID]?.name ?? "")").font(.callout)
                             Spacer()
                             Button("취소") { model.perform { $0.withdrawProposal(proposal.id) } }.controlSize(.small)
                         }
@@ -38,7 +38,7 @@ struct MarketView: View {
                 HStack {
                     Text("지역 선수 후보 3~5명이 옵니다. 능력은 낮지만 잠재력 높은 선수가 가끔 섞여 있습니다.").note()
                     Spacer()
-                    Button("테스트 열기 \(Format.money(game.tryoutFee))") { model.perform { try $0.holdTryout() } }
+                    Button("테스트 열기 \(DisplayFormat.money(game.tryoutFee))") { model.perform { try $0.holdTryout() } }
                         .disabled(game.candidates.contains { $0.source == .tryout })
                 }
             }
@@ -47,11 +47,11 @@ struct MarketView: View {
                 if game.userTeam.scoutLevel == 0 {
                     Text("구단 탭에서 스카우트 시설을 지으면 보낼 수 있습니다.").note()
                 } else if let trip = game.scoutTrip {
-                    Text("\(trip.region.rawValue) 스카우트가 \(trip.matchesLeft)경기 뒤에 돌아옵니다.").font(.callout)
+                    Text("\(trip.region.localizedName) 스카우트가 \(trip.matchesLeft)경기 뒤에 돌아옵니다.").font(.callout)
                 } else {
                     HStack {
                         ForEach(ScoutRegion.allCases, id: \.self) { region in
-                            Button("\(region.rawValue) \(Format.money(game.scoutCost(region)))") {
+                            Button("\(region.localizedName) \(DisplayFormat.money(game.scoutCost(region)))") {
                                 model.perform { try $0.sendScout(region) }
                             }
                             .disabled(region == .overseas && game.userTier > .semiPro)
@@ -69,13 +69,13 @@ struct MarketView: View {
                             HStack {
                                 PlayerRow(
                                     game: game, player: player,
-                                    trailing: String(localized: "\(candidate.source == .draft && game.sport == .football ? String(localized: "유소년 승급") : candidate.source.rawValue) · 연봉 \(Format.money(player.contract.salary))"))
+                                    trailing: String(localized: "\(candidate.source == .draft && game.sport == .football ? String(localized: "유소년 승급") : candidate.source.localizedName) · 연봉 \(DisplayFormat.money(player.contract.salary))"))
                                 // 카드 제목 "계약"(Contract)과 영어가 달라서 (Sign) 표를 나눈다.
                                 Button {
                                     model.perform { try $0.sign(candidate: candidate.id) }
                                 } label: {
                                     candidate.fee > 0
-                                        ? Text("계약 \(Format.money(game.price(candidate.fee)))", tableName: "Actions")
+                                        ? Text("계약 \(DisplayFormat.money(game.price(candidate.fee)))", tableName: "Actions")
                                         : Text("계약", tableName: "Actions")
                                 }
                                 .controlSize(.small)
@@ -90,18 +90,18 @@ struct MarketView: View {
                     ForEach(game.freeAgentMarket.prefix(15)) { player in
                         let market = Balance.marketSalary(ability: player.ability)
                         HStack {
-                            PlayerRow(game: game, player: player, trailing: String(localized: "시장가 \(Format.money(market))"))
+                            PlayerRow(game: game, player: player, trailing: String(localized: "시장가 \(DisplayFormat.money(market))"))
                             if game.proposals.contains(where: { $0.playerID == player.id }) {
                                 Text("제안함").note()
                             } else {
                                 Menu("제안") {
-                                    Button("시장가 (\(Format.money(market)), 2시즌)") {
+                                    Button("시장가 (\(DisplayFormat.money(market)), 2시즌)") {
                                         model.perform { try $0.proposeFreeAgent(player.id, salary: market, years: 2) }
                                     }
-                                    Button("20% 더 (\(Format.money(market * 12 / 10)), 2시즌)") {
+                                    Button("20% 더 (\(DisplayFormat.money(market * 12 / 10)), 2시즌)") {
                                         model.perform { try $0.proposeFreeAgent(player.id, salary: market * 12 / 10, years: 2) }
                                     }
-                                    Button("50% 더 (\(Format.money(market * 15 / 10)), 2시즌)") {
+                                    Button("50% 더 (\(DisplayFormat.money(market * 15 / 10)), 2시즌)") {
                                         model.perform { try $0.proposeFreeAgent(player.id, salary: market * 15 / 10, years: 2) }
                                     }
                                 }

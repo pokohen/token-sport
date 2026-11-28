@@ -8,10 +8,10 @@ struct PlayerDetail: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(player.origin + (player.traits.isEmpty ? "" : " · " + player.traits.map(\.rawValue).joined(separator: ", "))).note()
+            Text(player.origin + (player.traits.isEmpty ? "" : " · " + player.traits.map(\.localizedName).joined(separator: ", "))).note()
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), alignment: .leading, spacing: 2) {
                 ForEach(Attributes.weights(for: player.position).map(\.0), id: \.self) { key in
-                    Text("\(key.label(for: player.position.sport)) \(Int(player.attributes[key].rounded()))").font(.caption.monospacedDigit())
+                    Text("\(key.localizedLabel(for: player.position.sport)) \(Int(player.attributes[key].rounded()))").font(.caption.monospacedDigit())
                 }
             }
             if let line = player.football {
@@ -31,7 +31,7 @@ struct PlayerDetail: View {
             if game.isExpiring(player) {
                 let demand = game.renewalDemand(player)
                 if let counter = game.counters.first(where: { $0.playerID == player.id }) {
-                    Text("역제안: \(counter.years)시즌, 연봉 \(Format.money(counter.salary))").font(.caption.bold())
+                    Text("역제안: \(counter.years)시즌, 연봉 \(DisplayFormat.money(counter.salary))").font(.caption.bold())
                     HStack {
                         Button("수락") { model.perform { try $0.acceptCounter(counter.id) } }
                         Button("거절") { model.perform { $0.declineCounter(counter.id) } }
@@ -40,7 +40,7 @@ struct PlayerDetail: View {
                 } else if game.proposals.contains(where: { $0.playerID == player.id }) {
                     Text("재계약 제안을 보냈습니다. 다음 경기 뒤에 답이 옵니다.").font(.caption.bold())
                 } else {
-                    Text("재계약 요구: \(demand.years)시즌, 연봉 \(Format.money(demand.salary))").font(.caption.bold())
+                    Text("재계약 요구: \(demand.years)시즌, 연봉 \(DisplayFormat.money(demand.salary))").font(.caption.bold())
                     HStack {
                         Button("요구대로 제안") {
                             model.perform { try $0.proposeRenewal(player.id, salary: demand.salary, years: demand.years) }

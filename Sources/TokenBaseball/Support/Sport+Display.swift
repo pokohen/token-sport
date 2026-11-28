@@ -93,9 +93,16 @@ extension Player {
     }
 
     /// 던지는 손과 치는 손 ("우투좌타"). 야구 선수만 있다.
+    /// Hand의 rawValue(우/좌)는 저장 값이라 끼우지 않고, 네 가지를 통째로 쓴다.
     var handedness: String? {
         switch position.sport {
-        case .baseball: String(localized: "\(throwsHand.rawValue)투\(bats.rawValue)타")
+        case .baseball:
+            switch (throwsHand, bats) {
+            case (.right, .right): String(localized: "우투우타")
+            case (.right, .left): String(localized: "우투좌타")
+            case (.left, .right): String(localized: "좌투우타")
+            case (.left, .left): String(localized: "좌투좌타")
+            }
         case .football, .basketball, .duel: nil
         }
     }

@@ -10,7 +10,7 @@ struct SettingsTab: View {
             Card(String(localized: "상단바")) {
                 Picker("보일 숫자", selection: setting(\.menuBarDisplay)) {
                     ForEach(MenuBarDisplay.allCases, id: \.self) {
-                        Text(game.isCareer && $0 == .funds ? String(localized: "훈련 포인트") : $0.rawValue).tag($0)
+                        Text(game.isCareer && $0 == .funds ? String(localized: "훈련 포인트") : $0.localizedName).tag($0)
                     }
                 }
                 Toggle("훈련 애니메이션", isOn: setting(\.animationEnabled))
@@ -22,7 +22,7 @@ struct SettingsTab: View {
             }
             .font(.callout)
 
-            Card(String(localized: "모드"), trailing: String(localized: "지금: \(model.slot.label)")) {
+            Card(String(localized: "모드"), trailing: String(localized: "지금: \(model.slot.localizedLabel)")) {
                 SlotSwitcher()
             }
             .font(.callout)
@@ -30,7 +30,7 @@ struct SettingsTab: View {
             Card(String(localized: "난이도")) {
                 if !game.isCareer {
                     Picker("CPU 팀 맞춰주기", selection: setting(\.rubberBand)) {
-                        ForEach(RubberBand.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                        ForEach(RubberBand.allCases, id: \.self) { Text($0.localizedName).tag($0) }
                     }
                 }
                 HStack {
@@ -72,7 +72,7 @@ struct SettingsTab: View {
             if !game.hallOfFame.isEmpty {
                 Card(String(localized: "명예의 전당")) {
                     ForEach(Array(game.hallOfFame.enumerated()), id: \.offset) { _, entry in
-                        Text("\(entry.name) · \(entry.foundedSeason)~\(entry.endedSeason)시즌 · 최고 \(entry.bestTier.displayName)\(entry.star.map { String(localized: " · 간판 \($0)") } ?? "")").font(.callout)
+                        Text("\(entry.name) · \(entry.foundedSeason)~\(entry.endedSeason)시즌 · 최고 \(entry.bestTier.localizedDisplayName)\(entry.star.map { String(localized: " · 간판 \($0)") } ?? "")").font(.callout)
                     }
                 }
             }

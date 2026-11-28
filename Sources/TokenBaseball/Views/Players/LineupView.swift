@@ -35,7 +35,7 @@ struct LineupView: View {
                                 .disabled(index == ids.count - 1)
                             Menu(String(localized: "교체", table: "Actions")) {
                                 ForEach(bench) { sub in
-                                    Button("\(sub.position.label) \(sub.name) (\(Int(sub.ability.rounded())))") {
+                                    Button("\(sub.position.localizedLabel) \(sub.name) (\(Int(sub.ability.rounded())))") {
                                         var next = ids
                                         next[index] = sub.id
                                         model.perform { try $0.setLineup(next) }
@@ -60,12 +60,12 @@ struct LineupView: View {
                     set: { value in model.perform { try $0.setNextStarter(value) } })
                 ) {
                     Text("자동 (\(game.players[lineup.starter]?.name ?? ""))").tag(PlayerID?.none)
-                    ForEach(pitchers) { Text("\($0.position.label) \($0.name)").tag(PlayerID?.some($0.id)) }
+                    ForEach(pitchers) { Text("\($0.position.localizedLabel) \($0.name)").tag(PlayerID?.some($0.id)) }
                 }
                 .font(.callout)
                 ForEach(lineup.bullpen, id: \.self) { id in
                     if let player = game.players[id] {
-                        KeyValueRow(key: "\(player.position.label) \(player.name)", value: "\(Int(player.ability.rounded()))")
+                        KeyValueRow(key: "\(player.position.localizedLabel) \(player.name)", value: "\(Int(player.ability.rounded()))")
                     }
                 }
                 Text("선발 투수는 등판 후 \(Balance.starterRest(game.userTier))경기를 쉬어야 다시 선발로 나옵니다.").note()

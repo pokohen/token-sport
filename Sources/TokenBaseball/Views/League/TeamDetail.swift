@@ -10,7 +10,7 @@ struct TeamDetail: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("강도 \(Int(game.strength(of: team.id))) · 훈련소 Lv\(team.trainingLevel) · 경기장 Lv\(team.stadiumLevel)\(team.isUser ? "" : " · \(team.style.label(game.sport))")").note()
+            Text("강도 \(Int(game.strength(of: team.id))) · 훈련소 Lv\(team.trainingLevel) · 경기장 Lv\(team.stadiumLevel)\(team.isUser ? "" : " · \(team.style.localizedLabel(game.sport))")").note()
             if game.sport == .football {
                 Text("득점 \(row.runsFor) · 실점 \(row.runsAgainst) · 골득실 \(row.goalDifference > 0 ? "+" : "")\(row.goalDifference) · 승점 \(row.points)").note()
             } else if game.sport == .basketball {
@@ -23,7 +23,7 @@ struct TeamDetail: View {
                 PlayerLine(player: player, style: .compact) {
                     if !game.isCareer, !team.isUser, game.tradeWindowOpen {
                         let fee = game.value(for: player) * 13 / 10
-                        Button("제안 \(Format.money(fee))") {
+                        Button("제안 \(DisplayFormat.money(fee))") {
                             model.perform { try $0.proposeTransfer(player.id, fee: fee) }
                         }
                         .controlSize(.mini)

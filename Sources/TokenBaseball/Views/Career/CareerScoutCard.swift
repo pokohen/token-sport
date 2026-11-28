@@ -42,7 +42,7 @@ struct CareerScoutCard: View {
                 EmblemView(team: team, size: 24)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(team.name).font(.callout.weight(.medium)).lineLimit(1)
-                    Text("\(team.tier.displayName(for: game.sport)) · \(game.rank(of: team.id))위 · 가면 \(game.careerRole(on: team.id).rawValue)").note()
+                    Text("\(team.tier.localizedDisplayName(for: game.sport)) · \(game.rank(of: team.id))위 · 가면 \(game.careerRole(on: team.id).localizedName)").note()
                 }
                 Spacer()
                 Text(change(scout.lastChange)).font(.caption.monospacedDigit())

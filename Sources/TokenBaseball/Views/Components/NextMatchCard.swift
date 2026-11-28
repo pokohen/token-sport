@@ -16,7 +16,7 @@ struct NextMatchCard: View {
                 let opponent = game.teams[next.opponent]
                 // 몇 번째 경기인지 크게 적는다.
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(next.label).font(.title2.bold().monospacedDigit())
+                    Text(game.localizedLabel(of: next)).font(.title2.bold().monospacedDigit())
                     if next.kind == .regular {
                         Text("/ 전체 \(game.roundsPerSeason)라운드").font(.callout).foregroundStyle(.secondary)
                     }
@@ -28,7 +28,7 @@ struct NextMatchCard: View {
                     EmblemView(team: opponent, size: 28)
                     VStack(alignment: .leading) {
                         Text(next.userIsHome ? "홈 vs \(opponent.name)" : "원정 vs \(opponent.name)").font(.callout.weight(.medium))
-                        Text("\(opponent.tier.displayName(for: game.sport)) · 강도 \(Int(game.strength(of: opponent.id)))\(game.sport == .football ? " · \(game.formation(of: opponent.id).label)" : "")").note()
+                        Text("\(opponent.tier.localizedDisplayName(for: game.sport)) · 강도 \(Int(game.strength(of: opponent.id)))\(game.sport == .football ? " · \(game.formation(of: opponent.id).label)" : "")").note()
                     }
                     Spacer()
                     Button("경기 시작") {
@@ -42,7 +42,7 @@ struct NextMatchCard: View {
                     if let wait = game.timeToNextCharge(now: model.now) {
                         // 얼마나 남았는지, 몇 시에 되는지, 얼마나 찼는지를 함께 보여 준다.
                         HStack(spacing: 8) {
-                            Text("다음 경기까지 \(Format.countdown(wait))").font(.callout.weight(.medium))
+                            Text("다음 경기까지 \(DisplayFormat.countdown(wait))").font(.callout.weight(.medium))
                             Text("\(model.now.addingTimeInterval(wait).formatted(date: .omitted, time: .shortened))에 가능").note()
                             Spacer()
                         }
@@ -53,7 +53,7 @@ struct NextMatchCard: View {
                              ? String(localized: "기다리지 않고 훈련 포인트로 바로 치를 수 있습니다. 연달아 쓰면 두 배씩 비싸지고, 경기 기회가 새로 생기면 처음 값으로 돌아갑니다. 이렇게 치른 경기에서는 실전 경험으로 능력이 조금 오릅니다 (평점이 좋을수록 많이).")
                              : String(localized: "기다리지 않고 자금으로 바로 치를 수 있습니다. 연달아 쓰면 두 배씩 비싸지고, 경기 기회가 새로 생기면 처음 값으로 돌아갑니다.")).note()
                         Spacer()
-                        Button("바로 경기 · \(game.fundsText(game.extraMatchCost))") {
+                        Button("바로 경기 · \(game.localizedFundsText(game.extraMatchCost))") {
                             model.buyExtraMatchAndStart()
                             if model.game?.isMatchLive == true { goToMatch() }
                         }

@@ -53,7 +53,7 @@ struct CareerTrainingTab: View {
         let blocked = game.careerTrainingBlockedReason(key)
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
-                Text(CareerDrill.name(key, sport: game.sport)).font(.callout.weight(.medium))
+                Text(CareerDrill.localizedName(key, sport: game.sport)).font(.callout.weight(.medium))
                 Text("\(label(key)) \(String(format: "%.2f", value))").note()
             }
             .frame(width: 118, alignment: .leading)
@@ -71,7 +71,7 @@ struct CareerTrainingTab: View {
         }
     }
 
-    private func label(_ key: Attributes.Key) -> String { key.label(for: game.sport) }
+    private func label(_ key: Attributes.Key) -> String { key.localizedLabel(for: game.sport) }
 
     private func sessionsText(_ career: Career) -> String {
         career.sessionsLeft <= 0 && game.careerExtraTrainingEnabled

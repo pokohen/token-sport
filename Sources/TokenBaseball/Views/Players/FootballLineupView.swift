@@ -23,7 +23,7 @@ struct FootballLineupView: View {
                             Text("\(Int(player.ability.rounded()))").font(.callout.monospacedDigit())
                             Menu(String(localized: "교체", table: "Actions")) {
                                 ForEach(bench) { sub in
-                                    Button("\(sub.position.label) \(sub.name) (\(Int(sub.ability.rounded())))") {
+                                    Button("\(sub.position.localizedLabel) \(sub.name) (\(Int(sub.ability.rounded())))") {
                                         var next = ids
                                         next[index] = sub.id
                                         model.perform { try $0.setLineup(next) }
@@ -44,7 +44,7 @@ struct FootballLineupView: View {
             Card(String(localized: "벤치"), trailing: String(localized: "\(bench.count)명")) {
                 if bench.isEmpty { Text("벤치에 선수가 없습니다.").note() }
                 ForEach(bench) { player in
-                    KeyValueRow(key: "\(player.position.label) \(player.name)", value: "\(Int(player.ability.rounded()))")
+                    KeyValueRow(key: "\(player.position.localizedLabel) \(player.name)", value: "\(Int(player.ability.rounded()))")
                 }
                 Text("한 경기에 5명까지, 60분 이후 지친 선수부터 같은 포지션의 벤치 선수로 자동 교체됩니다.").note()
             }

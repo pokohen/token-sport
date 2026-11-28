@@ -20,7 +20,7 @@ struct PlayerRow: View {
                     }
                     if player.isForeign { Text("외").font(.caption2).padding(.horizontal, 3).background(.quaternary, in: Capsule()) }
                 }
-                Text("\(player.age)세 · \(player.handedness ?? player.position.label) · \(trailing ?? String(localized: "연봉 \(Format.money(player.contract.salary))"))").note()
+                Text("\(player.age)세 · \(player.handedness ?? player.position.localizedLabel) · \(trailing ?? String(localized: "연봉 \(DisplayFormat.money(player.contract.salary))"))").note()
             }
             Spacer()
             Stars(count: player.scoutStars(scoutLevel: game.userTeam.scoutLevel))

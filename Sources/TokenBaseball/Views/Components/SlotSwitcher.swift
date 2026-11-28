@@ -10,7 +10,7 @@ struct SlotSwitcher: View {
             ForEach(model.selectableSlots.filter { $0 != model.slot }, id: \.self) { slot in
                 HStack {
                     BallIcon(sport: slot.sport)
-                    Text(slot.label)
+                    Text(slot.localizedLabel)
                     Text(model.hasSave(slot: slot) ? "저장되어 있음" : "아직 없음").note()
                     Spacer()
                     Button(model.hasSave(slot: slot) ? "이어서 하기" : "새로 만들기") { model.switchSlot(to: slot) }

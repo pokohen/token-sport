@@ -63,9 +63,9 @@ struct LastResultCard: View {
     let result: LastResult
 
     var body: some View {
-        Card(String(localized: "지난 경기"), trailing: result.kind.label) {
+        Card(String(localized: "지난 경기"), trailing: result.kind.localizedLabel) {
             HStack {
-                Text(result.label).font(.title3.bold()).foregroundStyle(color)
+                Text(result.localizedLabel).font(.title3.bold()).foregroundStyle(color)
                 Text(result.wasHome ? "홈 vs \(result.opponent)" : "원정 vs \(result.opponent)").font(.callout)
             }
             ForEach(result.summary, id: \.self) { Text($0).note() }

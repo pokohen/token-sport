@@ -43,7 +43,7 @@ struct RootView: View {
                     // 한 모드의 파일이 깨져도 다른 모드는 계속 할 수 있어야 한다.
                     ForEach(model.selectableSlots.filter { $0 != model.slot }, id: \.self) { other in
                         Button { model.switchSlot(to: other) } label: {
-                            other.isCareer ? Text("\(other.label)로 가기") : Text("\(other.label)으로 가기")
+                            other.isCareer ? Text("\(other.localizedLabel)로 가기") : Text("\(other.localizedLabel)으로 가기")
                         }
                     }
                     Button(String(localized: "종료", table: "Actions")) { NSApplication.shared.terminate(nil) }

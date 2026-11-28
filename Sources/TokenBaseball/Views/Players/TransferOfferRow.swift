@@ -11,9 +11,9 @@ struct TransferOfferRow: View {
         if let player = game.players[offer.playerID] {
             VStack(alignment: .leading, spacing: 4) {
                 if let swapID = offer.swapPlayerID, let swap = game.players[swapID] {
-                    Text("\(game.teams[offer.fromTeam].name): \(player.name) ↔ \(swap.position.label) \(swap.name) (\(swap.grade) \(Int(swap.ability.rounded())), \(swap.age)세)").font(.callout)
+                    Text("\(game.teams[offer.fromTeam].name): \(player.name) ↔ \(swap.position.localizedLabel) \(swap.name) (\(swap.grade) \(Int(swap.ability.rounded())), \(swap.age)세)").font(.callout)
                 } else {
-                    Text("\(game.teams[offer.fromTeam].name): \(player.name)에게 \(Format.money(offer.fee))").font(.callout)
+                    Text("\(game.teams[offer.fromTeam].name): \(player.name)에게 \(DisplayFormat.money(offer.fee))").font(.callout)
                 }
                 HStack {
                     Button("수락") { model.perform { try $0.respond(to: offer.id, .accept) } }

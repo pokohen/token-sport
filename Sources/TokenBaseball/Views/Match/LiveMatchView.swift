@@ -28,7 +28,7 @@ struct LiveMatchView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card(live.kind.label, trailing: state.inningLabel) {
+            Card(live.kind.localizedLabel, trailing: state.localizedInningLabel) {
                 scoreboard
             }
             if let myName {
@@ -52,7 +52,7 @@ struct LiveMatchView: View {
                 KeyValueRow(key: String(localized: "타자 \(batter.name)"), value: String(localized: "\(batter.line.atBats)타수 \(batter.line.hits)안타"))
             }
             CommentaryCard(log: state.log, myName: myName)
-            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.runs) : \($0.home.runs) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.inningLabel) })
+            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.runs) : \($0.home.runs) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.localizedInningLabel) })
         }
     }
 

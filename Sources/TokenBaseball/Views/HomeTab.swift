@@ -13,7 +13,7 @@ struct HomeTab: View {
                     EmblemView(team: game.userTeam, size: 44)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(game.userTeam.name).font(.headline)
-                        Text("\(game.userTier.displayName) · \(game.season)시즌 · \(game.phaseText)").note()
+                        Text("\(game.userTier.localizedDisplayName) · \(game.season)시즌 · \(game.phaseText)").note()
                     }
                     Spacer()
                     if game.phase == .regular {
@@ -31,7 +31,7 @@ struct HomeTab: View {
                 Text("₩\(game.funds.balance.formatted())").font(.title2.bold().monospacedDigit())
                     .foregroundStyle(game.funds.balance < 0 ? Theme.loss : .primary)
                 KeyValueRow(key: String(localized: "오늘 번 자금 (오늘 쓴 토큰)"), value: "₩\(model.todayTokens.formatted())")
-                KeyValueRow(key: String(localized: "누적 토큰 수입"), value: Format.money(game.funds.tokenIncome))
+                KeyValueRow(key: String(localized: "누적 토큰 수입"), value: DisplayFormat.money(game.funds.tokenIncome))
                 KeyValueRow(key: String(localized: "경기당 연봉"), value: "−₩\(game.salaryPerMatch.formatted())")
                 KeyValueRow(key: String(localized: "인지도"), value: "\(Int(game.userTeam.fame))")
             }

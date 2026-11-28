@@ -23,8 +23,8 @@ struct CareerHallCard: View {
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 1) {
-                                Text("\(item.record.name) · \(item.record.position.label)").font(.callout.weight(.medium))
-                                Text("\(item.record.honor) · \(item.record.seasons)시즌 · 최고 \(item.record.bestTier.displayName)").note()
+                                Text("\(item.record.name) · \(item.record.position.localizedLabel)").font(.callout.weight(.medium))
+                                Text("\(item.record.localizedHonor) · \(item.record.seasons)시즌 · 최고 \(item.record.bestTier.localizedDisplayName)").note()
                             }
                             Spacer()
                             Image(systemName: open == item.index ? "chevron.up" : "chevron.down").font(.caption)

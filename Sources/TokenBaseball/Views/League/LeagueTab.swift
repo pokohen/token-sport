@@ -17,7 +17,7 @@ struct LeagueTab: View {
             .pickerStyle(.segmented)
             .labelsHidden()
 
-            Card(shown.displayName(for: game.sport), trailing: String(localized: "강도 범위 \(Int(Balance.strengthRange(shown).lowerBound))~\(Int(Balance.strengthRange(shown).upperBound))")) {
+            Card(shown.localizedDisplayName(for: game.sport), trailing: String(localized: "강도 범위 \(Int(Balance.strengthRange(shown).lowerBound))~\(Int(Balance.strengthRange(shown).upperBound))")) {
                 standings
             }
             if shown == game.userTier { promotion }
@@ -106,7 +106,7 @@ struct LeagueTab: View {
                 KeyValueRow(
                     key: String(localized: "필요 인지도"), value: "\(Int(game.userTeam.fame)) / \(Int(requirement.fame))",
                     valueColor: game.userTeam.fame >= requirement.fame ? Theme.win : Theme.loss)
-                KeyValueRow(key: String(localized: "신청비"), value: Format.money(requirement.fee))
+                KeyValueRow(key: String(localized: "신청비"), value: DisplayFormat.money(requirement.fee))
                 KeyValueRow(key: String(localized: "신청 마감"), value: String(localized: "\(Balance.applicationDeadlineRound)라운드 (지금 \(game.round)라운드 종료)"))
                 if game.appliedForPromotion {
                     Label("신청 완료. 시즌이 끝났을 때 1위면 자동 승격, 2위나 3위면 와일드카드를 거쳐 승강 플레이오프에 나갑니다.", systemImage: "checkmark.seal.fill")

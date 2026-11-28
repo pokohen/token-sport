@@ -20,7 +20,7 @@ struct MatchSpeedCard: View {
                 HStack {
                     Text("기다리지 않고 남은 경기를 끝까지 치릅니다. 결과는 지켜봤을 때와 같습니다.").note()
                     Spacer(minLength: 8)
-                    Button("결과 바로 보기 · \(game.fundsText(game.skipMatchCost))") { model.skipMatch() }
+                    Button("결과 바로 보기 · \(game.localizedFundsText(game.skipMatchCost))") { model.skipMatch() }
                         .disabled(blocked != nil)
                         .help(blocked ?? String(localized: "토큰을 내고 경기 결과를 바로 봅니다"))
                 }
