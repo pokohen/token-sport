@@ -38,11 +38,11 @@ extension AppModel {
 
     var menuBarText: String {
         guard let game else { return "Token Sports" }
-        return game.menuBarText(now: now, todayTokens: todayTokens)
+        return game.localizedMenuBarText(now: now, todayTokens: todayTokens)
     }
 
     var tooltip: String {
-        game?.menuBarTooltip(now: now, todayTokens: todayTokens) ?? "Token Sports"
+        game?.localizedMenuBarTooltip(now: now, todayTokens: todayTokens) ?? "Token Sports"
     }
 
     /// 지금 보여줄 훈련 모습. 경기 중에는 상단바에 훈련 대신 공이 나오므로 여기서 따로 다루지 않는다.

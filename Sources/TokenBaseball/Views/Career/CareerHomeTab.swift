@@ -21,7 +21,7 @@ struct CareerHomeTab: View {
                 if let goal = career.goal {
                     Card(String(localized: "시즌 목표")) {
                         KeyValueRow(
-                            key: goal.label,
+                            key: goal.localizedLabel,
                             value: goal.achieved.map { $0 ? String(localized: "달성") : String(localized: "실패") } ?? "\(goal.progress(of: me)) / \(goal.target)",
                             valueColor: goal.achieved == true ? Theme.win : goal.achieved == false ? Theme.loss : .primary)
                         if game.sport != .duel { Text("채우면 감독 신뢰 +10, 명성 +3. 채우지 못하면 감독 신뢰 −5.").note() }
@@ -32,7 +32,7 @@ struct CareerHomeTab: View {
                 if let visitor = game.careerScoutVisitor, !game.isMatchLive {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Image(systemName: "binoculars.fill").accessibilityHidden(true)
-                        Text("\(visitor.tier.displayName(for: game.sport)) \(visitor.name) 스카우트가 다음 경기를 직접 보러 옵니다.")
+                        Text("\(visitor.tier.localizedDisplayName(for: game.sport)) \(visitor.name) 스카우트가 다음 경기를 직접 보러 옵니다.")
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .font(.callout.weight(.medium)).foregroundStyle(Theme.warn)
@@ -49,10 +49,10 @@ struct CareerHomeTab: View {
                 EmblemView(team: game.userTeam, size: 44)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(me.name).font(.headline)
-                    Text([String(localized: "\(me.age)세"), me.position.label, me.handedness].compactMap { $0 }.joined(separator: " · ")).note()
+                    Text([String(localized: "\(me.age)세"), me.position.localizedLabel, me.handedness].compactMap { $0 }.joined(separator: " · ")).note()
                     Text(career.isFreeAgent
                         ? "무소속 · \(game.season)시즌"
-                        : "\(game.userTeam.name) · \(game.userTier.displayName(for: game.sport))").note()
+                        : "\(game.userTeam.name) · \(game.userTier.localizedDisplayName(for: game.sport))").note()
                     Text("\(game.season)시즌 · \(game.phaseText)").note()
                 }
                 Spacer()
@@ -64,16 +64,16 @@ struct CareerHomeTab: View {
             if let talent = game.careerTalent {
                 KeyValueRow(
                     key: String(localized: "타고난 재능"),
-                    value: talent.rawValue + (career.startAbility.map { String(localized: " · 타고난 능력 \(Int($0))") } ?? ""))
+                    value: talent.localizedName + (career.startAbility.map { String(localized: " · 타고난 능력 \(Int($0))") } ?? ""))
             }
             if let fans = career.fans {
                 // e스포츠: 감독 신뢰 대신 팬 수. 명성은 팬 수에서 나온다.
-                KeyValueRow(key: String(localized: "팬"), value: fansText(fans))
-                if let title = game.duelTitle { KeyValueRow(key: String(localized: "칭호"), value: title, valueColor: Theme.warn) }
+                KeyValueRow(key: String(localized: "팬"), value: DisplayFormat.fans(fans))
+                if let title = game.localizedDuelTitle { KeyValueRow(key: String(localized: "칭호"), value: title, valueColor: Theme.warn) }
                 if let next = game.nextDuelTournament {
                     KeyValueRow(
                         key: String(localized: "다음 개인 대회 (\(next.round)라운드 뒤)"),
-                        value: next.eligible ? next.tournament.baseName : String(localized: "\(next.tournament.baseName) · 팬 \(fansText(next.tournament.requiredFans)) 필요"))
+                        value: next.eligible ? next.tournament.localizedBaseName : String(localized: "\(next.tournament.localizedBaseName) · 팬 \(DisplayFormat.fans(next.tournament.requiredFans)) 필요"))
                 }
             } else {
                 Meter(label: String(localized: "감독 신뢰"), value: career.trust, color: career.trust < Balance.careerRenewalTrust ? Theme.loss : .accentColor)
@@ -90,15 +90,15 @@ struct CareerHomeTab: View {
     @ViewBuilder private func form(_ career: Career) -> some View {
         let condition = game.careerCondition
         KeyValueRow(
-            key: String(localized: "다음 경기 컨디션"), value: condition.label + percent(condition.modifier),
+            key: String(localized: "다음 경기 컨디션"), value: condition.localizedLabel + percent(condition.modifier),
             valueColor: condition.modifier > 0 ? Theme.win : condition.modifier < 0 ? Theme.loss : .primary)
-        if let streak = game.careerStreakText {
+        if let streak = game.localizedCareerStreakText {
             KeyValueRow(
                 key: game.careerStreak > 0 ? String(localized: "기세") : String(localized: "슬럼프"), value: streak + percent(game.careerMomentum),
                 valueColor: game.careerStreak > 0 ? Theme.win : Theme.loss)
         }
         if (career.run ?? 0) >= 2 || (career.bestRun ?? 0) >= 3 {
-            KeyValueRow(key: game.careerRunLabel, value: String(localized: "\(career.run ?? 0)경기 (최고 \(career.bestRun ?? 0)경기)"))
+            KeyValueRow(key: game.localizedCareerRunLabel, value: String(localized: "\(career.run ?? 0)경기 (최고 \(career.bestRun ?? 0)경기)"))
         }
     }
 

@@ -41,7 +41,7 @@ struct OnboardingView: View {
                 if step > 0 { Button("이전") { step -= step == 2 && fixedSport != nil ? 2 : 1 } }
                 Spacer()
                 if step == 1, fixedSport == nil, model.hasSave(slot: slot) {
-                    Button("\(slot.label) 이어서 하기") { model.switchSlot(to: slot) }
+                    Button("\(slot.localizedLabel) 이어서 하기") { model.switchSlot(to: slot) }
                         .keyboardShortcut(.defaultAction)
                 } else if makingPlayer, step == 2 {
                     if career.pointsLeft > 0 {
@@ -85,7 +85,7 @@ struct OnboardingView: View {
                 Text("구단이 파산해 해체되었습니다. 세계는 그대로 이어지고, 6부 시민 아마추어에서 새 시민 구단으로 다시 시작합니다.")
                 if let last = model.game?.hallOfFame.last {
                     Card(String(localized: "명예의 전당")) {
-                        Text("\(last.name) · \(last.foundedSeason)~\(last.endedSeason)시즌 · 최고 \(last.bestTier.displayName)")
+                        Text("\(last.name) · \(last.foundedSeason)~\(last.endedSeason)시즌 · 최고 \(last.bestTier.localizedDisplayName)")
                         if let star = last.star { Text("간판 선수 \(star)").note() }
                     }
                 }
@@ -116,7 +116,7 @@ struct OnboardingView: View {
                         Button { slot = item } label: {
                             VStack(spacing: 6) {
                                 BallIcon(sport: item.sport, size: 36)
-                                Text(item.label).font(.headline)
+                                Text(item.localizedLabel).font(.headline)
                                 Text(model.hasSave(slot: item) ? "저장되어 있음"
                                     : item == .football ? "구단 경영 · 승점제" : item == .footballPlayer ? "선수 한 명의 커리어"
                                     : item == .basketballPlayer ? "가드·포워드·센터의 커리어"
@@ -130,15 +130,15 @@ struct OnboardingView: View {
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(item.label)
+                        .accessibilityLabel(item.localizedLabel)
                     }
                 }
                 Text(slot.isCareer
-                    ? "\(slot.label): 16세에 6부 시민 구단에 입단해, 토큰으로 훈련하고 더 높은 리그로 올라가 1부 프로 리그의 스타가 되는 것이 목표입니다. 구단은 모두 CPU가 운영합니다."
+                    ? "\(slot.localizedLabel): 16세에 6부 시민 구단에 입단해, 토큰으로 훈련하고 더 높은 리그로 올라가 1부 프로 리그의 스타가 되는 것이 목표입니다. 구단은 모두 CPU가 운영합니다."
                     : "구단과 선수는 따로 저장됩니다. 나중에 설정에서 다른 모드로 바꿔 하나 더 만들 수 있습니다. 한 번에 하나만 토큰을 받습니다.").note()
             case 2 where makingPlayer:
                 CareerForm(setup: $career, sport: slot.sport)
-                Text("\(LeagueTier.citizenAmateur.displayName) 리그의 시민 구단에 입단합니다. 시작 훈련 포인트 \(Format.tokens(FundsLedger.startingFunds)) P.").note()
+                Text("\(LeagueTier.citizenAmateur.localizedDisplayName) 리그의 시민 구단에 입단합니다. 시작 훈련 포인트 \(Format.tokens(FundsLedger.startingFunds)) P.").note()
             case 2:
                 ChoiceGrid(items: NameGenerator.userCities, selection: $city, columns: 4) { $0 }
             case 3:
@@ -171,7 +171,7 @@ struct OnboardingView: View {
                         .frame(width: 48, height: 48)
                         VStack(alignment: .leading) {
                             Text(finalName).font(.headline)
-                            Text("\(LeagueTier.citizenAmateur.displayName) · \(chosen.label) · 선수 \(chosen == .football ? 16 : 14)명 · 시작 자금 ₩\(FundsLedger.startingFunds.formatted())").note()
+                            Text("\(LeagueTier.citizenAmateur.localizedDisplayName) · \(chosen.localizedLabel) · 선수 \(chosen == .football ? 16 : 14)명 · 시작 자금 ₩\(FundsLedger.startingFunds.formatted())").note()
                         }
                     }
                 }

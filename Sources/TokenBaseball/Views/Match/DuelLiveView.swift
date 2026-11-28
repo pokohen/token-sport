@@ -15,7 +15,7 @@ struct DuelLiveView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card(live.kind.label, trailing: trailing) {
+            Card(live.kind.localizedLabel, trailing: trailing) {
                 LiveScoreLine(
                     awayName: state.away.name, awayScore: state.away.sets,
                     homeName: state.home.name, homeScore: state.home.sets)
@@ -24,7 +24,7 @@ struct DuelLiveView: View {
                     let winner = record.homeWon ? record.home : record.away
                     KeyValueRow(
                         key: String(localized: "\(record.number)세트\(record.decider ? String(localized: " (에이스 결정전)") : "") · \(record.map)"),
-                        value: String(localized: "\(winner.name)(\(winner.race.label)) 승"),
+                        value: String(localized: "\(winner.name)(\(winner.race.localizedLabel)) 승"),
                         valueColor: (record.homeWon == live.userIsHome) ? Theme.win : Theme.loss)
                 }
             }
@@ -71,21 +71,21 @@ struct DuelLiveView: View {
         let a = set.sides[myIndex], b = set.sides[1 - myIndex]
         Card(String(localized: "\(state.records.count + 1)세트 · \(set.map.name)"), trailing: set.stakes == .regular ? nil : String(localized: "에이스 결정전")) {
             HStack {
-                Text("\(a.player.name) (\(a.player.race.label))").font(.callout.weight(.semibold)).foregroundStyle(Color.accentColor)
+                Text("\(a.player.name) (\(a.player.race.localizedLabel))").font(.callout.weight(.semibold)).foregroundStyle(Color.accentColor)
                 Spacer()
                 Text("대").note()
                 Spacer()
-                Text("\(b.player.name) (\(b.player.race.label))").font(.callout.weight(.semibold)).foregroundStyle(Theme.warn)
+                Text("\(b.player.name) (\(b.player.race.localizedLabel))").font(.callout.weight(.semibold)).foregroundStyle(Theme.warn)
             }
             DuelMinimap(set: set, myIndex: myIndex)
                 .accessibilityLabel("미니맵: 확장 \(a.bases) 대 \(b.bases)")
-            Text(set.map.note).note()
+            Text(set.map.localizedNote).note()
             MirrorStatGrid(rows: [
                 .init(String(localized: "확장"), "\(a.bases)", "\(b.bases)"),
                 .init(String(localized: "병력"), "\(Int(a.army.rounded()))", "\(Int(b.army.rounded()))"),
                 .init(String(localized: "일꾼"), "\(Int(a.workers.rounded()))", "\(Int(b.workers.rounded()))"),
                 .init(String(localized: "잡은 병력"), "\(Int(a.armyKilled.rounded()))", "\(Int(b.armyKilled.rounded()))"),
-                .init(String(localized: "빌드"), set.tick > 1 ? a.build.label : "-", set.tick > 1 ? b.build.label : "-"),
+                .init(String(localized: "빌드"), set.tick > 1 ? a.build.localizedLabel : "-", set.tick > 1 ? b.build.localizedLabel : "-"),
             ])
         }
     }

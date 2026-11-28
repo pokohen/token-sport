@@ -8,10 +8,10 @@ struct ClubTab: View {
     var body: some View {
         VStack(spacing: 10) {
             Card(String(localized: "시설")) {
-                facility(.training, name: Balance.trainingNames(game.sport)[game.userTeam.trainingLevel - 1],
+                facility(.training, name: Facility.localizedTrainingNames(game.sport)[game.userTeam.trainingLevel - 1],
                          effect: String(localized: "성장 ×\(String(format: "%.2f", Balance.trainingMultiplier[game.userTeam.trainingLevel - 1]))"))
                 Divider()
-                facility(.stadium, name: Balance.stadiumNames(game.sport)[game.userTeam.stadiumLevel - 1],
+                facility(.stadium, name: Facility.localizedStadiumNames(game.sport)[game.userTeam.stadiumLevel - 1],
                          effect: String(localized: "수용 \(Balance.stadiumCapacity[game.userTeam.stadiumLevel - 1].formatted())명 · 홈 보정 +\(String(format: "%.1f", Balance.stadiumHomeEdge[game.userTeam.stadiumLevel - 1] * 100))%"))
                 Divider()
                 facility(.scout, name: game.userTeam.scoutLevel == 0 ? String(localized: "없음") : String(localized: "스카우트 팀"),
@@ -23,11 +23,11 @@ struct ClubTab: View {
                     let blocked = game.promotionBlockedReason(promotion)
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(promotion.label(game.sport)).font(.callout)
-                            Text(blocked ?? (promotion.note.isEmpty ? String(localized: "인지도 +\(Int(game.promotionEffect(promotion)))") : String(localized: "인지도 +\(Int(game.promotionEffect(promotion))) · \(promotion.note)"))).note()
+                            Text(promotion.localizedLabel(game.sport)).font(.callout)
+                            Text(blocked ?? (promotion.localizedNote.isEmpty ? String(localized: "인지도 +\(Int(game.promotionEffect(promotion)))") : String(localized: "인지도 +\(Int(game.promotionEffect(promotion))) · \(promotion.localizedNote)"))).note()
                         }
                         Spacer()
-                        Button(Format.money(game.price(promotion.cost))) {
+                        Button(DisplayFormat.money(game.price(promotion.cost))) {
                             model.perform { try $0.promote(promotion) }
                         }
                         .disabled(blocked != nil || game.funds.balance < game.price(promotion.cost))
@@ -59,12 +59,12 @@ struct ClubTab: View {
     private func facility(_ facility: Facility, name: String, effect: String) -> some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("\(facility.rawValue) Lv\(game.facilityLevel(facility)) · \(name)").font(.callout.weight(.medium))
+                Text("\(facility.localizedName) Lv\(game.facilityLevel(facility)) · \(name)").font(.callout.weight(.medium))
                 Text(effect).note()
             }
             Spacer()
             if let cost = game.upgradeCost(facility) {
-                Button("업그레이드 \(Format.money(cost))") { model.perform { try $0.upgrade(facility) } }
+                Button("업그레이드 \(DisplayFormat.money(cost))") { model.perform { try $0.upgrade(facility) } }
                     .disabled(game.funds.balance < cost || game.crisisMatchesLeft != nil)
             } else {
                 Text("최고 레벨").note()
@@ -97,24 +97,24 @@ struct ClubTab: View {
     private var finance: some View {
         Card(String(localized: "이번 시즌 재정")) {
             let income = FundsLedger.Category.allCases.compactMap { category in
-                game.funds.seasonIncome[category.rawValue].map { (category.rawValue, $0) }
+                game.funds.seasonIncome[category.rawValue].map { (category, $0) }
             }
             let expense = FundsLedger.Category.allCases.compactMap { category in
-                game.funds.seasonExpense[category.rawValue].map { (category.rawValue, $0) }
+                game.funds.seasonExpense[category.rawValue].map { (category, $0) }
             }
             let totalIncome = income.reduce(0) { $0 + $1.1 }
             let totalExpense = expense.reduce(0) { $0 + $1.1 }
-            Text("수입 \(Format.money(totalIncome))").font(.caption.bold())
-            ForEach(income, id: \.0) { name, amount in
+            Text("수입 \(DisplayFormat.money(totalIncome))").font(.caption.bold())
+            ForEach(income, id: \.0) { category, amount in
                 KeyValueRow(
-                    key: "\(name) (\(totalIncome > 0 ? amount * 100 / totalIncome : 0)%)",
+                    key: "\(category.localizedName) (\(totalIncome > 0 ? amount * 100 / totalIncome : 0)%)",
                     value: "₩\(amount.formatted())", valueColor: Theme.win)
             }
             if income.isEmpty { Text("아직 수입이 없습니다.").note() }
             Divider()
-            Text("지출 \(Format.money(totalExpense))").font(.caption.bold())
-            ForEach(expense, id: \.0) { name, amount in
-                KeyValueRow(key: name, value: "−₩\(amount.formatted())", valueColor: Theme.loss)
+            Text("지출 \(DisplayFormat.money(totalExpense))").font(.caption.bold())
+            ForEach(expense, id: \.0) { category, amount in
+                KeyValueRow(key: category.localizedName, value: "−₩\(amount.formatted())", valueColor: Theme.loss)
             }
             if expense.isEmpty { Text("아직 지출이 없습니다.").note() }
             Divider()

@@ -8,17 +8,17 @@ struct DuelCircuitCard: View {
 
     var body: some View {
         let fans = career.fans ?? 0
-        Card(String(localized: "개인 대회"), trailing: game.duelTitle.map { String(localized: "칭호: \($0)") }) {
+        Card(String(localized: "개인 대회"), trailing: game.localizedDuelTitle.map { String(localized: "칭호: \($0)") }) {
             Text("팀 리그와 상관없이 팬 수로 나갑니다. 바로 아래 대회에서 우승하면 팬이 모자라도 다음 대회 한 번은 초대받습니다.").note()
             ForEach(DuelTournament.allCases.reversed(), id: \.self) { tournament in
                 let wins = (career.duelWins ?? []).indices.contains(tournament.rawValue - 1) ? career.duelWins![tournament.rawValue - 1] : 0
                 let open = game.canEnterDuel(tournament)
                 KeyValueRow(
-                    key: String(localized: "\(tournament.rawValue)단계 \(tournament.baseName)"),
-                    value: (open ? String(localized: "출전 가능") : String(localized: "팬 \(fansText(tournament.requiredFans))")) + (wins > 0 ? String(localized: " · 우승 \(wins)회") : ""),
+                    key: String(localized: "\(tournament.rawValue)단계 \(tournament.localizedBaseName)"),
+                    value: (open ? String(localized: "출전 가능") : String(localized: "팬 \(DisplayFormat.fans(tournament.requiredFans))")) + (wins > 0 ? String(localized: " · 우승 \(wins)회") : ""),
                     valueColor: open ? Theme.win : .secondary)
             }
-            KeyValueRow(key: String(localized: "지금 팬"), value: fansText(fans))
+            KeyValueRow(key: String(localized: "지금 팬"), value: DisplayFormat.fans(fans))
             let recent = (career.duelEvents ?? []).suffix(5).reversed()
             if !recent.isEmpty {
                 Divider()

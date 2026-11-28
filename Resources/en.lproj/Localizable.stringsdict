@@ -146,6 +146,22 @@
 			<string>%lld games</string>
 		</dict>
 	</dict>
+	<key>%lld경기 등판</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld appearance</string>
+			<key>other</key>
+			<string>%lld appearances</string>
+		</dict>
+	</dict>
 	<key>%lld경기 무실점 %lld경기 선방 %lld 실점 %lld</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -160,6 +176,22 @@
 			<string>%lld game</string>
 			<key>other</key>
 			<string>%lld games</string>
+		</dict>
+	</dict>
+	<key>%lld경기 출전</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld appearance</string>
+			<key>other</key>
+			<string>%lld appearances</string>
 		</dict>
 	</dict>
 	<key>%lld경기 타율 %@ %lld홈런 %lld타점</key>
@@ -210,6 +242,22 @@
 			<string>%lld games</string>
 		</dict>
 	</dict>
+	<key>%lld골</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld goal</string>
+			<key>other</key>
+			<string>%lld goals</string>
+		</dict>
+	</dict>
 	<key>%lld곳</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -242,6 +290,22 @@
 			<string>%lld pitches</string>
 		</dict>
 	</dict>
+	<key>%lld득점</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld point</string>
+			<key>other</key>
+			<string>%lld points</string>
+		</dict>
+	</dict>
 	<key>%lld명</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -256,6 +320,22 @@
 			<string>%lld player</string>
 			<key>other</key>
 			<string>%lld players</string>
+		</dict>
+	</dict>
+	<key>%lld승</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld win</string>
+			<key>other</key>
+			<string>%lld wins</string>
 		</dict>
 	</dict>
 	<key>%lld회 (크리티컬 %lld회)</key>
@@ -306,10 +386,26 @@
 			<string>%lld seasons</string>
 		</dict>
 	</dict>
+	<key>공격 포인트 %lld개 (골 + 도움)</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld goal contribution (goals + assists)</string>
+			<key>other</key>
+			<string>%lld goal contributions (goals + assists)</string>
+		</dict>
+	</dict>
 	<key>다음 개인 대회 (%lld라운드 뒤)</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>Next tournament (in %#@n@)</string>
+		<string>Next tournament (%#@n@)</string>
 		<key>n</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -320,6 +416,22 @@
 			<string>%lld round</string>
 			<key>other</key>
 			<string>%lld rounds</string>
+		</dict>
+	</dict>
+	<key>답할 계약 제안 %lld건</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld contract offer to answer</string>
+			<key>other</key>
+			<string>%lld contract offers to answer</string>
 		</dict>
 	</dict>
 	<key>답할 계약 제안이 %lld건 있습니다.</key>
@@ -338,6 +450,22 @@
 			<string>%lld contract offers</string>
 		</dict>
 	</dict>
+	<key>리바운드 %lld개</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld rebound</string>
+			<key>other</key>
+			<string>%lld rebounds</string>
+		</dict>
+	</dict>
 	<key>마무리 투입 점수 차: %lld점 이내</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -352,6 +480,22 @@
 			<string>%lld run</string>
 			<key>other</key>
 			<string>%lld runs</string>
+		</dict>
+	</dict>
+	<key>무실점 %lld경기</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld clean sheet</string>
+			<key>other</key>
+			<string>%lld clean sheets</string>
 		</dict>
 	</dict>
 	<key>변경 %lld건</key>
@@ -402,6 +546,22 @@
 			<string>%lld runs</string>
 		</dict>
 	</dict>
+	<key>세트 %lld승</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld set win</string>
+			<key>other</key>
+			<string>%lld set wins</string>
+		</dict>
+	</dict>
 	<key>시작 포인트가 %lld개 남았습니다</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -432,6 +592,38 @@
 			<string>%lld starting point</string>
 			<key>other</key>
 			<string>%lld starting points</string>
+		</dict>
+	</dict>
+	<key>안타 %lld개</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld hit</string>
+			<key>other</key>
+			<string>%lld hits</string>
+		</dict>
+	</dict>
+	<key>어시스트 %lld개</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld assist</string>
+			<key>other</key>
+			<string>%lld assists</string>
 		</dict>
 	</dict>
 	<key>역제안: %lld시즌, 연봉 %@</key>
@@ -466,6 +658,22 @@
 			<string>%lld seasons</string>
 		</dict>
 	</dict>
+	<key>재정 위기: 유예 %lld경기</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>Financial crisis: %lld match of grace left</string>
+			<key>other</key>
+			<string>Financial crisis: %lld matches of grace left</string>
+		</dict>
+	</dict>
 	<key>재정 위기: 자금이 0 아래입니다. 유예 %lld경기 안에 메우지 못하면 구단이 해체됩니다. 시설 업그레이드와 영입은 할 수 없습니다.</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -480,6 +688,38 @@
 			<string>%lld match</string>
 			<key>other</key>
 			<string>%lld matches</string>
+		</dict>
+	</dict>
+	<key>탈삼진 %lld개</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld strikeout</string>
+			<key>other</key>
+			<string>%lld strikeouts</string>
+		</dict>
+	</dict>
+	<key>홈런 %lld개</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld home run</string>
+			<key>other</key>
+			<string>%lld home runs</string>
 		</dict>
 	</dict>
 </dict>

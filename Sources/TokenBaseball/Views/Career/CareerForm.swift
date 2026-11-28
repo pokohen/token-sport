@@ -32,7 +32,7 @@ struct CareerForm: View {
     private func positionForm(_ positions: [Position], columns: Int, fallback: Position) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             TextField("선수 이름", text: $setup.name).textFieldStyle(.roundedBorder)
-            ChoiceGrid(items: positions, selection: $setup.position, columns: columns) { $0.label }
+            ChoiceGrid(items: positions, selection: $setup.position, columns: columns) { $0.localizedLabel }
             Text(positionNote).note()
             startPoints
             HometownPicker(selection: $setup.hometown)
@@ -59,7 +59,7 @@ struct CareerForm: View {
             .labelsHidden()
 
             let positions = pitcher ? CareerSetup.pitcherPositions : CareerSetup.batterPositions
-            ChoiceGrid(items: positions, selection: $setup.position, columns: pitcher ? 2 : 3) { $0.label }
+            ChoiceGrid(items: positions, selection: $setup.position, columns: pitcher ? 2 : 3) { $0.localizedLabel }
             Text(positionNote).note()
             startPoints
 
@@ -99,17 +99,17 @@ struct CareerForm: View {
             ForEach(Attributes.weights(for: setup.position).map(\.0), id: \.self) { key in
                 let count = setup.points[key] ?? 0
                 HStack(spacing: 8) {
-                    Text(key.label(for: setup.position.sport))
+                    Text(key.localizedLabel(for: setup.position.sport))
                     Spacer()
                     Text(count > 0 ? "+\(Int(Double(count) * Balance.careerStartPointValue))" : "—")
                         .monospacedDigit()
                         .foregroundStyle(count > 0 ? Color.accentColor : Color.secondary)
                     Button { setup.points[key] = count - 1 } label: { Image(systemName: "minus") }
                         .disabled(count <= 0)
-                        .accessibilityLabel("\(key.label(for: setup.position.sport)) 포인트 빼기")
+                        .accessibilityLabel("\(key.localizedLabel(for: setup.position.sport)) 포인트 빼기")
                     Button { setup.points[key] = count + 1 } label: { Image(systemName: "plus") }
                         .disabled(setup.pointsLeft <= 0 || count >= Balance.careerStartPointsPerStat)
-                        .accessibilityLabel("\(key.label(for: setup.position.sport)) 포인트 넣기")
+                        .accessibilityLabel("\(key.localizedLabel(for: setup.position.sport)) 포인트 넣기")
                 }
                 .controlSize(.small)
             }

@@ -14,7 +14,7 @@ struct BasketballLiveView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card(live.kind.label, trailing: state.isFinished ? String(localized: "경기 종료") : state.clockLabel) {
+            Card(live.kind.localizedLabel, trailing: state.isFinished ? String(localized: "경기 종료") : state.localizedClockLabel) {
                 LiveScoreLine(
                     awayName: state.away.name, awayScore: state.away.points,
                     homeName: state.home.name, homeScore: state.home.points)
@@ -43,7 +43,7 @@ struct BasketballLiveView: View {
             }
             CommentaryCard(log: state.log, myName: myName)
             OtherMatchesCard(rows: live.others.map {
-                ("\($0.away.shortName) \($0.away.points) : \($0.home.points) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.clockLabel)
+                ("\($0.away.shortName) \($0.away.points) : \($0.home.points) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.localizedClockLabel)
             })
         }
     }

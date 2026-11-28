@@ -14,12 +14,12 @@ struct CareerOfferRow: View {
                 EmblemView(team: team, size: 24)
                 VStack(alignment: .leading) {
                     Text(team.name).font(.callout.weight(.medium))
-                    Text("\(kindLabel) · \(team.tier.displayName(for: game.sport)) · \(game.rank(of: team.id))위").note()
+                    Text("\(kindLabel) · \(team.tier.localizedDisplayName(for: game.sport)) · \(game.rank(of: team.id))위").note()
                 }
                 Spacer()
             }
-            KeyValueRow(key: String(localized: "연봉 · 기간"), value: String(localized: "\(Format.money(offer.salary)) · \(offer.years)시즌"))
-            KeyValueRow(key: String(localized: "예상 입지"), value: offer.role.rawValue)
+            KeyValueRow(key: String(localized: "연봉 · 기간"), value: String(localized: "\(DisplayFormat.money(offer.salary)) · \(offer.years)시즌"))
+            KeyValueRow(key: String(localized: "예상 입지"), value: offer.role.localizedName)
             HStack {
                 Button("수락") { model.perform { try $0.acceptCareerOffer(offer.id) } }
                     .buttonStyle(.borderedProminent)

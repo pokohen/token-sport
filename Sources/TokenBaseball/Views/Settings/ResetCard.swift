@@ -18,7 +18,7 @@ struct ResetCard: View {
     var body: some View {
         Card(String(localized: "초기화")) {
             HStack {
-                Button("\(model.slot.label) 처음부터 다시") { pending = .slot }
+                Button("\(model.slot.localizedLabel) 처음부터 다시") { pending = .slot }
                 Button("전체 초기화") { pending = .all }
             }
             .disabled(pending != nil)
@@ -26,8 +26,8 @@ struct ResetCard: View {
             case .slot:
                 InlineConfirm(
                     message: game.isCareer
-                        ? String(localized: "지금 하던 \(model.slot.label)를 그만두고 처음부터 다시 시작할까요? 다른 모드는 그대로입니다. 저장 파일은 지우지 않고 backups 폴더로 옮겨 둡니다.")
-                        : String(localized: "지금 하던 \(model.slot.label)을 그만두고 처음부터 다시 시작할까요? 다른 모드는 그대로입니다. 저장 파일은 지우지 않고 backups 폴더로 옮겨 둡니다."),
+                        ? String(localized: "지금 하던 \(model.slot.localizedLabel)를 그만두고 처음부터 다시 시작할까요? 다른 모드는 그대로입니다. 저장 파일은 지우지 않고 backups 폴더로 옮겨 둡니다.")
+                        : String(localized: "지금 하던 \(model.slot.localizedLabel)을 그만두고 처음부터 다시 시작할까요? 다른 모드는 그대로입니다. 저장 파일은 지우지 않고 backups 폴더로 옮겨 둡니다."),
                     confirmTitle: String(localized: "처음부터 다시"), cancel: { pending = nil }
                 ) {
                     pending = nil

@@ -17,7 +17,7 @@ struct TacticCard: View {
             }
             .pickerStyle(.menu)
             .fixedSize()
-            Text(formation.summary).note()
+            Text(formation.localizedSummary).note()
             if let next = game.nextMatch() {
                 Text("다음 상대 \(game.teams[next.opponent].shortName)의 예상 포메이션: \(game.formation(of: next.opponent).label)").note()
             }
@@ -25,7 +25,7 @@ struct TacticCard: View {
                 get: { game.userTeam.tactic ?? .balanced },
                 set: { value in model.perform { $0.setTactic(value) } })
             ) {
-                ForEach(Tactic.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                ForEach(Tactic.allCases, id: \.self) { Text($0.localizedName).tag($0) }
             }
             .pickerStyle(.segmented)
             .labelsHidden()

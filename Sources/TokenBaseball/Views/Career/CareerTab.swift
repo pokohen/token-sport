@@ -34,14 +34,14 @@ struct CareerTab: View {
     private func contract(_ career: Career, _ me: Player) -> some View {
         Card(String(localized: "계약")) {
             KeyValueRow(key: String(localized: "소속"), value: career.isFreeAgent ? String(localized: "무소속") : game.userTeam.name)
-            KeyValueRow(key: String(localized: "연봉"), value: Format.money(me.contract.salary))
+            KeyValueRow(key: String(localized: "연봉"), value: DisplayFormat.money(me.contract.salary))
             // "N시즌"이 여기서는 남은 기간이고 다른 곳에서는 몇 번째 시즌이라, 영어가 달라서 표를 나눈다.
             KeyValueRow(
                 key: String(localized: "남은 계약"),
                 value: me.contract.seasonsLeft <= 0
                     ? String(localized: "만료") : String(localized: "\(me.contract.seasonsLeft)시즌", table: "Counts"),
                 valueColor: me.contract.seasonsLeft <= 1 ? Theme.warn : .primary)
-            KeyValueRow(key: String(localized: "통산 수입"), value: Format.money(career.earnings))
+            KeyValueRow(key: String(localized: "통산 수입"), value: DisplayFormat.money(career.earnings))
             if !career.isFreeAgent {
                 HStack {
                     Button("이적 요청") { model.perform { try $0.requestCareerTransfer() } }
@@ -74,7 +74,7 @@ struct CareerTab: View {
     }
 
     private func season(_ career: Career, _ me: Player) -> some View {
-        Card(String(localized: "이번 시즌"), trailing: game.userTier.displayName(for: game.sport)) {
+        Card(String(localized: "이번 시즌"), trailing: game.userTier.localizedDisplayName(for: game.sport)) {
             KeyValueRow(key: String(localized: "기록"), value: CareerText.record(
                 me, batting: me.batting, pitching: me.pitching, football: me.football, basketball: me.basketball))
             if let line = me.basketball {
@@ -84,7 +84,7 @@ struct CareerTab: View {
                 KeyValueRow(key: String(localized: "스틸 · 블록 · 실책"), value: "\(line.steals) · \(line.blocks) · \(line.turnovers)")
             } else if let line = me.duel {
                 ForEach(DuelRace.allCases, id: \.self) { race in
-                    KeyValueRow(key: String(localized: "대 \(race.label)"), value: line.versusText(race).replacingOccurrences(of: "대 \(race.label) ", with: ""))
+                    KeyValueRow(key: String(localized: "대 \(race.localizedLabel)"), value: line.localizedVersusRecord(race))
                 }
             } else if let line = me.football {
                 KeyValueRow(key: String(localized: "유효 슈팅 · 경고 · 퇴장"), value: "\(line.shotsOnTarget) · \(line.yellowCards) · \(line.redCards)")
@@ -106,7 +106,7 @@ struct CareerTab: View {
             KeyValueRow(
                 key: String(localized: "평균 평점"),
                 value: CareerText.rating(totals.ratedGames == 0 ? nil : totals.ratingTotal / Double(totals.ratedGames)))
-            KeyValueRow(key: String(localized: "가장 높이 오른 리그"), value: career.bestTier.displayName(for: game.sport))
+            KeyValueRow(key: String(localized: "가장 높이 오른 리그"), value: career.bestTier.localizedDisplayName(for: game.sport))
             if !career.clubs.isEmpty { Text(career.clubs.joined(separator: " → ")).note() }
             if !career.awards.isEmpty { Text(String(localized: "수상: ") + career.awards.joined(separator: " · ")).note() }
             if !career.history.isEmpty {
@@ -132,13 +132,13 @@ struct CareerTab: View {
             let byPosition = sport.groupsByPosition
             let peers = game.roster(of: team).filter { byPosition ? $0.position == me.position : $0.isPitcher == me.isPitcher }
                 .sorted { ($0.ability, -$0.id) > ($1.ability, -$1.id) }
-            Card(byPosition ? String(localized: "주전 경쟁 (\(me.position.label))") : me.isPitcher ? String(localized: "팀 투수진") : String(localized: "팀 타선")) {
+            Card(byPosition ? String(localized: "주전 경쟁 (\(me.position.localizedLabel))") : me.isPitcher ? String(localized: "팀 투수진") : String(localized: "팀 타선")) {
                 switch sport {
                 case .basketball:
-                    Text("\(me.position.label) 선발은 한 명입니다. 같은 포지션에서 가장 좋은 선수를 넘어서야 선발로 나오고, 감독 신뢰가 높으면 능력이 조금 낮아도 선발입니다. 벤치에서도 감독 신뢰만큼 출전 시간을 받습니다.").note()
+                    Text("\(me.position.localizedLabel) 선발은 한 명입니다. 같은 포지션에서 가장 좋은 선수를 넘어서야 선발로 나오고, 감독 신뢰가 높으면 능력이 조금 낮아도 선발입니다. 벤치에서도 감독 신뢰만큼 출전 시간을 받습니다.").note()
                 case .football:
                     let quota = game.formation(of: team).slots.filter { $0 == me.position }.count
-                    Text("포메이션 \(game.formation(of: team).label): \(me.position.label) 선발은 \(quota)명입니다. 감독 신뢰가 높으면 능력이 조금 낮아도 선발로 나옵니다.").note()
+                    Text("포메이션 \(game.formation(of: team).label): \(me.position.localizedLabel) 선발은 \(quota)명입니다. 감독 신뢰가 높으면 능력이 조금 낮아도 선발로 나옵니다.").note()
                 case .duel:
                     Text("팀 경기는 세트마다 한 명씩 나갑니다. 팀에서 가장 잘하는 선수가 에이스 결정전에 나갑니다.").note()
                 case .baseball:

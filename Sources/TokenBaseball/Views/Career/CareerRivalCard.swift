@@ -14,7 +14,7 @@ struct CareerRivalCard: View {
                     EmblemView(team: game.teams[team], size: 30)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(rival.name).font(.callout.weight(.semibold))
-                        Text("\(game.teams[team].name) · \(rival.age)세 · \(rival.position.label)").note()
+                        Text("\(game.teams[team].name) · \(rival.age)세 · \(rival.position.localizedLabel)").note()
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 1) {

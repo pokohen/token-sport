@@ -14,7 +14,7 @@ struct FootballLiveView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card(live.kind.label, trailing: "\(state.periodLabel) \(state.clockLabel)") {
+            Card(live.kind.localizedLabel, trailing: "\(state.localizedPeriodLabel) \(state.localizedClockLabel)") {
                 LiveScoreLine(
                     awayName: state.away.name, awayScore: state.away.goals,
                     homeName: state.home.name, homeScore: state.home.goals)
@@ -40,7 +40,7 @@ struct FootballLiveView: View {
                 ])
             }
             CommentaryCard(log: state.log, myName: myName)
-            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.goals) : \($0.home.goals) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.clockLabel) })
+            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.goals) : \($0.home.goals) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.localizedClockLabel) })
         }
     }
 
