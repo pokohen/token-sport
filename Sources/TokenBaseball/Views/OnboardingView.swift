@@ -31,7 +31,8 @@ struct OnboardingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // 선수 만들기는 고를 것이 많아 창 높이를 넘을 수 있으니 스크롤할 수 있게 한다.
-            if step == 0 { welcome } else { ScrollView { form.frame(maxWidth: .infinity, alignment: .leading) } }
+            // 첫 화면도 영어처럼 긴 언어에서는 창을 넘을 수 있어 같이 스크롤한다 (글이 "…"로 잘리지 않게).
+            ScrollView { (step == 0 ? AnyView(welcome) : AnyView(form)).frame(maxWidth: .infinity, alignment: .leading) }
             if let message = model.message {
                 Text(message).font(.callout).foregroundStyle(Theme.loss)
             }
