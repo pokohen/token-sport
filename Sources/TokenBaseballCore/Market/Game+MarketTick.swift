@@ -71,6 +71,9 @@ extension Game {
             let starter = switch sport {
             case .football:
                 currentFootballLineup.map { lineup in lineup.starters.contains { $0.id == player.id } } ?? true
+            case .duel:
+                DuelLineupBuilder.build(team: userTeam, players: players)
+                    .map { $0.prefix(DuelLineupBuilder.setsPerMatch).contains(player.id) } ?? true
             case .baseball, .basketball:
                 currentLineup.map { lineup in
                     lineup.batters.contains { $0.id == player.id } || lineup.starter == player.id

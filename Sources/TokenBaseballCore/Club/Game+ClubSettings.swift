@@ -27,7 +27,7 @@ extension Game {
             else { throw GameError("골키퍼 1명을 포함해 내 팀 선수 11명을 골라야 합니다.") }
             teams[userTeamID].lineupOverride = ids
             return
-        case .baseball, .basketball:
+        case .baseball, .basketball, .duel:
             break
         }
         guard chosen.count == 9, Set(ids).count == 9,
@@ -90,6 +90,8 @@ extension Game {
         switch sport {
         case .football: return footballLeaders(tier, count: count)
         case .basketball: return basketballLeaders(tier, count: count)
+        // 1:1 대전의 기록 순위는 선수 모드를 붙이는 단계에서 만든다.
+        case .duel: return []
         case .baseball: break
         }
         let everyone = teams(in: tier).flatMap { roster(of: $0.id) }

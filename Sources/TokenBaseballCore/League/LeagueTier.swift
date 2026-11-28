@@ -27,6 +27,24 @@ public enum LeagueTier: Int, Codable, CaseIterable, Comparable, Sendable {
 
     public var displayName: String { "\(rawValue)부 \(name)" }
 
+    /// 종목에 맞는 리그 이름. e스포츠만 이름이 다르다 (→ docs/10-esports.md "리그").
+    public func name(for sport: Sport) -> String {
+        switch sport {
+        case .baseball, .football, .basketball: name
+        case .duel:
+            switch self {
+            case .pro: "프로 리그"
+            case .semiPro: "챌린저 리그"
+            case .amateur: "아카데미 리그"
+            case .citizenPro: "대학·클럽 리그"
+            case .citizenSemiPro: "지역 아마추어"
+            case .citizenAmateur: "PC방 리그"
+            }
+        }
+    }
+
+    public func displayName(for sport: Sport) -> String { "\(rawValue)부 \(name(for: sport))" }
+
     /// 시민 리그(4~6부)인지.
     public var isCitizen: Bool { rawValue >= 4 }
 

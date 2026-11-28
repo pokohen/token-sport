@@ -96,6 +96,8 @@ extension Balance {
         case .football: position == .goalkeeper ? 32 : 29
         case .basketball: 30
         case .baseball: careerTrainingAgeLimit
+        // e스포츠는 멈추지 않고 나이에 따라 효과가 줄어든다 (`duelAgeFactor`). 은퇴가 35세다.
+        case .duel: 36
         }
     }
     /// 농구: 선발이 아닐 때 벤치에서 나와 뛰는 시간(분, 40분 경기). 감독 신뢰가 높을수록 길다 (신뢰 0이면 8분, 40이면 15분, 90 이상이면 24분).

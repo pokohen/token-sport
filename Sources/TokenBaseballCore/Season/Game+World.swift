@@ -172,6 +172,7 @@ extension Game {
             if let player = young.max(by: { ($0.potential, $0.id) < ($1.potential, $1.id) }) {
                 let what = switch sport {
                 case .football, .basketball: "기량이 눈에 띄게 늘었습니다"
+                case .duel: "손이 눈에 띄게 빨라졌습니다"
                 case .baseball: player.isPitcher ? "구속이 눈에 띄게 올랐습니다" : "타격이 눈에 띄게 늘었습니다"
                 }
                 post("\(team.name) \(player.age)세 \(player.position.label) \(player.name), \(what)")
@@ -243,6 +244,9 @@ extension Game {
         switch sport {
         case .football: return FootballLineupBuilder.core(team: teams[id], players: players)
         case .basketball: return BasketballLineupBuilder.core(team: teams[id], players: players)
+        case .duel:
+            return DuelLineupBuilder.build(team: teams[id], players: players)?
+                .prefix(DuelLineupBuilder.setsPerMatch).compactMap { players[$0] } ?? roster(of: id)
         case .baseball: break
         }
         let all = roster(of: id)

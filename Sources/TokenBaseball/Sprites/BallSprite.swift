@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import TokenBaseballCore
 
-/// 도트로 그린 야구공, 축구공, 농구공.
+/// 도트로 그린 야구공, 축구공, 농구공, 그리고 e스포츠의 마우스.
 ///
 /// 격자의 글자: `#` 테두리, `w` 흰 면, `r` 빨간 실밥(야구공), `k` 검은 조각(축구공),
 /// `o` 주황 면과 `l` 검은 줄(농구공), `.` 빈칸.
@@ -52,11 +52,28 @@ enum BallSprite {
         "....####....",
     ]
 
+    /// e스포츠: 공 대신 마우스 (휠과 버튼 경계는 `k`).
+    static let mouse = [
+        "...######...",
+        "..#wwkkww#..",
+        "..#wwkkww#..",
+        "..#kkkkkk#..",
+        "..#wwwwww#..",
+        "..#wwwwww#..",
+        "..#wwwwww#..",
+        "..#wwwwww#..",
+        "..#wwwwww#..",
+        "..#wwwwww#..",
+        "...#wwww#...",
+        "....####....",
+    ]
+
     static func grid(_ sport: Sport) -> [String] {
         switch sport {
         case .baseball: baseball
         case .football: football
         case .basketball: basketball
+        case .duel: mouse
         }
     }
 

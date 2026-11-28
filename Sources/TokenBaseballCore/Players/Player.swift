@@ -8,11 +8,14 @@ public enum Position: String, Codable, CaseIterable, Sendable {
     case goalkeeper = "GK", defender = "DF", midfielder = "MF", forward = "FW"
     // 농구 ("C"는 포수가 쓰고 있어서 센터는 "CE"다)
     case pointGuard = "PG", shootingGuard = "SG", smallForward = "SF", powerForward = "PF", center5 = "CE"
+    // e스포츠 1:1 대전: 포지션 자리에 종족이 들어간다.
+    case human = "HU", alien = "AL", protector = "PT"
 
     public var sport: Sport {
         switch self {
         case .goalkeeper, .defender, .midfielder, .forward: .football
         case .pointGuard, .shootingGuard, .smallForward, .powerForward, .center5: .basketball
+        case .human, .alien, .protector: .duel
         case .starter, .reliever, .closer, .catcher, .first, .second, .third, .shortstop,
              .left, .center, .right, .designated: .baseball
         }
@@ -43,6 +46,9 @@ public enum Position: String, Codable, CaseIterable, Sendable {
         case .smallForward: "스몰 포워드"
         case .powerForward: "파워 포워드"
         case .center5: "센터"
+        case .human: "휴먼"
+        case .alien: "에일리언"
+        case .protector: "프로텍터"
         }
     }
 
@@ -56,6 +62,18 @@ public enum Position: String, Codable, CaseIterable, Sendable {
     public static let football: [Position] = [.goalkeeper, .defender, .midfielder, .forward]
     /// 농구의 다섯 포지션.
     public static let basketball: [Position] = [.pointGuard, .shootingGuard, .smallForward, .powerForward, .center5]
+    /// 1:1 대전의 세 종족.
+    public static let duel: [Position] = [.human, .alien, .protector]
+
+    /// 1:1 대전 선수의 종족. 다른 종목이면 nil.
+    public var race: DuelRace? {
+        switch self {
+        case .human: .human
+        case .alien: .alien
+        case .protector: .protector
+        default: nil
+        }
+    }
 
     public static func all(for sport: Sport) -> [Position] {
         allCases.filter { $0.sport == sport }
@@ -88,6 +106,11 @@ public struct Attributes: Codable, Equatable, Sendable {
     // 농구 (슛·패스·드리블·수비·스피드·피지컬·체력은 위의 것을 같이 쓴다)
     public var three = 1.0
     public var rebounding = 1.0
+    // e스포츠 1:1 대전 (컨트롤은 야구의 제구 칸을 같이 쓴다)
+    public var macro = 1.0
+    public var strategy = 1.0
+    public var judgment = 1.0
+    public var mental = 1.0
 
     public init() {}
 
@@ -99,15 +122,22 @@ public struct Attributes: Codable, Equatable, Sendable {
         }
     }
 
+    /// e스포츠 능력치는 기본값이 아닐 때만 쓴다. 다른 종목의 저장 파일 모양을 바꾸지 않으려고.
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Key.self)
-        for key in Key.allCases { try container.encode(self[key], forKey: key) }
+        for key in Key.allCases where !(Key.duelOnly.contains(key) && self[key] == 1) {
+            try container.encode(self[key], forKey: key)
+        }
     }
 
     public enum Key: String, CaseIterable, Codable, CodingKey, Sendable {
         case contact, power, eye, speed, fielding, arm, stuff, control, breaking, stamina
         case shooting, passing, dribbling, tackling, physical, keeping
         case three, rebounding
+        case macro, strategy, judgment, mental
+
+        /// e스포츠에만 있는 능력치.
+        static let duelOnly: Set<Key> = [.macro, .strategy, .judgment, .mental]
 
         /// 종목별로 쓰는 능력치. 야구는 예전 순서 그대로다 (선수를 만들 때 난수를 이 순서로 쓴다).
         public static func all(for sport: Sport) -> [Key] {
@@ -116,6 +146,7 @@ public struct Attributes: Codable, Equatable, Sendable {
             case .football: [.shooting, .passing, .dribbling, .tackling, .speed, .physical, .keeping, .stamina]
             case .basketball:
                 [.shooting, .three, .passing, .dribbling, .tackling, .rebounding, .speed, .physical, .stamina]
+            case .duel: [.control, .macro, .strategy, .judgment, .mental]
             }
         }
 
@@ -139,6 +170,10 @@ public struct Attributes: Codable, Equatable, Sendable {
             case .keeping: "골키핑"
             case .three: "3점슛"
             case .rebounding: "리바운드"
+            case .macro: "운영"
+            case .strategy: "전략"
+            case .judgment: "판단"
+            case .mental: "멘탈"
             }
         }
 
@@ -148,6 +183,7 @@ public struct Attributes: Codable, Equatable, Sendable {
             case .baseball: label
             case .football: self == .speed ? "스피드" : label
             case .basketball: self == .speed ? "스피드" : self == .shooting ? "슛" : label
+            case .duel: self == .control ? "컨트롤" : label
             }
         }
     }
@@ -173,6 +209,10 @@ public struct Attributes: Codable, Equatable, Sendable {
             case .keeping: keeping
             case .three: three
             case .rebounding: rebounding
+            case .macro: macro
+            case .strategy: strategy
+            case .judgment: judgment
+            case .mental: mental
             }
         }
         set {
@@ -195,6 +235,10 @@ public struct Attributes: Codable, Equatable, Sendable {
             case .keeping: keeping = newValue
             case .three: three = newValue
             case .rebounding: rebounding = newValue
+            case .macro: macro = newValue
+            case .strategy: strategy = newValue
+            case .judgment: judgment = newValue
+            case .mental: mental = newValue
             }
         }
     }
@@ -230,6 +274,9 @@ public struct Attributes: Codable, Equatable, Sendable {
             [(.rebounding, 0.30), (.physical, 0.25), (.tackling, 0.22), (.shooting, 0.18), (.stamina, 0.05)]
         case .first, .second, .third, .shortstop, .left, .center, .right:
             [(.contact, 0.28), (.power, 0.22), (.eye, 0.15), (.speed, 0.10), (.fielding, 0.17), (.arm, 0.08)]
+        case .human, .alien, .protector:
+            // 종족의 비중은 엔진(`DuelRace.weights`)의 것을 그대로 쓴다.
+            position.race!.weights.pairs
         }
     }
 }
@@ -267,6 +314,7 @@ public enum Trait: String, Codable, CaseIterable, Sendable {
         switch position.sport {
         case .football: position == .goalkeeper ? [.coolHead] : [.clutch, .ironGlove, .ironLungs, .setPiece]
         case .basketball: [.clutch, .ironLungs]
+        case .duel: []
         case .baseball:
             [.clutch, .slowStarter, .leftyKiller, .ironGlove, .coolHead]
                 .filter { $0.forPitcher == position.isPitcher || $0 == .ironGlove && !position.isPitcher }
@@ -372,7 +420,7 @@ extension Player {
         switch position.sport {
         case .football: football = FootballLine()
         case .basketball: basketball = BasketballLine()
-        case .baseball: break
+        case .baseball, .duel: break
         }
     }
 }

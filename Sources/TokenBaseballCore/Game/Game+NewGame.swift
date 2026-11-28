@@ -144,9 +144,11 @@ extension Game {
             var spec = PlayerFactory.Spec(position: position, tier: tier, season: season)
             let center = clamp(target + rng.gaussian() * 4, range.lowerBound, range.upperBound)
             spec.ability = center...center
+            let ages = Balance.ageRange(tier, sport: sport)
+            // e스포츠는 전성기가 일러서 "젊은 팀"과 "노장 팀"의 나이도 이르다.
             switch teams[id].style {
-            case .youth: spec.age = 18...27
-            case .veteran: spec.age = 26...(Balance.ageRange(tier).upperBound)
+            case .youth: spec.age = sport == .duel ? ages.lowerBound...22 : 18...27
+            case .veteran: spec.age = (sport == .duel ? 24 : 26)...ages.upperBound
             default: break
             }
             let player = makePlayer(spec)

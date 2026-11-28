@@ -61,6 +61,9 @@ enum Snapshot {
                 BallIcon(sport: .basketball)
                 BallIcon(sport: .basketball)
                 BallIcon(sport: .basketball, size: 36)
+                Image(nsImage: BallSprite.menuBarImage(.duel))
+                BallIcon(sport: .duel)
+                BallIcon(sport: .duel, size: 36)
                 ChargeMarks(sport: position.sport, charges: 2)
             }
             drillSheet

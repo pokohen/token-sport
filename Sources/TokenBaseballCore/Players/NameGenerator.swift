@@ -68,6 +68,28 @@ public enum NameGenerator {
         "길거리 농구 출신", "입단 테스트 출신", "지역 리그 득점왕 출신",
     ]
 
+    /// e스포츠에서 걸러낼 이름: 널리 알려진 프로게이머와 겹치는 이름.
+    static let blockedEsports: Set<String> = [
+        "임요환", "홍진호", "이윤열", "최연성", "마재윤", "이영호", "이제동", "송병구", "김택용", "박정석",
+        "강민", "박성준", "이성은", "정명훈", "김윤환", "도재욱", "허영무", "김명운", "어윤수", "조성주",
+        "이신형", "김유진", "박령우", "조성호", "김대엽", "이상혁", "배준식", "정지훈", "한왕호", "문우찬",
+    ]
+    static let esportsOrigins = [
+        "PC방 고수 출신", "래더 상위권 출신", "고교 e스포츠부 출신", "대학 동아리 출신", "연습생 출신",
+        "개인 방송인 출신", "입단 테스트 출신", "지역 대회 우승 출신",
+    ]
+    /// 시민 리그(4~6부) e스포츠 선수의 한 줄. 어린 선수가 많아서 다른 종목의 직업 대신 쓴다.
+    static let esportsYouth = [
+        "고등학생", "대학생", "재수생", "PC방 단골", "편의점 알바생", "배달 라이더", "개발자 지망생",
+        "공업고 학생", "휴학생", "PC방 아르바이트생",
+    ]
+    /// 6부 PC방 리그의 PC방 이름. 실제 프랜차이즈 이름은 쓰지 않는다.
+    static let pcBangWords = ["번개", "별빛", "은하수", "초록", "새벽", "달빛", "무지개", "하늘", "골목", "역전", "모퉁이", "꿈나무"]
+    /// e스포츠 팀 이름에 쓰지 않는 말: 옛 프로게임단 이름을 떠올리게 하는 것 (한빛, 폭스).
+    static let esportsAvoided: Set<String> = ["한빛", "여우"]
+    static var esportsMascots: [String] { mascots.filter { !esportsAvoided.contains($0) } }
+    static var esportsSchoolWords: [String] { schoolWords.filter { !esportsAvoided.contains($0) } }
+
     public static func playerName(_ rng: inout SeededRNG, sport: Sport) -> String {
         while true {
             let name = rng.pick(surnames) + rng.pick(givenFirst) + rng.pick(givenSecond)
@@ -75,6 +97,7 @@ public enum NameGenerator {
             case .baseball: blocked
             case .football: blockedFootball
             case .basketball: blockedBasketball
+            case .duel: blockedEsports
             }
             if !banned.contains(name) { return name }
         }
@@ -86,11 +109,12 @@ public enum NameGenerator {
 
     public static func origin(tier: LeagueTier, sport: Sport, _ rng: inout SeededRNG) -> String {
         if tier.isCitizen {
-            return "\(rng.pick(neighborhoods)) \(rng.pick(jobs))"
+            return "\(rng.pick(neighborhoods)) \(rng.pick(sport == .duel ? esportsYouth : jobs))"
         }
         switch sport {
         case .football: return rng.pick(footballOrigins)
         case .basketball: return rng.pick(basketballOrigins)
+        case .duel: return rng.pick(esportsOrigins)
         case .baseball: return rng.pick(proOrigins)
         }
     }
@@ -122,11 +146,19 @@ public enum NameGenerator {
         ("전주", "전주 비빔"), ("원주", "원주 치악"),
     ]
 
+    /// 1부 e스포츠 10팀. 실제 게임단 이름과 겹치지 않게 지었다.
+    public static let esportsProTeams: [(city: String, name: String)] = [
+        ("서울", "서울 혜성 게이밍"), ("부산", "부산 파도 게이밍"), ("인천", "인천 항구 게이밍"), ("대구", "대구 불꽃 게이밍"),
+        ("광주", "광주 무지개 게이밍"), ("대전", "대전 로켓 게이밍"), ("수원", "수원 성곽 게이밍"), ("성남", "성남 픽셀 게이밍"),
+        ("울산", "울산 고래 게이밍"), ("제주", "제주 바람 게이밍"),
+    ]
+
     public static func proTeams(_ sport: Sport) -> [(city: String, name: String)] {
         switch sport {
         case .baseball: proTeams
         case .football: footballProTeams
         case .basketball: basketballProTeams
+        case .duel: esportsProTeams
         }
     }
 
@@ -202,6 +234,27 @@ public enum NameGenerator {
                 }
             }
             return ("", "제\(taken.count + 1) 시민 농구단")
+        case .duel:
+            for attempt in 0..<500 {
+                let city = rng.pick(cpuCities)
+                let name: String
+                switch tier {
+                case .pro, .semiPro:
+                    name = "\(city) \(rng.pick(esportsMascots)) 게이밍"
+                case .amateur:
+                    name = rng.chance(0.5) ? "\(city) \(rng.pick(esportsMascots)) 아카데미" : "\(city) \(rng.pick(industryWords)) 게임단"
+                case .citizenPro:
+                    name = rng.chance(0.5) ? "\(rng.pick(esportsSchoolWords))대학교 e스포츠부" : "\(city) 게이밍 클럽"
+                case .citizenSemiPro:
+                    name = rng.chance(0.6) ? "\(city) 아마추어 게임단" : "\(city) 게임 동호회"
+                case .citizenAmateur:
+                    name = "\(rng.pick(pcBangWords)) PC방 \(city)점"
+                }
+                if !taken.contains(name), !shortTaken.contains(shortName(name)) || attempt > 300 {
+                    return (city, name)
+                }
+            }
+            return ("", "제\(taken.count + 1) PC방")
         case .baseball:
             break
         }

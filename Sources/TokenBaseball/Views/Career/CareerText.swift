@@ -31,6 +31,8 @@ enum CareerText {
         case .basketball: return CareerText.basketball(basketball ?? BasketballLine())
         case .football: return CareerText.football(football ?? FootballLine(), keeper: me.position == .goalkeeper)
         case .baseball: return me.isPitcher ? CareerText.pitching(pitching) : CareerText.batting(batting)
+        // 1:1 대전의 기록(세트 승패, 종족전)은 선수 모드를 붙이는 단계에서 만든다.
+        case .duel: return "—"
         }
     }
 

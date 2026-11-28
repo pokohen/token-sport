@@ -10,7 +10,7 @@ public enum Balance {
     public static func teamsPerLeague(_ sport: Sport) -> Int {
         switch sport {
         case .football: 20
-        case .baseball, .basketball: teamsPerLeague
+        case .baseball, .basketball, .duel: teamsPerLeague
         }
     }
     /// 축구: 한 리그 경계에서 플레이오프 없이 바로 승격하는 팀 수. 20팀 리그는 잉글랜드처럼 두 팀(그 아래 네 팀이
@@ -63,6 +63,19 @@ public enum Balance {
         case .amateur: 19...33
         case .semiPro: 19...34
         case .pro: 19...36
+        }
+    }
+
+    /// 종목까지 본 나이 범위. e스포츠 선수는 어리다 (16세에 시작해 35세에 은퇴한다).
+    public static func ageRange(_ tier: LeagueTier, sport: Sport) -> ClosedRange<Int> {
+        guard sport == .duel else { return ageRange(tier) }
+        switch tier {
+        case .citizenAmateur: return 16...30
+        case .citizenSemiPro: return 16...29
+        case .citizenPro: return 17...28
+        case .amateur: return 17...27
+        case .semiPro: return 18...29
+        case .pro: return 18...31
         }
     }
 
@@ -124,6 +137,9 @@ public enum Balance {
             case .semiPro, .amateur: return 22
             default: return 18
             }
+        case .duel:
+            // 세 종족 여섯 명에, 영입할 자리 둘.
+            return 8
         }
     }
 
@@ -195,13 +211,13 @@ public enum Balance {
     public static func trainingNames(_ sport: Sport) -> [String] {
         switch sport {
         case .football: footballTrainingNames
-        case .baseball, .basketball: trainingNames
+        case .baseball, .basketball, .duel: trainingNames
         }
     }
     public static func stadiumNames(_ sport: Sport) -> [String] {
         switch sport {
         case .football: footballStadiumNames
-        case .baseball, .basketball: stadiumNames
+        case .baseball, .basketball, .duel: stadiumNames
         }
     }
 
@@ -350,6 +366,8 @@ public enum Balance {
             }
         case .baseball:
             return ageGrowthFactor(age)
+        case .duel:
+            return duelAgeFactor(age)
         case .football where position == .goalkeeper:
             switch age {
             case ...23: return 1.5
@@ -367,12 +385,28 @@ public enum Balance {
         }
     }
 
+    /// e스포츠 선수는 이 나이의 시즌을 마치면 반드시 은퇴한다.
+    public static let duelRetirementAge = 35
+
+    /// e스포츠: 어릴 때 많이 크고, 나이가 들수록 적게 큰다 (→ docs/10-esports.md "나이와 성장").
+    /// 다른 종목처럼 한도 나이에 갑자기 멈추지 않고 서서히 줄어든다. 선수 모드 훈련 효과에도 곱한다.
+    public static func duelAgeFactor(_ age: Int) -> Double {
+        switch age {
+        case ...19: 1.6
+        case 20...22: 1.2
+        case 23...25: 0.8
+        case 26...29: 0.4
+        default: 0.15
+        }
+    }
+
     /// 능력치가 본격적으로 떨어지기 시작하는 나이. 축구 골키퍼는 늦다.
     public static func declineStartAge(_ position: Position) -> Int {
         switch position.sport {
         case .football: position == .goalkeeper ? 35 : 33
         case .basketball: 33
         case .baseball: declineStartAge
+        case .duel: 30
         }
     }
 
@@ -382,12 +416,16 @@ public enum Balance {
         case .football: position == .goalkeeper ? 33 : 30
         case .basketball: 30
         case .baseball: 31
+        // e스포츠는 컨트롤(손)이 26세부터 조금씩 떨어진다.
+        case .duel: 26
         }
     }
 
     /// 은퇴를 생각하기 시작하는 나이. 골키퍼는 3년 늦다.
     public static func retirementAge(_ tier: LeagueTier, position: Position) -> Int {
-        retirementAge(tier) + (position == .goalkeeper && !tier.isCitizen ? 3 : 0)
+        // e스포츠는 전성기가 이르다. 35세 시즌이 끝나면 반드시 은퇴한다 (`duelRetirementAge`).
+        if position.sport == .duel { return tier.isCitizen ? 33 : 30 }
+        return retirementAge(tier) + (position == .goalkeeper && !tier.isCitizen ? 3 : 0)
     }
 
     /// 축구 출장 정지: 퇴장이면 쉬는 리그 경기 수, 그리고 시즌 경고 몇 장마다 한 경기를 쉬는지.

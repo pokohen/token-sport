@@ -44,7 +44,7 @@ public enum DuelRace: String, Codable, CaseIterable, Sendable {
 }
 
 /// 1:1 대전 선수의 능력치 다섯 가지 (0~99).
-/// 선수 모드에 붙일 때 `Attributes`와 어떻게 합칠지는 다음 단계(세계 만들기)에서 정한다.
+/// 선수 모드에서는 `Attributes`의 칸에 들어 있다 (컨트롤은 야구의 제구 칸을 같이 쓴다). `init(_:)`로 꺼낸다.
 public struct DuelSkills: Codable, Equatable, Sendable {
     /// 병력 하나하나를 다루는 손. 교전에서 덜 잃고 더 잡는다.
     public var control: Double
@@ -73,6 +73,17 @@ public struct DuelSkills: Codable, Equatable, Sendable {
     public static var keys: [WritableKeyPath<DuelSkills, Double>] { [\.control, \.macro, \.strategy, \.judgment, \.mental] }
 
     public static let labels = ["컨트롤", "운영", "전략", "판단", "멘탈"]
+
+    /// 선수의 능력치에서 꺼낸다.
+    public init(_ attributes: Attributes) {
+        self.init(control: attributes.control, macro: attributes.macro, strategy: attributes.strategy,
+                  judgment: attributes.judgment, mental: attributes.mental)
+    }
+
+    /// 능력치 키와 값의 짝 (`Attributes.weights` 모양).
+    var pairs: [(Attributes.Key, Double)] {
+        [(.control, control), (.macro, macro), (.strategy, strategy), (.judgment, judgment), (.mental, mental)]
+    }
 
     /// 종족의 비중으로 낸 종합 능력.
     public func overall(_ race: DuelRace) -> Double {
@@ -231,4 +242,9 @@ public struct DuelPlayer: Codable, Equatable, Sendable {
     }
 
     public var overall: Double { skills.overall(race) }
+
+    /// 선수 모드의 선수로 세트에 나간다.
+    public init(_ player: Player, style: DuelStyle = .balanced) {
+        self.init(name: player.name, race: player.position.race ?? .human, skills: DuelSkills(player.attributes), style: style)
+    }
 }

@@ -23,18 +23,21 @@ public enum SaveSlot: String, CaseIterable, Sendable {
     case footballPlayer = "football-player"
     /// 농구 선수 모드. (농구는 구단 모드가 없다.)
     case basketballPlayer = "basketball-player"
+    /// e스포츠 1:1 대전 선수 모드. 아직 앱에서 고를 수 없다.
+    case duelPlayer = "esports-duel"
 
     public var sport: Sport {
         switch self {
         case .baseball, .baseballPlayer: .baseball
         case .football, .footballPlayer: .football
         case .basketballPlayer: .basketball
+        case .duelPlayer: .duel
         }
     }
     /// 구단이 아니라 선수 한 명을 키우는 모드인지.
     public var isCareer: Bool {
         switch self {
-        case .baseballPlayer, .footballPlayer, .basketballPlayer: true
+        case .baseballPlayer, .footballPlayer, .basketballPlayer, .duelPlayer: true
         case .baseball, .football: false
         }
     }
@@ -46,6 +49,7 @@ public enum SaveSlot: String, CaseIterable, Sendable {
         case .baseballPlayer: "야구 선수"
         case .footballPlayer: "축구 선수"
         case .basketballPlayer: "농구 선수"
+        case .duelPlayer: "e스포츠 선수"
         }
     }
 
@@ -55,6 +59,7 @@ public enum SaveSlot: String, CaseIterable, Sendable {
         case .baseball: self = .baseball
         case .football: self = .football
         case .basketball: self = .basketballPlayer
+        case .duel: self = .duelPlayer
         }
     }
 
@@ -64,6 +69,7 @@ public enum SaveSlot: String, CaseIterable, Sendable {
         case .baseball: .baseballPlayer
         case .football: .footballPlayer
         case .basketball: .basketballPlayer
+        case .duel: .duelPlayer
         }
     }
 }
