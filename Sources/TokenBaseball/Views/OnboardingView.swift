@@ -31,7 +31,8 @@ struct OnboardingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // 선수 만들기는 고를 것이 많아 창 높이를 넘을 수 있으니 스크롤할 수 있게 한다.
-            if step == 0 { welcome } else { ScrollView { form.frame(maxWidth: .infinity, alignment: .leading) } }
+            // 첫 화면도 영어처럼 긴 언어에서는 창을 넘을 수 있어 같이 스크롤한다 (글이 "…"로 잘리지 않게).
+            ScrollView { (step == 0 ? AnyView(welcome) : AnyView(form)).frame(maxWidth: .infinity, alignment: .leading) }
             if let message = model.message {
                 Text(message).font(.callout).foregroundStyle(Theme.loss)
             }
@@ -83,7 +84,7 @@ struct OnboardingView: View {
                 Text("팀을 새로 키워주세요").font(.title2.bold())
                 Text("구단이 파산해 해체되었습니다. 세계는 그대로 이어지고, 6부 시민 아마추어에서 새 시민 구단으로 다시 시작합니다.")
                 if let last = model.game?.hallOfFame.last {
-                    Card("명예의 전당") {
+                    Card(String(localized: "명예의 전당")) {
                         Text("\(last.name) · \(last.foundedSeason)~\(last.endedSeason)시즌 · 최고 \(last.bestTier.displayName)")
                         if let star = last.star { Text("간판 선수 \(star)").note() }
                     }
@@ -91,7 +92,7 @@ struct OnboardingView: View {
             } else {
                 Text("Token Sports").font(.title2.bold())
                 Text("평소처럼 AI 코딩을 하면 쓴 토큰이 훈련 포인트로 쌓입니다. 야구, 축구, 농구 선수나 프로게이머 가운데 한 명이 되어, 그 포인트로 훈련하고 경기에 나서며 6부 시민 구단에서 1부 프로 리그의 스타까지 올라가 보세요.")
-                Card("토큰 사용량을 읽는 곳") {
+                Card(String(localized: "토큰 사용량을 읽는 곳")) {
                     Text(model.sources.claudeCode.root.path).font(.caption.monospaced()).textSelection(.enabled)
                     Text(model.sources.codex.root.path).font(.caption.monospaced()).textSelection(.enabled)
                     Text(model.sources.gemini.root.path).font(.caption.monospaced()).textSelection(.enabled)

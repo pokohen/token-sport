@@ -8,7 +8,7 @@ struct TacticCard: View {
 
     var body: some View {
         let formation = game.userTeam.formation ?? .f442
-        Card("전술", trailing: formation.label) {
+        Card(String(localized: "전술"), trailing: formation.label) {
             Picker("포메이션", selection: Binding(
                 get: { formation },
                 set: { value in model.perform { $0.setFormation(value) } })

@@ -79,7 +79,7 @@ extension AppModel {
     /// 내 경기가 끝났다 (끝까지 봤든 결과 바로 보기를 했든): 알리고 곧바로 저장한다.
     func matchDidFinish() {
         if let result = game?.lastResult {
-            notify("경기 종료", "\(result.opponent)전 \(result.label)")
+            notify(String(localized: "경기 종료"), String(localized: "\(result.opponent)전 \(result.label)"))
             // 팝오버로 결과를 보고 있었으면 상단바에 "경기 종료"를 남기지 않는다.
             if popoverVisible { game?.acknowledgeResult() }
         }

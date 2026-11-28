@@ -26,7 +26,7 @@ struct PlayerDetail: View {
                 Text("\(player.batting.games)경기 타율 \(String(format: "%.3f", player.batting.average)) · \(player.batting.homeRuns)홈런 · \(player.batting.runsBattedIn)타점 · \(player.batting.steals)도루 · OPS \(String(format: "%.3f", player.batting.ops))").note()
             }
             let left = player.contract.seasonsLeft
-            Text("계약 \(game.phase == .offseason ? (left <= 0 ? "만료 (오프시즌이 끝나면 떠남)" : "\(left)시즌 남음") : (left <= 1 ? "이번 시즌까지" : "\(left)시즌 남음"))\(player.contract.relegationClause ? " · 강등 조항 있음" : "")").note()
+            Text(contractText(left: left)).note()
 
             if game.isExpiring(player) {
                 let demand = game.renewalDemand(player)
@@ -58,5 +58,15 @@ struct PlayerDetail: View {
         .padding(8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.quaternary.opacity(0.6), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    /// 남은 계약 기간. 오프시즌에는 0시즌이면 떠나고, 시즌 중에는 1시즌이면 이번 시즌이 마지막이다.
+    private func contractText(left: Int) -> String {
+        let term = if game.phase == .offseason {
+            left <= 0 ? String(localized: "계약 만료 (오프시즌이 끝나면 떠남)") : String(localized: "계약 \(left)시즌 남음")
+        } else {
+            left <= 1 ? String(localized: "계약 이번 시즌까지") : String(localized: "계약 \(left)시즌 남음")
+        }
+        return player.contract.relegationClause ? term + String(localized: " · 강등 조항 있음") : term
     }
 }

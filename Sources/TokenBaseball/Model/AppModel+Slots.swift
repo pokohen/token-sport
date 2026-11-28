@@ -22,7 +22,7 @@ extension AppModel {
         do {
             try baseStore.saveActiveSlot(target)
         } catch {
-            message = "바꾸지 못했습니다: \(error.localizedDescription)"
+            message = String(localized: "바꾸지 못했습니다: \(error.localizedDescription)")
             return
         }
         matchTask?.cancel()
@@ -49,7 +49,7 @@ extension AppModel {
 
     func createClub(_ setup: Game.ClubSetup, sport chosen: Sport? = nil) {
         let name = setup.name.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { message = "팀 이름을 입력해 주세요."; return }
+        guard !name.isEmpty else { message = String(localized: "팀 이름을 입력해 주세요."); return }
         if game?.isBankrupt == true {
             perform { try $0.foundNewClub(setup: setup, now: Date()) }
         } else {
@@ -77,7 +77,7 @@ extension AppModel {
         do {
             try baseStore.saveActiveSlot(target)
         } catch {
-            message = "만들지 못했습니다: \(error.localizedDescription)"
+            message = String(localized: "만들지 못했습니다: \(error.localizedDescription)")
             return false
         }
         matchTask?.cancel()
@@ -93,7 +93,7 @@ extension AppModel {
     func createCareer(_ setup: CareerSetup) {
         var setup = setup
         setup.name = setup.name.trimmingCharacters(in: .whitespaces)
-        guard !setup.name.isEmpty else { message = "선수 이름을 입력해 주세요."; return }
+        guard !setup.name.isEmpty else { message = String(localized: "선수 이름을 입력해 주세요."); return }
         if slot.isCareer, game?.career?.retired == true {
             perform { try $0.startNewCareer(setup: setup, now: Date()) }
         } else {
@@ -133,7 +133,7 @@ extension AppModel {
                 }
             }
         } catch {
-            message = "초기화하지 못했습니다: \(error.localizedDescription)"
+            message = String(localized: "초기화하지 못했습니다: \(error.localizedDescription)")
             loadGame()
             if game?.isMatchLive == true { runMatchLoop() }
             return nil

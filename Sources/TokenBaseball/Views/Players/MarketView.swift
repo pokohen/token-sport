@@ -8,12 +8,12 @@ struct MarketView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card("이적 시장", trailing: game.tradeWindowOpen ? "열림" : "닫힘") {
+            Card(String(localized: "이적 시장"), trailing: game.tradeWindowOpen ? String(localized: "열림") : String(localized: "닫힘")) {
                 Text(windowText).note()
             }
 
             if !game.offers.isEmpty {
-                Card("들어온 오퍼") {
+                Card(String(localized: "들어온 오퍼")) {
                     ForEach(game.offers) { offer in
                         TransferOfferRow(game: game, offer: offer)
                     }
@@ -22,7 +22,7 @@ struct MarketView: View {
             }
 
             if !game.proposals.isEmpty {
-                Card("보낸 제안") {
+                Card(String(localized: "보낸 제안")) {
                     ForEach(game.proposals) { proposal in
                         HStack {
                             Text("\(proposal.kind.rawValue) · \(game.players[proposal.playerID]?.name ?? "")").font(.callout)
@@ -34,7 +34,7 @@ struct MarketView: View {
                 }
             }
 
-            Card("입단 테스트") {
+            Card(String(localized: "입단 테스트")) {
                 HStack {
                     Text("지역 선수 후보 3~5명이 옵니다. 능력은 낮지만 잠재력 높은 선수가 가끔 섞여 있습니다.").note()
                     Spacer()
@@ -43,7 +43,7 @@ struct MarketView: View {
                 }
             }
 
-            Card("스카우트", trailing: "시설 Lv\(game.userTeam.scoutLevel)") {
+            Card(String(localized: "스카우트"), trailing: String(localized: "시설 Lv\(game.userTeam.scoutLevel)")) {
                 if game.userTeam.scoutLevel == 0 {
                     Text("구단 탭에서 스카우트 시설을 지으면 보낼 수 있습니다.").note()
                 } else if let trip = game.scoutTrip {
@@ -63,15 +63,20 @@ struct MarketView: View {
             }
 
             if !game.candidates.isEmpty {
-                Card("영입 후보") {
+                Card(String(localized: "영입 후보")) {
                     ForEach(game.candidates) { candidate in
                         if let player = game.players[candidate.playerID] {
                             HStack {
                                 PlayerRow(
                                     game: game, player: player,
-                                    trailing: "\(candidate.source == .draft && game.sport == .football ? "유소년 승급" : candidate.source.rawValue) · 연봉 \(Format.money(player.contract.salary))")
-                                Button(candidate.fee > 0 ? "계약 \(Format.money(game.price(candidate.fee)))" : "계약") {
+                                    trailing: String(localized: "\(candidate.source == .draft && game.sport == .football ? String(localized: "유소년 승급") : candidate.source.rawValue) · 연봉 \(Format.money(player.contract.salary))"))
+                                // 카드 제목 "계약"(Contract)과 영어가 달라서 (Sign) 표를 나눈다.
+                                Button {
                                     model.perform { try $0.sign(candidate: candidate.id) }
+                                } label: {
+                                    candidate.fee > 0
+                                        ? Text("계약 \(Format.money(game.price(candidate.fee)))", tableName: "Actions")
+                                        : Text("계약", tableName: "Actions")
                                 }
                                 .controlSize(.small)
                             }
@@ -81,11 +86,11 @@ struct MarketView: View {
             }
 
             if game.phase == .offseason {
-                Card("자유계약 (FA)", trailing: "\(game.freeAgentMarket.count)명") {
+                Card(String(localized: "자유계약 (FA)"), trailing: String(localized: "\(game.freeAgentMarket.count)명")) {
                     ForEach(game.freeAgentMarket.prefix(15)) { player in
                         let market = Balance.marketSalary(ability: player.ability)
                         HStack {
-                            PlayerRow(game: game, player: player, trailing: "시장가 \(Format.money(market))")
+                            PlayerRow(game: game, player: player, trailing: String(localized: "시장가 \(Format.money(market))"))
                             if game.proposals.contains(where: { $0.playerID == player.id }) {
                                 Text("제안함").note()
                             } else {
@@ -115,11 +120,11 @@ struct MarketView: View {
     private var windowText: String {
         switch game.phase {
         case .offseason:
-            "오프시즌 이적 시장입니다. FA 영입, 이적 오퍼, 재계약을 할 수 있고, 친선 경기가 끝날 때마다 소식이 들어옵니다."
+            String(localized: "오프시즌 이적 시장입니다. FA 영입, 이적 오퍼, 재계약을 할 수 있고, 친선 경기가 끝날 때마다 소식이 들어옵니다.")
         case .regular where game.round < Balance.tradeDeadlineRound:
-            "시즌 중 트레이드 기간입니다 (\(Balance.tradeDeadlineRound)라운드까지). 가끔 트레이드 제안이 옵니다."
+            String(localized: "시즌 중 트레이드 기간입니다 (\(Balance.tradeDeadlineRound)라운드까지). 가끔 트레이드 제안이 옵니다.")
         default:
-            "트레이드 마감이 지났습니다. 다음 이적 시장은 시즌이 끝난 뒤에 열립니다."
+            String(localized: "트레이드 마감이 지났습니다. 다음 이적 시장은 시즌이 끝난 뒤에 열립니다.")
         }
     }
 }

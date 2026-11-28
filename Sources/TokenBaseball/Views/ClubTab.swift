@@ -7,24 +7,24 @@ struct ClubTab: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card("시설") {
+            Card(String(localized: "시설")) {
                 facility(.training, name: Balance.trainingNames(game.sport)[game.userTeam.trainingLevel - 1],
-                         effect: "성장 ×\(String(format: "%.2f", Balance.trainingMultiplier[game.userTeam.trainingLevel - 1]))")
+                         effect: String(localized: "성장 ×\(String(format: "%.2f", Balance.trainingMultiplier[game.userTeam.trainingLevel - 1]))"))
                 Divider()
                 facility(.stadium, name: Balance.stadiumNames(game.sport)[game.userTeam.stadiumLevel - 1],
-                         effect: "수용 \(Balance.stadiumCapacity[game.userTeam.stadiumLevel - 1].formatted())명 · 홈 보정 +\(String(format: "%.1f", Balance.stadiumHomeEdge[game.userTeam.stadiumLevel - 1] * 100))%")
+                         effect: String(localized: "수용 \(Balance.stadiumCapacity[game.userTeam.stadiumLevel - 1].formatted())명 · 홈 보정 +\(String(format: "%.1f", Balance.stadiumHomeEdge[game.userTeam.stadiumLevel - 1] * 100))%"))
                 Divider()
-                facility(.scout, name: game.userTeam.scoutLevel == 0 ? "없음" : "스카우트 팀",
-                         effect: game.userTeam.scoutLevel == 0 ? "지으면 스카우트를 보낼 수 있음" : "후보 \(3 + game.userTeam.scoutLevel / 2)명, 잠재력 평가가 더 정확")
+                facility(.scout, name: game.userTeam.scoutLevel == 0 ? String(localized: "없음") : String(localized: "스카우트 팀"),
+                         effect: game.userTeam.scoutLevel == 0 ? String(localized: "지으면 스카우트를 보낼 수 있음") : String(localized: "후보 \(3 + game.userTeam.scoutLevel / 2)명, 잠재력 평가가 더 정확"))
             }
 
-            Card("홍보", trailing: "인지도 \(Int(game.userTeam.fame))") {
+            Card(String(localized: "홍보"), trailing: String(localized: "인지도 \(Int(game.userTeam.fame))")) {
                 ForEach(Promotion.allCases, id: \.self) { promotion in
                     let blocked = game.promotionBlockedReason(promotion)
                     HStack {
                         VStack(alignment: .leading) {
                             Text(promotion.label(game.sport)).font(.callout)
-                            Text(blocked ?? (promotion.note.isEmpty ? "인지도 +\(Int(game.promotionEffect(promotion)))" : "인지도 +\(Int(game.promotionEffect(promotion))) · \(promotion.note)")).note()
+                            Text(blocked ?? (promotion.note.isEmpty ? String(localized: "인지도 +\(Int(game.promotionEffect(promotion)))") : String(localized: "인지도 +\(Int(game.promotionEffect(promotion))) · \(promotion.note)"))).note()
                         }
                         Spacer()
                         Button(Format.money(game.price(promotion.cost))) {
@@ -36,18 +36,18 @@ struct ClubTab: View {
                 Text("같은 홍보는 쓸수록 효과가 줄어듭니다 (시즌마다 초기화).").note()
             }
 
-            Card("훈련 방침") {
+            Card(String(localized: "훈련 방침")) {
                 if game.sport == .football {
-                    focusSlider("공격", \.batting)
-                    focusSlider("패스", \.pitching)
-                    focusSlider("수비", \.defense)
-                    focusSlider("체력", \.running)
+                    focusSlider(String(localized: "공격"), \.batting)
+                    focusSlider(String(localized: "패스"), \.pitching)
+                    focusSlider(String(localized: "수비"), \.defense)
+                    focusSlider(String(localized: "체력"), \.running)
                     Text("비중이 큰 쪽의 능력치가 더 많이 오릅니다 (공격: 슈팅·드리블, 수비: 수비·골키핑, 체력: 스피드·피지컬·체력). 토큰을 쓰는 동안에는 선수들이 조금 더 빨리 큽니다.").note()
                 } else {
-                    focusSlider("타격", \.batting)
-                    focusSlider("투구", \.pitching)
-                    focusSlider("수비", \.defense)
-                    focusSlider("주루", \.running)
+                    focusSlider(String(localized: "타격"), \.batting)
+                    focusSlider(String(localized: "투구", table: "Club"), \.pitching)
+                    focusSlider(String(localized: "수비"), \.defense)
+                    focusSlider(String(localized: "주루"), \.running)
                     Text("비중대로 경험치가 나뉩니다. 토큰을 쓰는 동안에는 선수들이 조금 더 빨리 큽니다.").note()
                 }
             }
@@ -77,7 +77,8 @@ struct ClubTab: View {
             + game.userTeam.focus.defense + game.userTeam.focus.running
         let share = total > 0 ? game.userTeam.focus[keyPath: keyPath] / total : 0.25
         return HStack {
-            Text(label).font(.callout).frame(width: 36, alignment: .leading)
+            // 영어 이름(Baserunning)이 한 줄에 들어가는 폭.
+            Text(label).font(.callout).lineLimit(1).frame(width: 84, alignment: .leading)
             Slider(
                 value: Binding(
                     get: { game.userTeam.focus[keyPath: keyPath] },
@@ -94,7 +95,7 @@ struct ClubTab: View {
     }
 
     private var finance: some View {
-        Card("이번 시즌 재정") {
+        Card(String(localized: "이번 시즌 재정")) {
             let income = FundsLedger.Category.allCases.compactMap { category in
                 game.funds.seasonIncome[category.rawValue].map { (category.rawValue, $0) }
             }
@@ -117,8 +118,8 @@ struct ClubTab: View {
             }
             if expense.isEmpty { Text("아직 지출이 없습니다.").note() }
             Divider()
-            KeyValueRow(key: "오늘 토큰으로 번 금액", value: "₩\(model.todayTokens.formatted())")
-            KeyValueRow(key: "경기당 연봉", value: "−₩\(game.salaryPerMatch.formatted())")
+            KeyValueRow(key: String(localized: "오늘 토큰으로 번 금액"), value: "₩\(model.todayTokens.formatted())")
+            KeyValueRow(key: String(localized: "경기당 연봉"), value: "−₩\(game.salaryPerMatch.formatted())")
         }
     }
 }

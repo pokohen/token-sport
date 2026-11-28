@@ -32,8 +32,8 @@ struct UpdateCard: View {
     }
 
     var body: some View {
-        Card("업데이트", trailing: UpdateChecker.isReleaseBuild
-            ? "지금 \(UpdateChecker.appVersion)" : UpdateChecker.buildCommit.map { "지금 \(String($0.prefix(7)))" }) {
+        Card(String(localized: "업데이트"), trailing: UpdateChecker.isReleaseBuild
+            ? String(localized: "지금 \(UpdateChecker.appVersion)") : UpdateChecker.buildCommit.map { String(localized: "지금 \(String($0.prefix(7)))") }) {
             if let update = model.update {
                 Label(update.headline, systemImage: "arrow.down.circle.fill")
                     .font(.callout.weight(.medium)).foregroundStyle(Color.accentColor)
@@ -52,7 +52,7 @@ struct UpdateCard: View {
                 }
                 if update.download != nil, Updater.cachedBlockedReason == nil {
                     HStack {
-                        Button(model.updateProgress ?? "지금 업데이트") { model.installUpdate() }
+                        Button(model.updateProgress ?? String(localized: "지금 업데이트")) { model.installUpdate() }
                             .buttonStyle(.borderedProminent)
                             .disabled(model.updateProgress != nil || game?.isMatchLive == true)
                         if model.updateProgress != nil { ProgressView().controlSize(.small) }

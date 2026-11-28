@@ -9,7 +9,7 @@ struct CareerScoutCard: View {
     var body: some View {
         let scouts = game.careerScouts
         let threshold = game.careerScoutOfferThreshold
-        Card("스카우트", trailing: scouts.isEmpty ? nil : "지켜보는 구단 \(scouts.count)/\(Balance.careerScoutMax)") {
+        Card(String(localized: "스카우트"), trailing: scouts.isEmpty ? nil : String(localized: "지켜보는 구단 \(scouts.count)/\(Balance.careerScoutMax)")) {
             if career.isFreeAgent {
                 Text("무소속일 때는 스카우트가 오지 않습니다. 입단 제안 가운데 하나를 고르세요.").note()
             } else if scouts.isEmpty {
@@ -48,7 +48,7 @@ struct CareerScoutCard: View {
                 Text(change(scout.lastChange)).font(.caption.monospacedDigit())
                     .foregroundStyle(scout.lastChange > 0.5 ? Theme.win : scout.lastChange < -0.5 ? Theme.loss : .secondary)
             }
-            Meter(label: "관심도", value: scout.interest, color: ready ? Theme.win : .accentColor)
+            Meter(label: String(localized: "관심도"), value: scout.interest, color: ready ? Theme.win : .accentColor)
             Text(status(scout, ready: ready, threshold: threshold)).note()
         }
         .accessibilityElement(children: .combine)
@@ -60,23 +60,23 @@ struct CareerScoutCard: View {
     }
 
     private func status(_ scout: CareerScout, ready: Bool, threshold: Double) -> String {
-        let watched = "지켜본 경기 \(scout.matchesWatched) · 직접 온 경기 \(scout.visits)"
+        let watched = String(localized: "지켜본 경기 \(scout.matchesWatched) · 직접 온 경기 \(scout.visits)")
         if ready {
             return game.tradeWindowOpen
-                ? "\(watched) · 제안을 준비하고 있습니다"
-                : "\(watched) · 이적 기간이 열리면 제안합니다"
+                ? String(localized: "\(watched) · 제안을 준비하고 있습니다")
+                : String(localized: "\(watched) · 이적 기간이 열리면 제안합니다")
         }
-        return "\(watched) · 제안까지 \(Int((threshold - scout.interest).rounded(.up)))"
+        return String(localized: "\(watched) · 제안까지 \(Int((threshold - scout.interest).rounded(.up)))")
     }
 
     private func help(_ threshold: Double) -> String {
-        var text = "경기를 뛸 때마다 평점에 따라 관심도가 오르내립니다. 그 구단에 가면 주전일수록, 명성이 높을수록 더 빨리 쌓입니다. 관심도가 \(Int(threshold))을 넘은 구단은 이적 기간에 제안을 보냅니다."
+        var text = String(localized: "경기를 뛸 때마다 평점에 따라 관심도가 오르내립니다. 그 구단에 가면 주전일수록, 명성이 높을수록 더 빨리 쌓입니다. 관심도가 \(Int(threshold))을 넘은 구단은 이적 기간에 제안을 보냅니다.")
         if career.transferRequested {
-            text += " 이적을 요청해 두어서 문턱이 낮아졌습니다."
+            text += String(localized: " 이적을 요청해 두어서 문턱이 낮아졌습니다.")
         } else if (game.myPlayer?.contract.seasonsLeft ?? 1) <= 0 {
-            text += " 계약이 끝나서 문턱이 낮아졌습니다."
+            text += String(localized: " 계약이 끝나서 문턱이 낮아졌습니다.")
         }
-        text += " 제안을 거절하거나 답하지 않으면 그 구단은 떠납니다. 구단을 옮기면 처음부터 다시 쌓습니다."
+        text += String(localized: " 제안을 거절하거나 답하지 않으면 그 구단은 떠납니다. 구단을 옮기면 처음부터 다시 쌓습니다.")
         return text
     }
 }

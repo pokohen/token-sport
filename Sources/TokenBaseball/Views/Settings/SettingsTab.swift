@@ -7,10 +7,10 @@ struct SettingsTab: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card("상단바") {
+            Card(String(localized: "상단바")) {
                 Picker("보일 숫자", selection: setting(\.menuBarDisplay)) {
                     ForEach(MenuBarDisplay.allCases, id: \.self) {
-                        Text(game.isCareer && $0 == .funds ? "훈련 포인트" : $0.rawValue).tag($0)
+                        Text(game.isCareer && $0 == .funds ? String(localized: "훈련 포인트") : $0.rawValue).tag($0)
                     }
                 }
                 Toggle("훈련 애니메이션", isOn: setting(\.animationEnabled))
@@ -22,12 +22,12 @@ struct SettingsTab: View {
             }
             .font(.callout)
 
-            Card("모드", trailing: "지금: \(model.slot.label)") {
+            Card(String(localized: "모드"), trailing: String(localized: "지금: \(model.slot.label)")) {
                 SlotSwitcher()
             }
             .font(.callout)
 
-            Card("난이도") {
+            Card(String(localized: "난이도")) {
                 if !game.isCareer {
                     Picker("CPU 팀 맞춰주기", selection: setting(\.rubberBand)) {
                         ForEach(RubberBand.allCases, id: \.self) { Text($0.rawValue).tag($0) }
@@ -56,21 +56,23 @@ struct SettingsTab: View {
 
             UpdateCard()
 
-            Card("토큰 경로") {
+            Card(String(localized: "토큰 경로")) {
                 Text(model.sources.claudeCode.root.path).font(.caption.monospaced()).textSelection(.enabled)
                 Text(model.sources.codex.root.path).font(.caption.monospaced()).textSelection(.enabled)
                 Text(model.sources.gemini.root.path).font(.caption.monospaced()).textSelection(.enabled)
                 Text(model.sources.opencode.root.path).font(.caption.monospaced()).textSelection(.enabled)
-                Text("이 컴퓨터 안에서만 읽고 외부로 보내지 않습니다. \(game.isCareer ? "선수를" : "구단을") 만든 뒤에 쓴 토큰만 셉니다.").note()
+                Text(game.isCareer
+                     ? String(localized: "이 컴퓨터 안에서만 읽고 외부로 보내지 않습니다. 선수를 만든 뒤에 쓴 토큰만 셉니다.")
+                     : String(localized: "이 컴퓨터 안에서만 읽고 외부로 보내지 않습니다. 구단을 만든 뒤에 쓴 토큰만 셉니다.")).note()
                 Text("저장 파일: \(model.store.fileURL.path)").font(.caption2.monospaced()).textSelection(.enabled)
             }
 
             ResetCard(game: game)
 
             if !game.hallOfFame.isEmpty {
-                Card("명예의 전당") {
+                Card(String(localized: "명예의 전당")) {
                     ForEach(Array(game.hallOfFame.enumerated()), id: \.offset) { _, entry in
-                        Text("\(entry.name) · \(entry.foundedSeason)~\(entry.endedSeason)시즌 · 최고 \(entry.bestTier.displayName)\(entry.star.map { " · 간판 \($0)" } ?? "")").font(.callout)
+                        Text("\(entry.name) · \(entry.foundedSeason)~\(entry.endedSeason)시즌 · 최고 \(entry.bestTier.displayName)\(entry.star.map { String(localized: " · 간판 \($0)") } ?? "")").font(.callout)
                     }
                 }
             }

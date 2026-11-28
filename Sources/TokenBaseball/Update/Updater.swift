@@ -28,14 +28,14 @@ enum Updater {
 
     /// 앱 안에서 업데이트할 수 없는 이유. 할 수 있으면 nil.
     static func blockedReason(app: URL? = installedApp) -> String? {
-        guard UpdateChecker.isReleaseBuild, let app else { return "배포 파일로 설치한 앱에서만 됩니다." }
+        guard UpdateChecker.isReleaseBuild, let app else { return String(localized: "배포 파일로 설치한 앱에서만 됩니다.") }
         if app.path.contains("/AppTranslocation/") {
-            return "앱을 응용 프로그램 폴더로 옮긴 뒤에 할 수 있습니다."
+            return String(localized: "앱을 응용 프로그램 폴더로 옮긴 뒤에 할 수 있습니다.")
         }
         if !FileManager.default.isWritableFile(atPath: app.deletingLastPathComponent().path) {
-            return "앱이 있는 폴더를 고칠 권한이 없습니다. 아래 명령으로 업데이트하세요."
+            return String(localized: "앱이 있는 폴더를 고칠 권한이 없습니다. 아래 명령으로 업데이트하세요.")
         }
-        if teamIdentifier(of: app) == nil { return "서명되지 않은 앱이라 앱 안에서 업데이트할 수 없습니다." }
+        if teamIdentifier(of: app) == nil { return String(localized: "서명되지 않은 앱이라 앱 안에서 업데이트할 수 없습니다.") }
         return nil
     }
 
@@ -79,13 +79,13 @@ enum Updater {
     static func prepare(
         from download: URL, expectedVersion: String, current app: URL, progress: @Sendable (String) -> Void
     ) async throws -> URL {
-        guard download.scheme == "https" || download.isFileURL else { throw Failure("내려받는 주소가 올바르지 않습니다.") }
-        guard let team = teamIdentifier(of: app) else { throw Failure("이 앱의 서명을 읽지 못했습니다.") }
+        guard download.scheme == "https" || download.isFileURL else { throw Failure(String(localized: "내려받는 주소가 올바르지 않습니다.")) }
+        guard let team = teamIdentifier(of: app) else { throw Failure(String(localized: "이 앱의 서명을 읽지 못했습니다.")) }
         let work = FileManager.default.temporaryDirectory
             .appendingPathComponent("TokenSportUpdate-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
         do {
-            progress("내려받는 중…")
+            progress(String(localized: "내려받는 중…"))
             let image = work.appendingPathComponent("update.dmg")
             if download.isFileURL {
                 try FileManager.default.copyItem(at: download, to: image)
@@ -93,30 +93,30 @@ enum Updater {
                 var request = URLRequest(url: download, timeoutInterval: 120)
                 request.setValue("TokenSport-update", forHTTPHeaderField: "User-Agent")
                 let (file, response) = try await URLSession.shared.download(for: request)
-                guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw Failure("내려받지 못했습니다.") }
+                guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw Failure(String(localized: "내려받지 못했습니다.")) }
                 try FileManager.default.moveItem(at: file, to: image)
             }
 
-            progress("확인하는 중…")
+            progress(String(localized: "확인하는 중…"))
             let mount = work.appendingPathComponent("mnt", isDirectory: true)
             guard run("/usr/bin/hdiutil", ["attach", image.path, "-nobrowse", "-readonly", "-quiet", "-mountpoint", mount.path]).status == 0 else {
-                throw Failure("내려받은 파일을 열지 못했습니다.")
+                throw Failure(String(localized: "내려받은 파일을 열지 못했습니다."))
             }
             let fresh = work.appendingPathComponent(appName, isDirectory: true)
             let inside = [appName, legacyAppName].map { mount.appendingPathComponent($0) }
                 .first { FileManager.default.fileExists(atPath: $0.path) }
             let copied = inside.map { run("/usr/bin/ditto", [$0.path, fresh.path]).status == 0 } ?? false
             run("/usr/bin/hdiutil", ["detach", mount.path, "-quiet", "-force"])
-            guard copied else { throw Failure("내려받은 파일 안에 앱이 없습니다.") }
+            guard copied else { throw Failure(String(localized: "내려받은 파일 안에 앱이 없습니다.")) }
 
             // 같은 개발자가 서명했는가, Apple 공증을 받았는가, 정말 그 버전인가.
-            guard isSigned(fresh, byTeam: team) else { throw Failure("새 버전의 서명이 이 앱과 다릅니다. 업데이트하지 않았습니다.") }
+            guard isSigned(fresh, byTeam: team) else { throw Failure(String(localized: "새 버전의 서명이 이 앱과 다릅니다. 업데이트하지 않았습니다.")) }
             guard run("/usr/sbin/spctl", ["--assess", "--type", "execute", fresh.path]).status == 0 else {
-                throw Failure("새 버전이 Apple 공증 검사를 통과하지 못했습니다. 업데이트하지 않았습니다.")
+                throw Failure(String(localized: "새 버전이 Apple 공증 검사를 통과하지 못했습니다. 업데이트하지 않았습니다."))
             }
             let plist = NSDictionary(contentsOf: fresh.appendingPathComponent("Contents/Info.plist"))
             guard plist?["CFBundleShortVersionString"] as? String == expectedVersion else {
-                throw Failure("내려받은 앱의 버전이 다릅니다. 업데이트하지 않았습니다.")
+                throw Failure(String(localized: "내려받은 앱의 버전이 다릅니다. 업데이트하지 않았습니다."))
             }
             return fresh
         } catch {

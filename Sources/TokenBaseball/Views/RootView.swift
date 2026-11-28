@@ -17,11 +17,13 @@ enum AppTab: String, CaseIterable {
     }
 
     func title(career: Bool) -> String {
-        guard career else { return rawValue }
         switch self {
-        case .club: return "훈련"
-        case .players: return "커리어"
-        default: return rawValue
+        case .home: String(localized: "홈")
+        case .match: String(localized: "경기")
+        case .league: String(localized: "리그")
+        case .club: career ? String(localized: "훈련") : String(localized: "구단")
+        case .players: career ? String(localized: "커리어") : String(localized: "선수")
+        case .settings: String(localized: "설정")
         }
     }
 }
@@ -40,9 +42,11 @@ struct RootView: View {
                         .multilineTextAlignment(.center)
                     // 한 모드의 파일이 깨져도 다른 모드는 계속 할 수 있어야 한다.
                     ForEach(model.selectableSlots.filter { $0 != model.slot }, id: \.self) { other in
-                        Button("\(other.label)\(other.isCareer ? "로" : "으로") 가기") { model.switchSlot(to: other) }
+                        Button { model.switchSlot(to: other) } label: {
+                            other.isCareer ? Text("\(other.label)로 가기") : Text("\(other.label)으로 가기")
+                        }
                     }
-                    Button("종료") { NSApplication.shared.terminate(nil) }
+                    Button(String(localized: "종료", table: "Actions")) { NSApplication.shared.terminate(nil) }
                 }
                 .padding(24)
             } else if let game = model.game, game.career?.retired == true {

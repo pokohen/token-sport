@@ -23,8 +23,8 @@ struct DuelLiveView: View {
                 ForEach(state.records, id: \.number) { record in
                     let winner = record.homeWon ? record.home : record.away
                     KeyValueRow(
-                        key: "\(record.number)세트\(record.decider ? " (에이스 결정전)" : "") · \(record.map)",
-                        value: "\(winner.name)(\(winner.race.label)) 승",
+                        key: String(localized: "\(record.number)세트\(record.decider ? String(localized: " (에이스 결정전)") : "") · \(record.map)"),
+                        value: String(localized: "\(winner.name)(\(winner.race.label)) 승"),
                         valueColor: (record.homeWon == live.userIsHome) ? Theme.win : Theme.loss)
                 }
             }
@@ -42,34 +42,34 @@ struct DuelLiveView: View {
             CommentaryCard(log: state.log, myName: me?.name)
             OtherMatchesCard(rows: live.others.map {
                 ("\(NameGenerator.shortName($0.away.name)) \($0.away.sets) : \($0.home.sets) \(NameGenerator.shortName($0.home.name))",
-                 $0.isFinished ? "종료" : "\($0.records.count + 1)세트")
+                 $0.isFinished ? String(localized: "종료") : String(localized: "\($0.records.count + 1)세트"))
             })
         }
     }
 
     private var trailing: String {
-        if state.isFinished { return "경기 종료" }
-        guard let set = state.current else { return "세트 사이" }
-        return "\(state.records.count + 1)세트 \(set.clockLabel)"
+        if state.isFinished { return String(localized: "경기 종료") }
+        guard let set = state.current else { return String(localized: "세트 사이") }
+        return String(localized: "\(state.records.count + 1)세트 \(set.clockLabel)")
     }
 
     /// 내 선수가 지금 세트에 나와 있지 않을 때의 한 줄.
     private func waiting(_ me: Player) -> String {
-        if state.isFinished { return "이번 경기에는 나오지 않았습니다." }
-        guard mine.lineup.contains(me.id) else { return "이번 경기에는 나오지 않습니다. 벤치에서 응원합니다." }
+        if state.isFinished { return String(localized: "이번 경기에는 나오지 않았습니다.") }
+        guard mine.lineup.contains(me.id) else { return String(localized: "이번 경기에는 나오지 않습니다. 벤치에서 응원합니다.") }
         if let playing = state.currentPlayers {
             let id = live.userIsHome ? playing.home : playing.away
-            if id != me.id, let name = mine.players[id]?.name { return "이번 세트는 \(name) 선수가 나갑니다." }
+            if id != me.id, let name = mine.players[id]?.name { return String(localized: "이번 세트는 \(name) 선수가 나갑니다.") }
         }
-        if mine.lineup.first == me.id { return "에이스 결정전까지 가면 다시 나갑니다." }
-        return "세트를 기다리는 중입니다."
+        if mine.lineup.first == me.id { return String(localized: "에이스 결정전까지 가면 다시 나갑니다.") }
+        return String(localized: "세트를 기다리는 중입니다.")
     }
 
     @ViewBuilder private func currentSet(_ set: DuelSet) -> some View {
         // 엔진의 0번 선수는 팀 경기의 홈 쪽이다.
         let myIndex = live.userIsHome ? 0 : 1
         let a = set.sides[myIndex], b = set.sides[1 - myIndex]
-        Card("\(state.records.count + 1)세트 · \(set.map.name)", trailing: set.stakes == .regular ? nil : "에이스 결정전") {
+        Card(String(localized: "\(state.records.count + 1)세트 · \(set.map.name)"), trailing: set.stakes == .regular ? nil : String(localized: "에이스 결정전")) {
             HStack {
                 Text("\(a.player.name) (\(a.player.race.label))").font(.callout.weight(.semibold)).foregroundStyle(Color.accentColor)
                 Spacer()
@@ -81,11 +81,11 @@ struct DuelLiveView: View {
                 .accessibilityLabel("미니맵: 확장 \(a.bases) 대 \(b.bases)")
             Text(set.map.note).note()
             MirrorStatGrid(rows: [
-                .init("확장", "\(a.bases)", "\(b.bases)"),
-                .init("병력", "\(Int(a.army.rounded()))", "\(Int(b.army.rounded()))"),
-                .init("일꾼", "\(Int(a.workers.rounded()))", "\(Int(b.workers.rounded()))"),
-                .init("잡은 병력", "\(Int(a.armyKilled.rounded()))", "\(Int(b.armyKilled.rounded()))"),
-                .init("빌드", set.tick > 1 ? a.build.label : "-", set.tick > 1 ? b.build.label : "-"),
+                .init(String(localized: "확장"), "\(a.bases)", "\(b.bases)"),
+                .init(String(localized: "병력"), "\(Int(a.army.rounded()))", "\(Int(b.army.rounded()))"),
+                .init(String(localized: "일꾼"), "\(Int(a.workers.rounded()))", "\(Int(b.workers.rounded()))"),
+                .init(String(localized: "잡은 병력"), "\(Int(a.armyKilled.rounded()))", "\(Int(b.armyKilled.rounded()))"),
+                .init(String(localized: "빌드"), set.tick > 1 ? a.build.label : "-", set.tick > 1 ? b.build.label : "-"),
             ])
         }
     }

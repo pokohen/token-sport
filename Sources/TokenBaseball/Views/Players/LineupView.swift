@@ -17,7 +17,7 @@ struct LineupView: View {
     @ViewBuilder private var baseball: some View {
         if let lineup = game.currentLineup {
             let custom = !game.userTeam.lineupOverride.isEmpty
-            Card("타순", trailing: custom ? "직접 정함" : "자동") {
+            Card(String(localized: "타순"), trailing: custom ? String(localized: "직접 정함") : String(localized: "자동")) {
                 let ids = lineup.batters.map(\.id)
                 let bench = game.roster(of: game.userTeamID).filter { !$0.isPitcher && !ids.contains($0.id) }
                 ForEach(Array(lineup.batters.enumerated()), id: \.element.id) { index, entry in
@@ -33,7 +33,7 @@ struct LineupView: View {
                                 .disabled(index == 0)
                             Button { move(ids, from: index, to: index + 1) } label: { Image(systemName: "chevron.down") }
                                 .disabled(index == ids.count - 1)
-                            Menu("교체") {
+                            Menu(String(localized: "교체", table: "Actions")) {
                                 ForEach(bench) { sub in
                                     Button("\(sub.position.label) \(sub.name) (\(Int(sub.ability.rounded())))") {
                                         var next = ids
@@ -53,7 +53,7 @@ struct LineupView: View {
                 }
                 Text("주황색 자리는 제 포지션이 아니라 수비가 깎입니다.").note()
             }
-            Card("투수") {
+            Card(String(localized: "투수")) {
                 let pitchers = game.roster(of: game.userTeamID).filter(\.isPitcher)
                 Picker("다음 경기 선발", selection: Binding(
                     get: { game.userTeam.starterOverride },

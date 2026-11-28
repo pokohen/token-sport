@@ -9,7 +9,7 @@ struct Meter: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Text(label).foregroundStyle(.secondary).frame(width: 64, alignment: .leading)
+            Text(label).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true).frame(width: 64, alignment: .leading)
             Bar(fraction: value / 100, color: color)
             Text("\(Int(value.rounded()))").monospacedDigit().frame(width: 28, alignment: .trailing)
         }

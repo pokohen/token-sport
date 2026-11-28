@@ -1,0 +1,7 @@
+/* English. Keys are the Korean text in the code (Scripts/check-strings.sh lists what's missing). */
+
+"계약" = "Sign";
+"계약 %@" = "Sign %@";
+"교체" = "Swap";
+"은퇴" = "Retire";
+"종료" = "Quit";

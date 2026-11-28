@@ -14,15 +14,15 @@ struct LiveMatchView: View {
 
     /// 내 선수가 아직 나오지 않았을 때의 안내.
     private var waiting: String {
-        guard let me = myPlayer else { return "아직 나오지 않았습니다" }
+        guard let me = myPlayer else { return String(localized: "아직 나오지 않았습니다") }
         let mine = live.userIsHome ? state.home : state.away
         switch me.position {
         case .starter:
-            return mine.pitchers.first?.playerID == me.id ? "곧 마운드에 오릅니다" : "오늘은 등판하지 않는 날입니다"
+            return mine.pitchers.first?.playerID == me.id ? String(localized: "곧 마운드에 오릅니다") : String(localized: "오늘은 등판하지 않는 날입니다")
         case .reliever, .closer:
-            return "불펜에서 대기 중"
+            return String(localized: "불펜에서 대기 중")
         default:
-            return "아직 타석에 서지 않았습니다"
+            return String(localized: "아직 타석에 서지 않았습니다")
         }
     }
 
@@ -48,11 +48,11 @@ struct LiveMatchView: View {
             Card {
                 let pitcher = state.currentPitcher
                 let batter = state.currentBatter
-                KeyValueRow(key: "투수 \(pitcher.name)", value: "\(pitcher.line.pitches)구")
-                KeyValueRow(key: "타자 \(batter.name)", value: "\(batter.line.atBats)타수 \(batter.line.hits)안타")
+                KeyValueRow(key: String(localized: "투수 \(pitcher.name)"), value: String(localized: "\(pitcher.line.pitches)구"))
+                KeyValueRow(key: String(localized: "타자 \(batter.name)"), value: String(localized: "\(batter.line.atBats)타수 \(batter.line.hits)안타"))
             }
             CommentaryCard(log: state.log, myName: myName)
-            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.runs) : \($0.home.runs) \($0.home.shortName)", $0.isFinished ? "종료" : $0.inningLabel) })
+            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.runs) : \($0.home.runs) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.inningLabel) })
         }
     }
 
@@ -86,9 +86,9 @@ struct LiveMatchView: View {
 
     private var diamond: some View {
         ZStack {
-            base(filled: state.bases[1] != nil, label: "2루").offset(y: -34)
-            base(filled: state.bases[2] != nil, label: "3루").offset(x: -38)
-            base(filled: state.bases[0] != nil, label: "1루").offset(x: 38)
+            base(filled: state.bases[1] != nil, label: String(localized: "2루")).offset(y: -34)
+            base(filled: state.bases[2] != nil, label: String(localized: "3루")).offset(x: -38)
+            base(filled: state.bases[0] != nil, label: String(localized: "1루")).offset(x: 38)
             Image(systemName: "house.fill").font(.caption).foregroundStyle(.secondary).offset(y: 34)
         }
     }
@@ -98,7 +98,7 @@ struct LiveMatchView: View {
             .fill(filled ? Theme.warn : Color.secondary.opacity(0.25))
             .frame(width: 18, height: 18)
             .rotationEffect(.degrees(45))
-            .accessibilityLabel("\(label) \(filled ? "주자 있음" : "비어 있음")")
+            .accessibilityLabel(filled ? "\(label) 주자 있음" : "\(label) 비어 있음")
     }
 
     private func dots(_ label: String, filled: Int, of total: Int, color: Color) -> some View {

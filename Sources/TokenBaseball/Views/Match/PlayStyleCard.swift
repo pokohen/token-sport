@@ -8,7 +8,7 @@ struct PlayStyleCard: View {
 
     var body: some View {
         let style = game.career?.style ?? .balanced
-        Card("플레이 스타일", trailing: game.myPlayer?.position.label) {
+        Card(String(localized: "플레이 스타일"), trailing: game.myPlayer?.position.label) {
             if game.sport == .duel {
                 duel
             } else if game.myPlayer?.position == .goalkeeper {
@@ -43,10 +43,10 @@ struct PlayStyleCard: View {
         .pickerStyle(.segmented)
         .labelsHidden()
         let summary = switch style {
-        case .balanced: "빌드를 고르게 씁니다."
-        case .rush: "초반 공격 빌드가 잦습니다. 상대가 막으면 그대로 불리해집니다."
-        case .macro: "확장을 먼저 하고 장기전으로 갑니다. 초반 공격에 약합니다."
-        case .gambit: "깜짝 빌드와 기습이 잦습니다. 성공하면 크게 이기고, 읽히면 크게 집니다."
+        case .balanced: String(localized: "빌드를 고르게 씁니다.")
+        case .rush: String(localized: "초반 공격 빌드가 잦습니다. 상대가 막으면 그대로 불리해집니다.")
+        case .macro: String(localized: "확장을 먼저 하고 장기전으로 갑니다. 초반 공격에 약합니다.")
+        case .gambit: String(localized: "깜짝 빌드와 기습이 잦습니다. 성공하면 크게 이기고, 읽히면 크게 집니다.")
         }
         Text(summary).note()
     }

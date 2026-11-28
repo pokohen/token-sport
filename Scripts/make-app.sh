@@ -9,6 +9,7 @@ cd "$(dirname "$0")/.."
 #   TB_ARCHS     "arm64 x86_64"처럼 주면 두 종류의 맥에서 모두 도는 앱을 만든다
 #   TB_VERSION   앱 버전 (예: 0.2.0)
 #   TB_SIGN      서명할 인증서 이름 (Developer ID Application: …). 없으면 내 맥에서만 쓰는 임시 서명
+#   TB_LANGUAGES 한국어 말고 넣을 화면 언어 (예: "en ja"). 번역이 끝나기 전에는 비워 둔다 (배포 앱은 한국어만)
 ARCH_FLAGS=()
 for arch in ${TB_ARCHS:-}; do ARCH_FLAGS+=(--arch "$arch"); done
 VERSION="${TB_VERSION:-0.1.0}"
@@ -25,6 +26,14 @@ cp "$BIN" "$APP/Contents/MacOS/TokenBaseball"
 # 앱 아이콘 (Scripts/make-icon.sh로 만들어 저장소에 넣어 둔 파일).
 mkdir -p "$APP/Contents/Resources"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+# 화면 문구 번역. 한국어가 기본이고 (코드에 쓴 한국어 문구가 그대로 열쇠다), 다른 언어는 Resources/<언어>.lproj에 둔다.
+# 맥의 언어가 넣은 언어 가운데 없으면 한국어로 나온다.
+mkdir -p "$APP/Contents/Resources/ko.lproj"
+LOCALIZATIONS="<string>ko</string>"
+for lang in ${TB_LANGUAGES:-}; do
+    cp -R "Resources/$lang.lproj" "$APP/Contents/Resources/"
+    LOCALIZATIONS="$LOCALIZATIONS<string>$lang</string>"
+done
 cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -34,6 +43,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
     <key>CFBundleDisplayName</key><string>Token Sports</string>
     <key>CFBundleIdentifier</key><string>app.tokenbaseball.TokenBaseball</string>
     <key>CFBundleExecutable</key><string>TokenBaseball</string>
+    <key>CFBundleDevelopmentRegion</key><string>ko</string>
+    <key>CFBundleLocalizations</key><array>LOCALIZATIONS</array>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>0.1.0</string>
@@ -44,6 +55,7 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
 </dict>
 </plist>
 PLIST
+sed -i '' "s#LOCALIZATIONS#$LOCALIZATIONS#" "$APP/Contents/Info.plist"
 # 새 버전 확인에 쓰는 정보: 빌드한 커밋과 저장소 (소유자/이름).
 # 직접 고친 파일이 있으면 커밋을 적지 않는다 (그런 빌드는 새 버전 확인을 하지 않는다).
 COMMIT=""
