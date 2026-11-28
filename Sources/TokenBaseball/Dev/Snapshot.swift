@@ -31,6 +31,8 @@ enum Snapshot {
         game.generateDemoCareerOffer()
         game.generateDemoCareerScouts()
         model.game = game
+        // 설정 탭과 초기화 카드가 이 선수의 저장 칸을 보여 주게 한다.
+        model.slot = SaveSlot.career(for: position.sport)
         model.todayTokens = 12_000_000
 
         render(OnboardingView(bankrupt: false, step: 1), model, directory, "01-onboarding-모드")
@@ -48,6 +50,7 @@ enum Snapshot {
         try? SaveStore(fileURL: directory.appendingPathComponent("demo-save.json")).save(GameSave(game: game))
         render(TabContent(tab: .match, game: game).padding(12), model, directory, "3-중계")
         render(
+            VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
                 MenuBarLabel(model: model)
                 Image(nsImage: BallSprite.menuBarImage(.baseball))
@@ -59,6 +62,8 @@ enum Snapshot {
                 BallIcon(sport: .basketball)
                 BallIcon(sport: .basketball, size: 36)
                 ChargeMarks(sport: position.sport, charges: 2)
+            }
+            drillSheet
             }
             .padding(8), model, directory, "4-상단바", width: nil)
     }
@@ -103,6 +108,7 @@ enum Snapshot {
         try? SaveStore(fileURL: directory.appendingPathComponent("demo-save.json")).save(GameSave(game: game))
         render(TabContent(tab: .match, game: game).padding(12), model, directory, "3-중계")
         render(
+            VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 4) {
                 MenuBarLabel(model: model)
                 Image(nsImage: BallSprite.menuBarImage(sport))
@@ -112,12 +118,22 @@ enum Snapshot {
                 BallIcon(sport: .football)
                 BallIcon(sport: .basketball)
                 ChargeMarks(sport: sport, charges: 2)
-                ForEach(Array(Sprites.Drill.allCases.enumerated()), id: \.offset) { _, drill in
-                    Image(nsImage: Sprites.image(drill, frame: 0))
-                    Image(nsImage: Sprites.image(drill, frame: 1))
-                }
+            }
+            drillSheet
             }
             .padding(8), model, directory, "4-상단바", width: nil)
+    }
+
+    /// 훈련 그림 전부 (두 장씩). 크게 그려서 도트를 확인할 수 있게 한다.
+    private static var drillSheet: some View {
+        HStack(spacing: 6) {
+            ForEach(Array(Sprites.Drill.allCases.enumerated()), id: \.offset) { _, drill in
+                ForEach(0..<2, id: \.self) { frame in
+                    Image(nsImage: Sprites.image(drill, frame: frame))
+                        .interpolation(.none).resizable().frame(width: 36, height: 36)
+                }
+            }
+        }
     }
 
     private static func render<Content: View>(
