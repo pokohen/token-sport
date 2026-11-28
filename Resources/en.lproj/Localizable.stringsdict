@@ -50,6 +50,22 @@
 			<string>%lld matches</string>
 		</dict>
 	</dict>
+	<key>%@은(는) 아직 쉬어야 합니다. 선발은 등판 뒤 %lld경기를 쉽니다.</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%1$@ still needs rest. Starters rest %2$lld match after pitching.</string>
+			<key>other</key>
+			<string>%1$@ still needs rest. Starters rest %2$lld matches after pitching.</string>
+		</dict>
+	</dict>
 	<key>%lld경기 %lld골 %lld도움 슈팅 %lld</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -608,6 +624,22 @@
 			<string>%lld hit</string>
 			<key>other</key>
 			<string>%lld hits</string>
+		</dict>
+	</dict>
+	<key>야수 %lld명, 투수 %lld명은 남아 있어야 합니다.</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%2$#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>Keep at least %1$lld position players and %2$lld pitcher.</string>
+			<key>other</key>
+			<string>Keep at least %1$lld position players and %2$lld pitchers.</string>
 		</dict>
 	</dict>
 	<key>어시스트 %lld개</key>

@@ -7,7 +7,7 @@
 #   남음  코드에서 사라졌는데 표(Resources/<언어>.lproj/*.strings, *.stringsdict)에 남은 것
 #   감싸지 않음  한국어 문구인데 번역 대상이 아닌 것 (String으로 넘기면서 String(localized:)를 빠뜨린 것,
 #                번역되는 문구 안에 \(조건 ? "홈" : "원정")처럼 끼운 한국어)
-# 지금은 앱 화면(Sources/TokenBaseball)만 본다. Dev 폴더(스냅샷·셀프테스트)와 Headless(터미널 출력)는 번역하지 않는다.
+# 앱 화면(Sources/TokenBaseball)과 Core에서 String(localized:)로 감싼 글을 본다. Dev 폴더(스냅샷·셀프테스트)와 Headless(터미널 출력)는 번역하지 않는다.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 LANG_CODE="${1:-en}"
@@ -26,7 +26,8 @@ lines = {}
 for path in glob.glob(os.path.join(out, "*.stringsdata")):
     data = json.load(open(path))
     source = data["source"].split("/Sources/")[-1]
-    if not source.startswith("TokenBaseball/") or source.startswith("TokenBaseball/Dev/"):
+    # Core는 화면에 바로 보이는 글(오류, 할 수 없는 이유, 기록 순위)만 번역한다. 감싸지 않은 한국어는 앱만 찾는다.
+    if not source.startswith(("TokenBaseball/", "TokenBaseballCore/")) or source.startswith("TokenBaseball/Dev/"):
         continue
     for table, items in data["tables"].items():
         for item in items:

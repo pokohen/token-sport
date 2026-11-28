@@ -1,0 +1,22 @@
+/* Core가 만드는 이름 */
+"%lld승" = "%lldW";
+"3점슛" = "3-pointers";
+"공격 포인트" = "Goal contributions";
+"다승" = "Wins";
+"도움" = "Assists";
+"득점" = "Goals";
+"리바운드" = "Rebounds";
+"무실점 경기" = "Clean sheets";
+"블록" = "Blocks";
+"선방" = "Saves";
+"세트 승" = "Set wins";
+"세트 승률" = "Set win rate";
+"슈팅" = "Steals";
+"스틸" = "Shots";
+"어시스트" = "Assists";
+"에이스 결정전" = "Ace matches";
+"타율" = "AVG";
+"타점" = "RBI";
+"탈삼진" = "Strikeouts";
+"평균자책점" = "ERA";
+"홈런" = "HR";

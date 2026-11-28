@@ -199,12 +199,12 @@ extension Game {
     /// 지금 은퇴할 수 없는 이유. 할 수 있으면 nil.
     /// 한 시즌을 끝까지 치른 뒤부터, 오프시즌에 할 수 있다 (나이는 상관없다).
     public var careerRetireBlockedReason: String? {
-        guard let career, !career.retired, players[career.playerID] != nil else { return "선수가 없습니다." }
-        if isMatchLive { return "경기가 끝난 뒤에 은퇴할 수 있습니다." }
+        guard let career, !career.retired, players[career.playerID] != nil else { return String(localized: "선수가 없습니다.") }
+        if isMatchLive { return String(localized: "경기가 끝난 뒤에 은퇴할 수 있습니다.") }
         if careerSeasonsPlayed < Balance.careerRetireMinSeasons {
-            return "한 시즌을 끝까지 치른 뒤부터 은퇴할 수 있습니다."
+            return String(localized: "한 시즌을 끝까지 치른 뒤부터 은퇴할 수 있습니다.")
         }
-        if phase != .offseason { return "은퇴는 시즌이 끝난 오프시즌에 할 수 있습니다." }
+        if phase != .offseason { return String(localized: "은퇴는 시즌이 끝난 오프시즌에 할 수 있습니다.") }
         return nil
     }
 
@@ -258,10 +258,18 @@ extension Game {
 
     /// 은퇴 뒤 같은 세계에서 새 선수로 다시 시작한다.
     public mutating func startNewCareer(setup: CareerSetup, now: Date) throws {
-        guard career?.retired == true else { throw GameError("지금은 새 선수를 만들 수 없습니다.") }
+        guard career?.retired == true else { throw GameError(String(localized: "지금은 새 선수를 만들 수 없습니다.")) }
         let name = setup.name.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { throw GameError("선수 이름을 입력해 주세요.") }
-        guard setup.sport == sport else { throw GameError("이 세계에서는 \(sport.label) 선수만 만들 수 있습니다.") }
+        guard !name.isEmpty else { throw GameError(String(localized: "선수 이름을 입력해 주세요.")) }
+        guard setup.sport == sport else {
+            let message = switch sport {
+            case .baseball: String(localized: "이 세계에서는 야구 선수만 만들 수 있습니다.")
+            case .football: String(localized: "이 세계에서는 축구 선수만 만들 수 있습니다.")
+            case .basketball: String(localized: "이 세계에서는 농구 선수만 만들 수 있습니다.")
+            case .duel: String(localized: "이 세계에서는 e스포츠 선수만 만들 수 있습니다.")
+            }
+            throw GameError(message)
+        }
         let ranked = rankedStandings(.citizenAmateur)
         let club = ranked[ranked.count / 2].teamID
         var cleaned = setup

@@ -51,7 +51,7 @@ extension Game {
 
     mutating func startDuelMatch(_ next: NextMatch, home: TeamID, away: TeamID, tier: LeagueTier, now: Date) throws {
         guard let state = makeDuelMatch(home: home, away: away, kind: next.kind, seed: rng.next()) else {
-            throw GameError("경기를 시작할 수 없습니다.")
+            throw GameError(String(localized: "경기를 시작할 수 없습니다."))
         }
         // 같은 라운드의 내 리그 다른 경기는 함께 돌아가며 "타 구장 소식"으로 보인다.
         var others: [DuelMatch] = []
@@ -266,9 +266,9 @@ extension Game {
         }
         let regulars = everyone.filter { line($0).sets >= max(1, round / 3) }
         return [
-            ("세트 승", board(everyone, { Double(line($0).setWins) }, { "\(line($0).setWins)승" })),
-            ("세트 승률", board(regulars, { line($0).winRate }, { "\(Int((line($0).winRate * 100).rounded()))%" })),
-            ("에이스 결정전", board(everyone.filter { line($0).aceWins > 0 }, { Double(line($0).aceWins) }, { "\(line($0).aceWins)승" })),
+            (String(localized: "세트 승", table: "Leaders"), board(everyone, { Double(line($0).setWins) }, { String(localized: "\(line($0).setWins)승", table: "Leaders") })),
+            (String(localized: "세트 승률", table: "Leaders"), board(regulars, { line($0).winRate }, { "\(Int((line($0).winRate * 100).rounded()))%" })),
+            (String(localized: "에이스 결정전", table: "Leaders"), board(everyone.filter { line($0).aceWins > 0 }, { Double(line($0).aceWins) }, { String(localized: "\(line($0).aceWins)승", table: "Leaders") })),
         ]
     }
 }

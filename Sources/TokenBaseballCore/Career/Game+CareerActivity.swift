@@ -93,11 +93,11 @@ extension Game {
 
     /// 지금 이 활동을 할 수 없는 이유. 할 수 있으면 nil.
     public func careerActivityBlockedReason(_ activity: CareerActivity) -> String? {
-        guard let career, !career.retired, players[career.playerID] != nil else { return "선수가 없습니다." }
-        if career.isFreeAgent { return "소속 구단이 있어야 합니다." }
-        if career.activityDone == true { return "다음 경기를 치르면 다시 할 수 있습니다." }
+        guard let career, !career.retired, players[career.playerID] != nil else { return String(localized: "선수가 없습니다.") }
+        if career.isFreeAgent { return String(localized: "소속 구단이 있어야 합니다.") }
+        if career.activityDone == true { return String(localized: "다음 경기를 치르면 다시 할 수 있습니다.") }
         if career.fans == nil, career.fame >= Balance.careerFameCap(userTier) {
-            return "지금 리그에서는 명성이 더 오르지 않습니다. 윗 리그로 올라가야 합니다."
+            return String(localized: "지금 리그에서는 명성이 더 오르지 않습니다. 윗 리그로 올라가야 합니다.")
         }
         let cost = careerActivityCost(activity)
         if let reason = insufficientFundsReason(cost) { return reason }
@@ -130,10 +130,10 @@ extension Game {
 
     /// 내 선수의 이름을 바꾼다. 지난 시즌 기록과 구단 이력은 그대로다.
     public mutating func renameCareerPlayer(to newName: String) throws {
-        guard let career, !career.retired, var me = players[career.playerID] else { throw GameError("선수가 없습니다.") }
+        guard let career, !career.retired, var me = players[career.playerID] else { throw GameError(String(localized: "선수가 없습니다.")) }
         let name = newName.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { throw GameError("선수 이름을 입력해 주세요.") }
-        guard name.count <= 12 else { throw GameError("이름은 12자까지입니다.") }
+        guard !name.isEmpty else { throw GameError(String(localized: "선수 이름을 입력해 주세요.")) }
+        guard name.count <= 12 else { throw GameError(String(localized: "이름은 12자까지입니다.")) }
         me.name = name
         players[me.id] = me
     }

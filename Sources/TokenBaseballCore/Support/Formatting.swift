@@ -43,8 +43,8 @@ extension Game {
     func insufficientFundsReason(_ cost: Int) -> String? {
         guard funds.balance < cost else { return nil }
         return isCareer
-            ? "훈련 포인트가 모자랍니다. \(fundsText(cost))가 필요합니다."
-            : "자금이 모자랍니다. \(fundsText(cost))이 필요합니다."
+            ? String(localized: "훈련 포인트가 모자랍니다. \(localizedFundsText(cost))가 필요합니다.")
+            : String(localized: "자금이 모자랍니다. \(localizedFundsText(cost))이 필요합니다.")
     }
 
     /// 로그에서 읽은 사용량을 자금에 반영한다. 번 금액을 돌려준다.

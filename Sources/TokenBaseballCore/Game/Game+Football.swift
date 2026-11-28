@@ -45,7 +45,7 @@ extension Game {
         guard var state = makeFootballMatch(
             home: home, away: away, kind: next.kind, seed: rng.next(), rules: playoffRules)
         else {
-            throw GameError("경기를 시작할 수 없습니다.")
+            throw GameError(String(localized: "경기를 시작할 수 없습니다."))
         }
         if isCareer {
             decorateCareerFootball(&state, userIsHome: next.userIsHome)
@@ -311,14 +311,14 @@ extension Game {
         }
         let keepers = everyone.filter { $0.position == .goalkeeper && line($0).games >= max(1, round / 2) }
         return [
-            ("득점", rows(everyone.sorted { (line($0).goals, -$0.id) > (line($1).goals, -$1.id) }) { "\(line($0).goals)" }),
-            ("도움", rows(everyone.sorted { (line($0).assists, -$0.id) > (line($1).assists, -$1.id) }) { "\(line($0).assists)" }),
-            ("공격 포인트", rows(everyone.sorted { (line($0).points, -$0.id) > (line($1).points, -$1.id) }) { "\(line($0).points)" }),
-            ("슈팅", rows(everyone.sorted { (line($0).shots, -$0.id) > (line($1).shots, -$1.id) }) { "\(line($0).shots)" }),
-            ("무실점 경기", rows(keepers.sorted { (line($0).cleanSheets, -$0.id) > (line($1).cleanSheets, -$1.id) }) {
+            (String(localized: "득점", table: "Leaders"), rows(everyone.sorted { (line($0).goals, -$0.id) > (line($1).goals, -$1.id) }) { "\(line($0).goals)" }),
+            (String(localized: "도움", table: "Leaders"), rows(everyone.sorted { (line($0).assists, -$0.id) > (line($1).assists, -$1.id) }) { "\(line($0).assists)" }),
+            (String(localized: "공격 포인트", table: "Leaders"), rows(everyone.sorted { (line($0).points, -$0.id) > (line($1).points, -$1.id) }) { "\(line($0).points)" }),
+            (String(localized: "슈팅", table: "Leaders"), rows(everyone.sorted { (line($0).shots, -$0.id) > (line($1).shots, -$1.id) }) { "\(line($0).shots)" }),
+            (String(localized: "무실점 경기", table: "Leaders"), rows(keepers.sorted { (line($0).cleanSheets, -$0.id) > (line($1).cleanSheets, -$1.id) }) {
                 "\(line($0).cleanSheets)"
             }),
-            ("선방", rows(keepers.sorted { (line($0).saves, -$0.id) > (line($1).saves, -$1.id) }) { "\(line($0).saves)" }),
+            (String(localized: "선방", table: "Leaders"), rows(keepers.sorted { (line($0).saves, -$0.id) > (line($1).saves, -$1.id) }) { "\(line($0).saves)" }),
         ]
     }
 }

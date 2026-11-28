@@ -101,10 +101,10 @@ extension Game {
     // MARK: 제안에 답하기
 
     public mutating func acceptCareerOffer(_ id: Int) throws {
-        guard !isMatchLive else { throw GameError("경기가 끝난 뒤에 답할 수 있습니다.") }
+        guard !isMatchLive else { throw GameError(String(localized: "경기가 끝난 뒤에 답할 수 있습니다.")) }
         guard let career, !career.retired, let offer = career.offers.first(where: { $0.id == id }),
               let me = players[career.playerID]
-        else { throw GameError("이미 사라진 제안입니다.") }
+        else { throw GameError(String(localized: "이미 사라진 제안입니다.")) }
 
         let club = teams[offer.teamID]
         if offer.kind == .renewal {
@@ -134,7 +134,7 @@ extension Game {
 
     public mutating func declineCareerOffer(_ id: Int) throws {
         guard let offer = career?.offers.first(where: { $0.id == id }) else { return }
-        guard offer.kind != .tryout else { throw GameError("입단 제안 중 하나는 골라야 합니다.") }
+        guard offer.kind != .tryout else { throw GameError(String(localized: "입단 제안 중 하나는 골라야 합니다.")) }
         career?.offers.removeAll { $0.id == id }
         if offer.kind == .transfer { coolCareerScout(offer.teamID) }
         post("\(teams[offer.teamID].name)의 \(offer.kind == .renewal ? "재계약" : "이적") 제안을 거절했습니다.")
@@ -143,10 +143,10 @@ extension Game {
     /// 연봉을 올려 달라고 한다. 제안마다 한 번만 할 수 있고, 이적 제안은 거절당하면 사라진다.
     public mutating func negotiateCareerOffer(_ id: Int) throws {
         guard let career, let index = career.offers.firstIndex(where: { $0.id == id }) else {
-            throw GameError("이미 사라진 제안입니다.")
+            throw GameError(String(localized: "이미 사라진 제안입니다."))
         }
         var offer = career.offers[index]
-        guard !offer.negotiated else { throw GameError("이미 한 번 요구했습니다.") }
+        guard !offer.negotiated else { throw GameError(String(localized: "이미 한 번 요구했습니다.")) }
         offer.negotiated = true
         let name = teams[offer.teamID].name
         if rng.chance(min(0.9, 0.45 + career.fame / 200)) {
@@ -165,9 +165,9 @@ extension Game {
 
     /// 이적 요청: 제안이 올 확률이 오르지만 감독 신뢰가 떨어진다. 이적 기간마다 한 번.
     public mutating func requestCareerTransfer() throws {
-        guard let career, !career.retired, !career.isFreeAgent else { throw GameError("지금은 요청할 수 없습니다.") }
-        guard tradeWindowOpen else { throw GameError("이적 기간이 아닙니다.") }
-        guard !career.transferRequested else { throw GameError("이번 이적 기간에 이미 요청했습니다.") }
+        guard let career, !career.retired, !career.isFreeAgent else { throw GameError(String(localized: "지금은 요청할 수 없습니다.")) }
+        guard tradeWindowOpen else { throw GameError(String(localized: "이적 기간이 아닙니다.")) }
+        guard !career.transferRequested else { throw GameError(String(localized: "이번 이적 기간에 이미 요청했습니다.")) }
         self.career?.transferRequested = true
         if career.fans == nil { self.career?.trust = max(0, career.trust - 10) }
         // 소문이 돈다: 지켜보던 구단들의 관심이 오르고, 제안의 문턱이 낮아지고, 새 스카우트가 더 잘 온다.
