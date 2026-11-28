@@ -62,7 +62,9 @@ struct CareerTab: View {
                 Text(career.transferRequested
                     ? "이적을 요청해 두었습니다. 이적 기간 동안 스카우트가 더 잘 오고, 더 낮은 관심도에서도 제안합니다."
                     : game.tradeWindowOpen
-                    ? "이적을 요청하면 스카우트들의 관심이 오르고 제안의 문턱이 낮아지지만, 감독 신뢰가 10 떨어집니다. 이적 기간마다 한 번."
+                    ? (career.fans != nil
+                        ? "이적을 요청하면 스카우트들의 관심이 오르고 제안의 문턱이 낮아집니다. 이적 기간마다 한 번."
+                        : "이적을 요청하면 스카우트들의 관심이 오르고 제안의 문턱이 낮아지지만, 감독 신뢰가 10 떨어집니다. 이적 기간마다 한 번.")
                     : "지금은 이적 기간이 아닙니다 (정규시즌 \(Balance.tradeDeadlineRound)라운드까지, 그리고 오프시즌).").note()
             }
         }
@@ -77,6 +79,10 @@ struct CareerTab: View {
                     key: "출전 시간 · 야투 · 3점슛",
                     value: "평균 \(String(format: "%.1f", line.minutesPerGame))분 · \(Int((line.fieldGoalRate * 100).rounded()))% · \(Int((line.threeRate * 100).rounded()))%")
                 KeyValueRow(key: "스틸 · 블록 · 실책", value: "\(line.steals) · \(line.blocks) · \(line.turnovers)")
+            } else if let line = me.duel {
+                ForEach(DuelRace.allCases, id: \.self) { race in
+                    KeyValueRow(key: "대 \(race.label)", value: line.versusText(race).replacingOccurrences(of: "대 \(race.label) ", with: ""))
+                }
             } else if let line = me.football {
                 KeyValueRow(key: "유효 슈팅 · 경고 · 퇴장", value: "\(line.shotsOnTarget) · \(line.yellowCards) · \(line.redCards)")
             } else if me.isPitcher {

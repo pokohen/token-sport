@@ -67,12 +67,12 @@ public enum DuelTournament: Int, Codable, CaseIterable, Comparable, Sendable {
     /// 한 판을 이길 때마다 느는 팬. 우승하면 두 배를 더 받는다.
     var fansPerWin: Int {
         switch self {
-        case .pcBang: 15
-        case .city: 120
-        case .national: 900
-        case .korea: 9_000
-        case .asia: 80_000
-        case .world: 700_000
+        case .pcBang: 40
+        case .city: 400
+        case .national: 3_000
+        case .korea: 25_000
+        case .asia: 200_000
+        case .world: 1_500_000
         }
     }
 
@@ -220,6 +220,7 @@ extension Game {
 
         var gained = tournament.fansPerWin * wins
         if won { gained += tournament.fansPerWin * 2 }
+        gained = Int(Double(gained) * Balance.duelFanRoom(career.fans ?? 0))
         career.fans = (career.fans ?? 0) + gained
         let prize = won ? tournament.prize : wins == rounds - 1 ? tournament.prize / 2 : wins == rounds - 2 ? tournament.prize / 4 : 0
         if prize > 0 { funds.earn(price(prize), .prize) }

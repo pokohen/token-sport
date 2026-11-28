@@ -82,7 +82,9 @@ extension Game {
         case .powerForward, .center5:
             career.goal = CareerGoal(kind: .rebounds, target: 130 + clamp(edge * 4, -40, 120))
         case .human, .alien, .protector:
-            career.goal = CareerGoal(kind: .setWins, target: 14 + clamp(edge / 2, -8, 12))
+            // 출전 순서 두 번째 안이면 매 경기 나오고, 아니면 네 경기에 한 번 나온다.
+            let rank = roster(of: userTeamID).filter { $0.position.sport == .duel && $0.ability > me.ability }.count
+            career.goal = CareerGoal(kind: .setWins, target: rank < 2 ? 16 + clamp(edge / 2, -6, 10) : 4)
         default:
             career.goal = CareerGoal(kind: .hits, target: 26 + clamp(edge, -6, 10))
         }
@@ -113,7 +115,14 @@ extension Game {
             let done = goal.progress(of: me) >= goal.target
             goal.achieved = done
             career.goal = goal
-            if done {
+            if done, let fans = career.fans {
+                // e스포츠: 감독 신뢰 대신 팬이 는다.
+                let gain = max(20, fans / 10)
+                career.fans = fans + gain
+                post("시즌 목표(\(goal.label))를 채웠습니다. 팬 +\(fansText(gain)).")
+            } else if career.fans != nil {
+                post("시즌 목표(\(goal.label))를 채우지 못했습니다.")
+            } else if done {
                 career.trust = min(100, career.trust + 10)
                 career.fame = min(100, career.fame + 3)
                 post("시즌 목표(\(goal.label))를 채웠습니다. 감독 신뢰 +10, 명성 +3.")
@@ -123,6 +132,7 @@ extension Game {
             }
         }
         self.career = career
+        syncDuelFame()
     }
 
     /// 내 구단이 승격하거나 강등됐다. 계약은 이어진다.
@@ -154,7 +164,7 @@ extension Game {
             return
         }
         guard me.contract.seasonsLeft <= 0, let team = me.teamID else { return }
-        if career.trust >= Balance.careerRenewalTrust {
+        if me.position.sport == .duel ? careerDuelWanted(me, on: team) : career.trust >= Balance.careerRenewalTrust {
             let offer = CareerOffer(
                 id: newCareerOfferID(), kind: .renewal, teamID: team,
                 salary: Int(Double(me.contract.salary) * 1.05 / 1_000) * 1_000,
@@ -233,7 +243,7 @@ extension Game {
             duel: me.position.sport == .duel ? duel : nil,
             ratedGames: ratedGames, ratingTotal: ratingTotal, awards: career.awards,
             peakAbility: career.peakAbility, bestTier: career.bestTier, earnings: career.earnings,
-            seasonsPlayed: careerSeasonsPlayed)
+            seasonsPlayed: careerSeasonsPlayed, fans: career.fans, duelTitle: duelTitle)
         careerHall = (careerHall ?? []) + [record]
         if let team = me.teamID { clearCareerLineup(team) }
         removePlayer(me.id)

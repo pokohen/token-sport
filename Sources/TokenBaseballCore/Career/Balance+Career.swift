@@ -126,19 +126,27 @@ extension Balance {
     public static let careerDuelLossShift = -0.7
     /// 내 선수가 출전 순서에 들지 못해도 이 경기 수가 지나면 한 세트를 받는다.
     public static let careerDuelGuaranteedEvery = 4
+    /// 팀에서 순위가 낮아도 지난 시즌 평점이 이만큼이면 재계약을 제안받는다.
+    public static let careerDuelRenewalRating = 6.0
     /// 세트를 이길 때마다 리그만큼 느는 팬 (6부 → 1부).
     public static func duelFanBase(_ tier: LeagueTier) -> Int {
         switch tier {
-        case .citizenAmateur: 4
-        case .citizenSemiPro: 10
-        case .citizenPro: 25
-        case .amateur: 70
-        case .semiPro: 220
-        case .pro: 700
+        case .citizenAmateur: 35
+        case .citizenSemiPro: 45
+        case .citizenPro: 100
+        case .amateur: 250
+        case .semiPro: 700
+        case .pro: 1_800
         }
     }
     /// 세트를 이길 때마다 지금 팬의 이만큼이 더 는다 (팬이 팬을 부른다).
-    public static let duelFanShare = 0.008
+    public static let duelFanShare = 0.012
+    /// 팬이 이 수에 가까울수록 덜 는다 (나라 안의 e스포츠 팬이 그쯤이다). 1,000만 명에서 느는 양이 3분의 2로 준다.
+    public static let duelFanCeiling = 30_000_000
+    /// 팬이 이미 많을수록 줄어드는 배수 (0.1 ~ 1).
+    public static func duelFanRoom(_ fans: Int) -> Double {
+        max(0.1, 1 - Double(fans) / Double(duelFanCeiling))
+    }
     /// 세 경기 넘게 지면 경기마다 팬이 이만큼 준다.
     public static let duelFanSlumpLoss = 0.01
     /// 오프시즌마다 줄어드는 팬 몫.

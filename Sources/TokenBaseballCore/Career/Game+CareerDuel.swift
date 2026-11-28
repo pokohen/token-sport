@@ -23,6 +23,13 @@ extension Game {
         career?.duelStyle = style == .balanced ? nil : style
     }
 
+    /// e스포츠 재계약: 감독 신뢰 대신 팀 안의 실력 순위(여섯 명 중 넷째 안)나 지난 시즌 평점으로 정한다.
+    func careerDuelWanted(_ me: Player, on team: TeamID) -> Bool {
+        let better = roster(of: team).filter { $0.position.sport == .duel && $0.ability > me.ability }.count
+        let rating = career?.history.last(where: { $0.season == season })?.averageRating ?? 6
+        return better < 4 || rating >= Balance.careerDuelRenewalRating
+    }
+
     // MARK: 평점
 
     /// 세트 하나의 평점 (6.0이 "무난했다"). 이기면 오르고 지면 내린다. 병력·일꾼 교환, 빨리 끝낸 완승, 역전,
@@ -74,7 +81,7 @@ extension Game {
         let before = fans
         for record in match.sets(of: me.id) {
             guard let entry = record.entry(for: me.id), entry.won else { continue }
-            var gain = Double(Balance.duelFanBase(tier)) + Double(fans) * Balance.duelFanShare
+            var gain = (Double(Balance.duelFanBase(tier)) + Double(fans) * Balance.duelFanShare) * Balance.duelFanRoom(fans)
             if record.decider { gain *= 2 }
             if kind == .playoff { gain *= 2 }
             if kind == .friendly { gain *= 0.3 }

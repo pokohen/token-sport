@@ -73,7 +73,10 @@ struct OnboardingView: View {
             HStack(spacing: 8) {
                 if fixedSport != .football { Image(systemName: fixedSport == nil ? "figure.baseball" : "baseball.fill") }
                 if fixedSport != .baseball { Image(systemName: fixedSport == nil ? "figure.soccer" : "soccerball") }
-                if fixedSport == nil { Image(systemName: "figure.basketball") }
+                if fixedSport == nil {
+                    Image(systemName: "figure.basketball")
+                    Image(systemName: "gamecontroller.fill")
+                }
             }
             .font(.system(size: 40)).foregroundStyle(Color.accentColor)
             if bankrupt {
@@ -87,7 +90,7 @@ struct OnboardingView: View {
                 }
             } else {
                 Text("Token Sports").font(.title2.bold())
-                Text("평소처럼 AI 코딩을 하면 쓴 토큰이 훈련 포인트로 쌓입니다. 야구, 축구, 농구 선수 가운데 한 명이 되어, 그 포인트로 훈련하고 경기에 나서며 6부 시민 구단에서 1부 프로 리그의 스타까지 올라가 보세요.")
+                Text("평소처럼 AI 코딩을 하면 쓴 토큰이 훈련 포인트로 쌓입니다. 야구, 축구, 농구 선수나 프로게이머 가운데 한 명이 되어, 그 포인트로 훈련하고 경기에 나서며 6부 시민 구단에서 1부 프로 리그의 스타까지 올라가 보세요.")
                 Card("토큰 사용량을 읽는 곳") {
                     Text(model.sources.claudeCode.root.path).font(.caption.monospaced()).textSelection(.enabled)
                     Text(model.sources.codex.root.path).font(.caption.monospaced()).textSelection(.enabled)
@@ -96,7 +99,7 @@ struct OnboardingView: View {
                     Text("이 컴퓨터 안에서만 읽습니다. 외부로 보내지 않습니다. 설치 이전 사용량은 세지 않습니다.").note()
                 }
             }
-            Text("KBO를 비롯한 실제 리그·구단과 무관한 비공식 팬 프로젝트입니다.").note()
+            Text("KBO를 비롯한 실제 리그·구단·게임과 무관한 비공식 팬 프로젝트입니다.").note()
         }
     }
 
@@ -116,6 +119,7 @@ struct OnboardingView: View {
                                 Text(model.hasSave(slot: item) ? "저장되어 있음"
                                     : item == .football ? "구단 경영 · 승점제" : item == .footballPlayer ? "선수 한 명의 커리어"
                                     : item == .basketballPlayer ? "가드·포워드·센터의 커리어"
+                                    : item == .duelPlayer ? "1:1 대전 프로게이머의 커리어"
                                     : item.isCareer ? "타자·투수 한 명의 커리어" : "구단 경영 · 승률제").note()
                             }
                             .frame(maxWidth: .infinity)
