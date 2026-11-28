@@ -10,13 +10,13 @@ struct RenameCard: View {
     var body: some View {
         if game.isCareer {
             if let me = game.myPlayer, game.career?.retired != true {
-                Card("선수 이름") {
+                Card(String(localized: "선수 이름")) {
                     field(placeholder: me.name) { try $0.renameCareerPlayer(to: $1) }
                     Text("12자까지. 지난 기록과 구단 이력은 그대로입니다.").note()
                 }
             }
         } else {
-            Card("팀 이름") {
+            Card(String(localized: "팀 이름")) {
                 field(placeholder: game.userTeam.name) { try $0.renameTeam($0.userTeamID, to: $1) }
             }
         }

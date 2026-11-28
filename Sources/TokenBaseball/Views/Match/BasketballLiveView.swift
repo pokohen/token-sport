@@ -14,14 +14,14 @@ struct BasketballLiveView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Card(live.kind.label, trailing: state.isFinished ? "경기 종료" : state.clockLabel) {
+            Card(live.kind.label, trailing: state.isFinished ? String(localized: "경기 종료") : state.clockLabel) {
                 LiveScoreLine(
                     awayName: state.away.name, awayScore: state.away.points,
                     homeName: state.home.name, homeScore: state.home.points)
                 quarters
             }
             if let myName {
-                MyPlayerLiveCard(name: myName, performance: myPerformance, waiting: "벤치에서 대기 중")
+                MyPlayerLiveCard(name: myName, performance: myPerformance, waiting: String(localized: "벤치에서 대기 중"))
             }
             Card {
                 let myBall = state.homeHasBall == live.userIsHome
@@ -32,18 +32,18 @@ struct BasketballLiveView: View {
                 }
                 let a = mine.totals, b = theirs.totals
                 MirrorStatGrid(rows: [
-                    .init("야투", shots(a.fieldGoalsMade, a.fieldGoalsAttempted), shots(b.fieldGoalsMade, b.fieldGoalsAttempted)),
-                    .init("3점슛", shots(a.threesMade, a.threesAttempted), shots(b.threesMade, b.threesAttempted)),
-                    .init("자유투", shots(a.freeThrowsMade, a.freeThrowsAttempted), shots(b.freeThrowsMade, b.freeThrowsAttempted)),
-                    .init("리바운드", "\(a.rebounds)", "\(b.rebounds)"),
-                    .init("어시스트", "\(a.assists)", "\(b.assists)"),
-                    .init("스틸 · 블록", "\(a.steals) · \(a.blocks)", "\(b.steals) · \(b.blocks)"),
-                    .init("실책", "\(a.turnovers)", "\(b.turnovers)"),
+                    .init(String(localized: "야투"), shots(a.fieldGoalsMade, a.fieldGoalsAttempted), shots(b.fieldGoalsMade, b.fieldGoalsAttempted)),
+                    .init(String(localized: "3점슛"), shots(a.threesMade, a.threesAttempted), shots(b.threesMade, b.threesAttempted)),
+                    .init(String(localized: "자유투"), shots(a.freeThrowsMade, a.freeThrowsAttempted), shots(b.freeThrowsMade, b.freeThrowsAttempted)),
+                    .init(String(localized: "리바운드"), "\(a.rebounds)", "\(b.rebounds)"),
+                    .init(String(localized: "어시스트"), "\(a.assists)", "\(b.assists)"),
+                    .init(String(localized: "스틸 · 블록"), "\(a.steals) · \(a.blocks)", "\(b.steals) · \(b.blocks)"),
+                    .init(String(localized: "실책"), "\(a.turnovers)", "\(b.turnovers)"),
                 ])
             }
             CommentaryCard(log: state.log, myName: myName)
             OtherMatchesCard(rows: live.others.map {
-                ("\($0.away.shortName) \($0.away.points) : \($0.home.points) \($0.home.shortName)", $0.isFinished ? "종료" : $0.clockLabel)
+                ("\($0.away.shortName) \($0.away.points) : \($0.home.points) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.clockLabel)
             })
         }
     }

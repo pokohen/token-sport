@@ -7,7 +7,7 @@ struct NewsCard: View {
     var count = 12
 
     var body: some View {
-        Card("소식") {
+        Card(String(localized: "소식")) {
             let recent = game.news.suffix(count)
             if recent.isEmpty { Text("아직 소식이 없습니다.").note() }
             ForEach(recent.reversed()) { item in

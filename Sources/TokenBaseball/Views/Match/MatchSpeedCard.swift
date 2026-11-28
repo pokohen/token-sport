@@ -22,7 +22,7 @@ struct MatchSpeedCard: View {
                     Spacer(minLength: 8)
                     Button("결과 바로 보기 · \(game.fundsText(game.skipMatchCost))") { model.skipMatch() }
                         .disabled(blocked != nil)
-                        .help(blocked ?? "토큰을 내고 경기 결과를 바로 봅니다")
+                        .help(blocked ?? String(localized: "토큰을 내고 경기 결과를 바로 봅니다"))
                 }
             }
         }

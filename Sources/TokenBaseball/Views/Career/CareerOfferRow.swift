@@ -18,8 +18,8 @@ struct CareerOfferRow: View {
                 }
                 Spacer()
             }
-            KeyValueRow(key: "연봉 · 기간", value: "\(Format.money(offer.salary)) · \(offer.years)시즌")
-            KeyValueRow(key: "예상 입지", value: offer.role.rawValue)
+            KeyValueRow(key: String(localized: "연봉 · 기간"), value: String(localized: "\(Format.money(offer.salary)) · \(offer.years)시즌"))
+            KeyValueRow(key: String(localized: "예상 입지"), value: offer.role.rawValue)
             HStack {
                 Button("수락") { model.perform { try $0.acceptCareerOffer(offer.id) } }
                     .buttonStyle(.borderedProminent)
@@ -35,9 +35,9 @@ struct CareerOfferRow: View {
 
     private var kindLabel: String {
         switch offer.kind {
-        case .transfer: "이적 제안"
-        case .renewal: "재계약 제안"
-        case .tryout: "입단 제안"
+        case .transfer: String(localized: "이적 제안")
+        case .renewal: String(localized: "재계약 제안")
+        case .tryout: String(localized: "입단 제안")
         }
     }
 }

@@ -9,7 +9,7 @@ struct CareerRivalCard: View {
 
     var body: some View {
         if let record = career.rival, let rival = game.careerRival, let team = rival.teamID {
-            Card("라이벌", trailing: "맞대결 \(record.wins)승 \(record.draws)무 \(record.losses)패") {
+            Card(String(localized: "라이벌"), trailing: String(localized: "맞대결 \(record.wins)승 \(record.draws)무 \(record.losses)패")) {
                 HStack(spacing: 10) {
                     EmblemView(team: game.teams[team], size: 30)
                     VStack(alignment: .leading, spacing: 1) {
@@ -23,7 +23,7 @@ struct CareerRivalCard: View {
                     }
                 }
                 Divider()
-                KeyValueRow(key: "나", value: line(me))
+                KeyValueRow(key: String(localized: "나"), value: line(me))
                 KeyValueRow(key: rival.name, value: line(rival))
                 if let last = record.lastMeeting { Text(last).note().fixedSize(horizontal: false, vertical: true) }
                 Text("같은 리그에서 나와 비슷한 선수입니다. 그 구단과 만나 둘 다 뛴 날, 평점이 높은 쪽이 맞대결에서 이깁니다. 이기면 명성이 \(Int(Balance.careerRivalFame)) 오릅니다. 리그가 달라지거나 새 시즌에 내가 크게 앞서 있으면 새 라이벌이 생깁니다.").note().fixedSize(horizontal: false, vertical: true)

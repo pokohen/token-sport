@@ -85,7 +85,7 @@ final class AppModel: ObservableObject {
             game = try store.load()?.game
         } catch {
             game = nil
-            loadError = "저장 파일을 읽지 못했습니다.\n\(store.fileURL.path)\n\(error.localizedDescription)"
+            loadError = String(localized: "저장 파일을 읽지 못했습니다.\n\(store.fileURL.path)\n\(error.localizedDescription)")
         }
     }
 
@@ -130,7 +130,7 @@ final class AppModel: ObservableObject {
         // 그래서 경기 중에는 비교하지 않고, 경기 전의 상태와 견준다.
         if game?.isMatchLive != true {
             let ready = (game?.charges ?? 0) > 0 && game?.nextMatch() != nil
-            if ready, wasMatchReady == false { notify("경기를 치를 수 있습니다", "상단바를 눌러 경기를 시작하세요.") }
+            if ready, wasMatchReady == false { notify(String(localized: "경기를 치를 수 있습니다"), String(localized: "상단바를 눌러 경기를 시작하세요.")) }
             wasMatchReady = ready
         }
         updateStatusTooltip()
@@ -141,7 +141,7 @@ final class AppModel: ObservableObject {
         do {
             try store.save(GameSave(game: game))
         } catch {
-            message = "저장하지 못했습니다: \(error.localizedDescription)"
+            message = String(localized: "저장하지 못했습니다: \(error.localizedDescription)")
         }
     }
 

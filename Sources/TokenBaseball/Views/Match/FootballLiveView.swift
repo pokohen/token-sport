@@ -26,21 +26,21 @@ struct FootballLiveView: View {
                 .note()
             }
             if let myName {
-                MyPlayerLiveCard(name: myName, performance: myPerformance, waiting: "벤치에서 대기 중")
+                MyPlayerLiveCard(name: myName, performance: myPerformance, waiting: String(localized: "벤치에서 대기 중"))
             }
             Card {
                 pitch
                 let share = Int(((live.userIsHome ? state.homePossession : 1 - state.homePossession) * 100).rounded())
                 MirrorStatGrid(rows: [
-                    .init("점유율", "\(share)%", "\(100 - share)%"),
-                    .init("슈팅 (유효)", "\(mine.shots) (\(mine.shotsOnTarget))", "\(theirs.shots) (\(theirs.shotsOnTarget))"),
-                    .init("코너킥", "\(mine.corners)", "\(theirs.corners)"),
-                    .init("반칙", "\(mine.fouls)", "\(theirs.fouls)"),
-                    .init("경고 · 퇴장", "\(mine.yellowCards) · \(mine.redCards)", "\(theirs.yellowCards) · \(theirs.redCards)"),
+                    .init(String(localized: "점유율"), "\(share)%", "\(100 - share)%"),
+                    .init(String(localized: "슈팅 (유효)"), "\(mine.shots) (\(mine.shotsOnTarget))", "\(theirs.shots) (\(theirs.shotsOnTarget))"),
+                    .init(String(localized: "코너킥"), "\(mine.corners)", "\(theirs.corners)"),
+                    .init(String(localized: "반칙"), "\(mine.fouls)", "\(theirs.fouls)"),
+                    .init(String(localized: "경고 · 퇴장"), "\(mine.yellowCards) · \(mine.redCards)", "\(theirs.yellowCards) · \(theirs.redCards)"),
                 ])
             }
             CommentaryCard(log: state.log, myName: myName)
-            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.goals) : \($0.home.goals) \($0.home.shortName)", $0.isFinished ? "종료" : $0.clockLabel) })
+            OtherMatchesCard(rows: live.others.map { ("\($0.away.shortName) \($0.away.goals) : \($0.home.goals) \($0.home.shortName)", $0.isFinished ? String(localized: "종료") : $0.clockLabel) })
         }
     }
 
@@ -48,7 +48,7 @@ struct FootballLiveView: View {
     private var pitch: some View {
         let fromMine = live.userIsHome ? state.ballZoneFromHome : 2 - state.ballZoneFromHome
         let myBall = state.homeHasBall == live.userIsHome
-        let labels = ["우리 진영", "중원", "상대 진영"]
+        let labels = [String(localized: "우리 진영"), String(localized: "중원"), String(localized: "상대 진영")]
         return VStack(spacing: 4) {
             HStack(spacing: 2) {
                 ForEach(0..<3, id: \.self) { zone in

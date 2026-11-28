@@ -26,7 +26,7 @@ enum UpdateChecker {
 
         /// 화면에 보이는 한 줄 제목.
         var headline: String {
-            version.map { "새 버전 \($0)이(가) 나왔습니다" } ?? "새 버전이 있습니다 (변경 \(count)건)"
+            version.map { String(localized: "새 버전 \($0)이(가) 나왔습니다") } ?? String(localized: "새 버전이 있습니다 (변경 \(count)건)")
         }
     }
 
@@ -83,16 +83,16 @@ enum UpdateChecker {
             return await fetch("releases/latest", notFound: .upToDate) { parseRelease($0, current: appVersion) }
         }
         guard let commit = buildCommit else {
-            return .unknown("앱 번들로 실행할 때만 확인할 수 있습니다 (Scripts/make-app.sh로 만든 앱).")
+            return .unknown(String(localized: "앱 번들로 실행할 때만 확인할 수 있습니다 (Scripts/make-app.sh로 만든 앱)."))
         }
         return await fetch(
-            "compare/\(commit)...HEAD", notFound: .unknown("이 빌드의 커밋이 저장소에 없습니다 (직접 고친 빌드)."), parse: parse)
+            "compare/\(commit)...HEAD", notFound: .unknown(String(localized: "이 빌드의 커밋이 저장소에 없습니다 (직접 고친 빌드).")), parse: parse)
     }
 
     /// GitHub API에 한 번 묻고 응답을 읽는다.
     private static func fetch(_ path: String, notFound: Outcome, parse: (Data) -> Outcome) async -> Outcome {
         guard let url = URL(string: "https://api.github.com/repos/\(repository)/\(path)") else {
-            return .unknown("저장소 주소가 올바르지 않습니다.")
+            return .unknown(String(localized: "저장소 주소가 올바르지 않습니다."))
         }
         var request = URLRequest(url: url, timeoutInterval: 15)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
@@ -101,10 +101,10 @@ enum UpdateChecker {
             let (data, response) = try await URLSession.shared.data(for: request)
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
             if status == 404 { return notFound }
-            guard status == 200 else { return .unknown("GitHub가 응답하지 않았습니다 (\(status)).") }
+            guard status == 200 else { return .unknown(String(localized: "GitHub가 응답하지 않았습니다 (\(status)).")) }
             return parse(data)
         } catch {
-            return .unknown("확인하지 못했습니다: \(error.localizedDescription)")
+            return .unknown(String(localized: "확인하지 못했습니다: \(error.localizedDescription)"))
         }
     }
 
@@ -119,7 +119,7 @@ enum UpdateChecker {
             let assets: [Asset]?
         }
         guard let response = try? JSONDecoder().decode(Response.self, from: data) else {
-            return .unknown("응답을 읽지 못했습니다.")
+            return .unknown(String(localized: "응답을 읽지 못했습니다."))
         }
         let latest = response.tag_name.hasPrefix("v") ? String(response.tag_name.dropFirst()) : response.tag_name
         guard isVersion(latest, newerThan: current) else { return .upToDate }
@@ -167,7 +167,7 @@ enum UpdateChecker {
             let commits: [Entry]
         }
         guard let response = try? JSONDecoder().decode(Response.self, from: data) else {
-            return .unknown("응답을 읽지 못했습니다.")
+            return .unknown(String(localized: "응답을 읽지 못했습니다."))
         }
         guard response.ahead_by > 0, let head = response.commits.last?.sha else { return .upToDate }
         let titles = response.commits.reversed()

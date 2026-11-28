@@ -10,12 +10,20 @@ struct PlayersTab: View {
 
     enum Section: String, CaseIterable {
         case roster = "로스터", lineup = "라인업", market = "영입·이적"
+
+        var title: String {
+            switch self {
+            case .roster: String(localized: "로스터")
+            case .lineup: String(localized: "라인업")
+            case .market: String(localized: "영입·이적")
+            }
+        }
     }
 
     var body: some View {
         VStack(spacing: 10) {
             Picker("", selection: $section) {
-                ForEach(Section.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                ForEach(Section.allCases, id: \.self) { Text($0.title).tag($0) }
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -32,7 +40,7 @@ struct PlayersTab: View {
         let all = game.roster(of: game.userTeamID)
         let shown = all.filter { !expiringOnly || game.isExpiring($0) }
             .sorted { (Self.group($0), -$0.ability) < (Self.group($1), -$1.ability) }
-        return Card("선수단", trailing: "\(all.count) / \(game.rosterLimit(game.userTier))명") {
+        return Card(String(localized: "선수단"), trailing: String(localized: "\(all.count) / \(game.rosterLimit(game.userTier))명")) {
             Toggle("계약 만료 예정만 보기 (\(all.filter { game.isExpiring($0) }.count)명)", isOn: $expiringOnly)
                 .font(.callout)
             ForEach(shown) { player in

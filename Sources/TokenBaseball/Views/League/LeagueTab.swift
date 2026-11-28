@@ -17,7 +17,7 @@ struct LeagueTab: View {
             .pickerStyle(.segmented)
             .labelsHidden()
 
-            Card(shown.displayName(for: game.sport), trailing: "강도 범위 \(Int(Balance.strengthRange(shown).lowerBound))~\(Int(Balance.strengthRange(shown).upperBound))") {
+            Card(shown.displayName(for: game.sport), trailing: String(localized: "강도 범위 \(Int(Balance.strengthRange(shown).lowerBound))~\(Int(Balance.strengthRange(shown).upperBound))")) {
                 standings
             }
             if shown == game.userTier { promotion }
@@ -31,8 +31,8 @@ struct LeagueTab: View {
     /// 축구의 승격·강등 규칙 한 줄. 20팀 리그는 세 팀, 그보다 작은 리그는 두 팀이 오르내린다.
     private func footballRuleText(teams: Int) -> String {
         let direct = Balance.footballAutoPromotions(teams: teams)
-        let up = direct == 1 ? "1위는" : "1~\(direct)위는"
-        return "\(up) 자동 승격, \(direct + 1)~\(direct + 4)위는 승격 플레이오프(한 팀 승격), 맨 아래 \(direct + 1)팀(\(teams - direct)~\(teams)위)은 자동 강등."
+        let up = direct == 1 ? String(localized: "1위는") : String(localized: "1~\(direct)위는")
+        return String(localized: "\(up) 자동 승격, \(direct + 1)~\(direct + 4)위는 승격 플레이오프(한 팀 승격), 맨 아래 \(direct + 1)팀(\(teams - direct)~\(teams)위)은 자동 강등.")
     }
 
     private var standings: some View {
@@ -89,9 +89,9 @@ struct LeagueTab: View {
 
     @ViewBuilder private var promotion: some View {
         if !game.isCareer, let level = game.promotionStadiumRequirement {
-            Card("승격 조건: 구장 등급") {
+            Card(String(localized: "승격 조건: 구장 등급")) {
                 KeyValueRow(
-                    key: "필요한 경기장", value: "Lv\(game.userTeam.stadiumLevel) / Lv\(level)",
+                    key: String(localized: "필요한 경기장"), value: "Lv\(game.userTeam.stadiumLevel) / Lv\(level)",
                     valueColor: game.userTeam.stadiumLevel >= level ? Theme.win : Theme.loss)
                 if game.userTeam.stadiumLevel >= level {
                     Label("구장 등급을 채웠습니다. 순위만으로 승격이 정해집니다.", systemImage: "checkmark.seal.fill")
@@ -102,12 +102,12 @@ struct LeagueTab: View {
                 Text("신청은 필요 없습니다. \(footballRuleText(teams: game.rankedStandings(game.userTier).count)) 플레이오프는 준결승 두 경기 합산, 결승 중립 구장 단판입니다.").note()
             }
         } else if !game.isCareer, let requirement = game.promotionRequirement {
-            Card("승강 플레이오프 신청") {
+            Card(String(localized: "승강 플레이오프 신청")) {
                 KeyValueRow(
-                    key: "필요 인지도", value: "\(Int(game.userTeam.fame)) / \(Int(requirement.fame))",
+                    key: String(localized: "필요 인지도"), value: "\(Int(game.userTeam.fame)) / \(Int(requirement.fame))",
                     valueColor: game.userTeam.fame >= requirement.fame ? Theme.win : Theme.loss)
-                KeyValueRow(key: "신청비", value: Format.money(requirement.fee))
-                KeyValueRow(key: "신청 마감", value: "\(Balance.applicationDeadlineRound)라운드 (지금 \(game.round)라운드 종료)")
+                KeyValueRow(key: String(localized: "신청비"), value: Format.money(requirement.fee))
+                KeyValueRow(key: String(localized: "신청 마감"), value: String(localized: "\(Balance.applicationDeadlineRound)라운드 (지금 \(game.round)라운드 종료)"))
                 if game.appliedForPromotion {
                     Label("신청 완료. 시즌이 끝났을 때 1위면 자동 승격, 2위나 3위면 와일드카드를 거쳐 승강 플레이오프에 나갑니다.", systemImage: "checkmark.seal.fill")
                         .font(.callout).foregroundStyle(Theme.win)
@@ -121,7 +121,7 @@ struct LeagueTab: View {
     }
 
     private var leaders: some View {
-        Card("기록 순위") {
+        Card(String(localized: "기록 순위")) {
             let groups = game.leaders(shown, count: 3)
             LazyVGrid(columns: [GridItem(.flexible(), alignment: .top), GridItem(.flexible(), alignment: .top)], spacing: 10) {
                 ForEach(groups, id: \.title) { group in
@@ -145,7 +145,7 @@ struct LeagueTab: View {
     @ViewBuilder private var awards: some View {
         let list = game.awards.filter { $0.tier == shown }
         if !list.isEmpty {
-            Card("지난 시즌 시상") {
+            Card(String(localized: "지난 시즌 시상")) {
                 ForEach(Array(list.enumerated()), id: \.offset) { _, award in
                     KeyValueRow(
                         key: "\(award.title) · \(award.playerName) (\(award.teamName))", value: award.detail,

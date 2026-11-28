@@ -7,7 +7,7 @@ struct PolicyCard: View {
     let game: Game
 
     var body: some View {
-        Card("투수 운용 방침") {
+        Card(String(localized: "투수 운용 방침")) {
             let policy = game.userTeam.policy
             Stepper("선발 교체 투구 수: \(policy.starterPitchLimit)구", value: binding(\.starterPitchLimit), in: 50...130, step: 5)
             Stepper("선발 교체 실점: \(policy.starterRunLimit)점", value: binding(\.starterRunLimit), in: 2...10)

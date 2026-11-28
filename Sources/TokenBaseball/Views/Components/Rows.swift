@@ -29,7 +29,8 @@ struct Stars: View {
 
 extension View {
     /// 작은 보조 글씨.
-    func note() -> some View { font(.caption).foregroundStyle(.secondary) }
+    /// 안내문은 줄을 바꿔 다 보여 준다 (영어처럼 긴 언어에서 "…"로 잘리지 않게).
+    func note() -> some View { font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
 }
 
 /// 포지션 약자 (SP, SS, GK …). 목록에서 줄을 맞추려고 폭을 고정한다.

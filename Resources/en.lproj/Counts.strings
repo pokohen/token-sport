@@ -1,0 +1,3 @@
+/* English. Keys are the Korean text in the code (Scripts/check-strings.sh lists what's missing). */
+
+"%lld시즌" = "%lld seasons";

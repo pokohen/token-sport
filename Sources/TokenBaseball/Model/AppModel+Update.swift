@@ -21,7 +21,7 @@ extension AppModel {
         switch outcome {
         case .upToDate:
             update = nil
-            updateStatus = "최신 버전입니다."
+            updateStatus = String(localized: "최신 버전입니다.")
         case .available(let found):
             update = found
             updateStatus = found.headline + "."
@@ -30,8 +30,8 @@ extension AppModel {
                 UpdateChecker.notifiedHead = found.head
                 if game?.settings.notificationsEnabled ?? true {
                     Notifier.send(
-                        title: "Token Sports 새 버전",
-                        body: (found.titles.first ?? "변경 \(found.count)건") + " — 설정 탭에서 업데이트 방법을 확인하세요")
+                        title: String(localized: "Token Sports 새 버전"),
+                        body: (found.titles.first ?? String(localized: "변경 \(found.count)건")) + String(localized: " — 설정 탭에서 업데이트 방법을 확인하세요"))
                 }
             }
         case .unknown(let reason):
@@ -51,14 +51,14 @@ extension AppModel {
               let app = Updater.installedApp else { return }
         if let reason = Updater.blockedReason() { updateError = reason; return }
         updateError = nil
-        updateProgress = "내려받는 중…"
+        updateProgress = String(localized: "내려받는 중…")
         Task { [weak self] in
             do {
                 let fresh = try await Updater.prepare(from: download, expectedVersion: version, current: app) { text in
                     Task { @MainActor in self?.updateProgress = text }
                 }
                 guard let self else { return }
-                self.updateProgress = "다시 여는 중…"
+                self.updateProgress = String(localized: "다시 여는 중…")
                 self.pendingSave?.cancel()
                 self.save()
                 do {
@@ -70,7 +70,7 @@ extension AppModel {
                 NSApplication.shared.terminate(nil)
             } catch {
                 self?.updateProgress = nil
-                self?.updateError = (error as? Updater.Failure)?.message ?? "업데이트하지 못했습니다: \(error.localizedDescription)"
+                self?.updateError = (error as? Updater.Failure)?.message ?? String(localized: "업데이트하지 못했습니다: \(error.localizedDescription)")
             }
         }
     }

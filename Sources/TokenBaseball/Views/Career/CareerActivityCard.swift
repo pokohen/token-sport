@@ -10,8 +10,8 @@ struct CareerActivityCard: View {
     var body: some View {
         let cap = Balance.careerFameCap(game.userTier)
         let duel = career.fans != nil
-        return Card(duel ? "팬 활동" : "명성 활동",
-                    trailing: duel ? "팬 \(fansText(career.fans ?? 0))" : "명성 \(Int(career.fame)) / 이 리그 한도 \(Int(cap))") {
+        return Card(duel ? String(localized: "팬 활동") : String(localized: "명성 활동"),
+                    trailing: duel ? String(localized: "팬 \(fansText(career.fans ?? 0))") : String(localized: "명성 \(Int(career.fame)) / 이 리그 한도 \(Int(cap))")) {
             Text(duel
                 ? "훈련 포인트를 들여 팬을 늘립니다. 경기 사이에 한 번 할 수 있습니다. 팬은 경기와 개인 대회로 버는 것이 가장 큽니다."
                 : "훈련 포인트를 들여 명성을 올립니다. 경기 사이에 한 번 할 수 있고, 명성이 높을수록 더 큰 구단에서 제안이 옵니다.").note()
@@ -23,8 +23,8 @@ struct CareerActivityCard: View {
                         Text(activity.detail(for: game.sport)).note()
                     }
                     Spacer()
-                    let gain = game.careerActivityFans(activity).map { "팬 +\(fansText($0))" }
-                        ?? "명성 +\(String(format: "%.1f", game.careerActivityGain(activity)))"
+                    let gain = game.careerActivityFans(activity).map { String(localized: "팬 +\(fansText($0))") }
+                        ?? String(localized: "명성 +\(String(format: "%.1f", game.careerActivityGain(activity)))")
                     Button("\(gain) · \(Format.tokens(game.careerActivityCost(activity))) P") {
                         model.perform { try $0.doCareerActivity(activity) }
                     }

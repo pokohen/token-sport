@@ -8,7 +8,7 @@ struct NextMatchCard: View {
     var goToMatch: () -> Void = {}
 
     var body: some View {
-        Card("다음 경기", accessory: AnyView(ChargeMarks(sport: game.sport, charges: game.charges))) {
+        Card(String(localized: "다음 경기"), accessory: AnyView(ChargeMarks(sport: game.sport, charges: game.charges))) {
             if game.isMatchLive {
                 Text("경기가 진행 중입니다.").font(.callout)
                 Button("중계 보기", action: goToMatch)
@@ -27,7 +27,7 @@ struct NextMatchCard: View {
                 HStack {
                     EmblemView(team: opponent, size: 28)
                     VStack(alignment: .leading) {
-                        Text("\(next.userIsHome ? "홈" : "원정") vs \(opponent.name)").font(.callout.weight(.medium))
+                        Text(next.userIsHome ? "홈 vs \(opponent.name)" : "원정 vs \(opponent.name)").font(.callout.weight(.medium))
                         Text("\(opponent.tier.displayName(for: game.sport)) · 강도 \(Int(game.strength(of: opponent.id)))\(game.sport == .football ? " · \(game.formation(of: opponent.id).label)" : "")").note()
                     }
                     Spacer()
@@ -49,14 +49,16 @@ struct NextMatchCard: View {
                         Bar(fraction: 1 - wait / Balance.matchChargeInterval)
                     }
                     HStack {
-                        Text("기다리지 않고 \(game.isCareer ? "훈련 포인트" : "자금")로 바로 치를 수 있습니다. 연달아 쓰면 두 배씩 비싸지고, 경기 기회가 새로 생기면 처음 값으로 돌아갑니다.\(game.isCareer ? " 이렇게 치른 경기에서는 실전 경험으로 능력이 조금 오릅니다 (평점이 좋을수록 많이)." : "")").note()
+                        Text(game.isCareer
+                             ? String(localized: "기다리지 않고 훈련 포인트로 바로 치를 수 있습니다. 연달아 쓰면 두 배씩 비싸지고, 경기 기회가 새로 생기면 처음 값으로 돌아갑니다. 이렇게 치른 경기에서는 실전 경험으로 능력이 조금 오릅니다 (평점이 좋을수록 많이).")
+                             : String(localized: "기다리지 않고 자금으로 바로 치를 수 있습니다. 연달아 쓰면 두 배씩 비싸지고, 경기 기회가 새로 생기면 처음 값으로 돌아갑니다.")).note()
                         Spacer()
                         Button("바로 경기 · \(game.fundsText(game.extraMatchCost))") {
                             model.buyExtraMatchAndStart()
                             if model.game?.isMatchLive == true { goToMatch() }
                         }
                         .disabled(game.extraMatchBlockedReason != nil)
-                        .help(game.extraMatchBlockedReason ?? "경기 기회를 하나 사서 바로 시작합니다")
+                        .help(game.extraMatchBlockedReason ?? String(localized: "경기 기회를 하나 사서 바로 시작합니다"))
                     }
                 }
             } else {

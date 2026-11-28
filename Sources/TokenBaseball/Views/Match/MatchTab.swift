@@ -38,14 +38,14 @@ struct MatchTab: View {
 
     @ViewBuilder private var schedule: some View {
         if game.phase == .regular, game.round < game.roundsPerSeason {
-            Card("일정") {
+            Card(String(localized: "일정")) {
                 let upcoming = Array(game.schedules[game.userTier.index].enumerated())
                     .filter { $0.offset >= game.round }.prefix(6)
                 ForEach(Array(upcoming), id: \.offset) { index, fixtures in
                     if let fixture = fixtures.first(where: { $0.involves(game.userTeamID) }) {
                         let opponent = game.teams[fixture.opponent(of: game.userTeamID)]
                         KeyValueRow(
-                            key: "\(index + 1)라운드 · \(fixture.home == game.userTeamID ? "홈" : "원정")",
+                            key: String(localized: "\(index + 1)라운드 · \(fixture.home == game.userTeamID ? String(localized: "홈") : String(localized: "원정"))"),
                             value: opponent.name)
                     }
                 }

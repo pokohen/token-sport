@@ -16,7 +16,7 @@ struct CareerHallCard: View {
 
     var body: some View {
         if !records.isEmpty {
-            Card("명예의 전당", trailing: "\(records.count)명") {
+            Card(String(localized: "명예의 전당"), trailing: String(localized: "\(records.count)명")) {
                 ForEach(records, id: \.index) { item in
                     Button {
                         open = open == item.index ? nil : item.index

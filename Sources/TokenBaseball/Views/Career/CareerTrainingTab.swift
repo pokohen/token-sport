@@ -8,8 +8,8 @@ struct CareerTrainingTab: View {
     var body: some View {
         VStack(spacing: 10) {
             if let career = game.career, let me = game.myPlayer {
-                Card("훈련", trailing: sessionsText(career)) {
-                    KeyValueRow(key: "훈련 포인트", value: "\(Format.tokens(game.funds.balance)) P")
+                Card(String(localized: "훈련"), trailing: sessionsText(career)) {
+                    KeyValueRow(key: String(localized: "훈련 포인트"), value: "\(Format.tokens(game.funds.balance)) P")
                     if let critical = career.lastCritical {
                         Label(critical, systemImage: "sparkles")
                             .font(.callout.weight(.semibold)).foregroundStyle(Theme.warn)
@@ -22,7 +22,7 @@ struct CareerTrainingTab: View {
                     Text(trainingNote(career, me)).note().fixedSize(horizontal: false, vertical: true)
                 }
 
-                Card("한계 돌파 훈련") {
+                Card(String(localized: "한계 돌파 훈련")) {
                     Text("큰 포인트를 들여 능력의 한계를 조금 넓힙니다. 능력치가 더 오르지 않을 때 씁니다. 훈련 횟수를 한 번 씁니다.").note()
                     HStack {
                         Text("한계 +1").font(.callout)
@@ -35,11 +35,11 @@ struct CareerTrainingTab: View {
                     if let reason = game.careerBreakthroughBlockedReason { Text(reason).note() }
                 }
 
-                Card("내 선수") {
-                    KeyValueRow(key: "능력", value: "\(String(format: "%.1f", me.ability)) (\(me.grade))")
-                    KeyValueRow(key: "시즌 시작 때보다", value: String(format: "%+.1f", me.ability - me.abilityAtSeasonStart))
-                    KeyValueRow(key: "최고 능력", value: "\(Int(career.peakAbility))")
-                    KeyValueRow(key: "지금까지 훈련", value: "\(career.trainingCount)회 (크리티컬 \(career.criticalCount ?? 0)회)")
+                Card(String(localized: "내 선수")) {
+                    KeyValueRow(key: String(localized: "능력"), value: "\(String(format: "%.1f", me.ability)) (\(me.grade))")
+                    KeyValueRow(key: String(localized: "시즌 시작 때보다"), value: String(format: "%+.1f", me.ability - me.abilityAtSeasonStart))
+                    KeyValueRow(key: String(localized: "최고 능력"), value: "\(Int(career.peakAbility))")
+                    KeyValueRow(key: String(localized: "지금까지 훈련"), value: String(localized: "\(career.trainingCount)회 (크리티컬 \(career.criticalCount ?? 0)회)"))
                     Text(me.position.sport == .duel
                         ? "어떤 훈련이든 능력은 같은 양만큼 오릅니다. 어릴수록 많이 오릅니다 (지금 \(me.age)세: \(String(format: "%g", Balance.duelAgeFactor(me.age)))배). 컨트롤은 \(Balance.earlyDeclineAge(me.position))세부터 조금씩, \(Balance.declineStartAge(me.position))세부터 많이 떨어지고, 운영과 판단은 나이가 들어도 조금씩 오릅니다."
                         : "어떤 훈련이든 능력은 같은 양만큼 오릅니다. 훈련하지 않아도 경기를 뛰면 조금씩 큽니다. \(Balance.declineStartAge(me.position))세부터는 시즌마다 능력치가 크게 떨어집니다.").note()
@@ -75,18 +75,18 @@ struct CareerTrainingTab: View {
 
     private func sessionsText(_ career: Career) -> String {
         career.sessionsLeft <= 0 && game.careerExtraTrainingEnabled
-            ? "추가 훈련 \(game.careerExtraSessionsUsed)번 · 비용 ×\(String(format: "%.1f", game.careerSessionCostMultiplier))"
-            : "남은 횟수 \(max(0, career.sessionsLeft))/\(Balance.careerSessionsPerMatch)"
+            ? String(localized: "추가 훈련 \(game.careerExtraSessionsUsed)번 · 비용 ×\(String(format: "%.1f", game.careerSessionCostMultiplier))")
+            : String(localized: "남은 횟수 \(max(0, career.sessionsLeft))/\(Balance.careerSessionsPerMatch)")
     }
 
     private func trainingNote(_ career: Career, _ me: Player) -> String {
         if me.age >= Balance.careerTrainingAgeLimit(me.position) {
-            return "\(Balance.careerTrainingAgeLimit(me.position))세부터는 훈련으로 능력치를 올릴 수 없습니다."
+            return String(localized: "\(Balance.careerTrainingAgeLimit(me.position))세부터는 훈련으로 능력치를 올릴 수 없습니다.")
         }
         if career.sessionsLeft <= 0, game.careerExtraTrainingEnabled {
-            return "정해진 \(Balance.careerSessionsPerMatch)번을 다 써서 지금부터는 추가 훈련입니다. 비용이 \(String(format: "%.1f", game.careerSessionCostMultiplier))배이고, 한 번 할 때마다 \(Balance.careerExtraSessionCost)배씩 더 비싸집니다. 다음 경기를 치르면 처음 값으로 돌아갑니다."
+            return String(localized: "정해진 \(Balance.careerSessionsPerMatch)번을 다 써서 지금부터는 추가 훈련입니다. 비용이 \(String(format: "%.1f", game.careerSessionCostMultiplier))배이고, 한 번 할 때마다 \(String(describing: Balance.careerExtraSessionCost))배씩 더 비싸집니다. 다음 경기를 치르면 처음 값으로 돌아갑니다.")
         }
-        if career.sessionsLeft <= 0 { return "오늘 훈련을 마쳤습니다. 다음 경기를 치르면 다시 \(Balance.careerSessionsPerMatch)번 훈련할 수 있습니다. 설정 탭에서 \"추가 훈련\"을 켜면 더 비싼 값에 이어서 할 수 있습니다." }
-        return "경기와 경기 사이에 \(Balance.careerSessionsPerMatch)번까지 훈련합니다. 어떤 훈련이든 능력이 \(String(format: "%.3f", game.careerTrainingStep))씩 오르고, 그 능력치가 높을수록 포인트가 많이 듭니다. 윗 리그로 갈수록 한 번에 더 많이 오르고 더 비쌉니다 (지금 \(game.userTier.rawValue)부: 비용 \(String(format: "%.1f", game.careerTrainingCostFactor))배). 100번에 한 번꼴로 크리티컬이 터져 세 배 오릅니다. 쓰지 않은 포인트는 그대로 남습니다."
+        if career.sessionsLeft <= 0 { return String(localized: "오늘 훈련을 마쳤습니다. 다음 경기를 치르면 다시 \(Balance.careerSessionsPerMatch)번 훈련할 수 있습니다. 설정 탭에서 \"추가 훈련\"을 켜면 더 비싼 값에 이어서 할 수 있습니다.") }
+        return String(localized: "경기와 경기 사이에 \(Balance.careerSessionsPerMatch)번까지 훈련합니다. 어떤 훈련이든 능력이 \(String(format: "%.3f", game.careerTrainingStep))씩 오르고, 그 능력치가 높을수록 포인트가 많이 듭니다. 윗 리그로 갈수록 한 번에 더 많이 오르고 더 비쌉니다 (지금 \(game.userTier.rawValue)부: 비용 \(String(format: "%.1f", game.careerTrainingCostFactor))배). 100번에 한 번꼴로 크리티컬이 터져 세 배 오릅니다. 쓰지 않은 포인트는 그대로 남습니다.")
     }
 }

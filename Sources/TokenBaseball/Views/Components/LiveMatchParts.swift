@@ -9,7 +9,7 @@ struct CommentaryCard: View {
     var myName: String? = nil
 
     var body: some View {
-        Card("문자 중계") {
+        Card(String(localized: "문자 중계")) {
             ForEach(Array(log.suffix(8).reversed().enumerated()), id: \.offset) { index, event in
                 let mine = myName.map { event.text.contains($0) } ?? false
                 Text(event.text)
@@ -32,11 +32,11 @@ struct MyPlayerLiveCard: View {
         Card {
             if let performance {
                 KeyValueRow(
-                    key: "내 선수 \(name)",
-                    value: "평점 \(String(format: "%.1f", performance.rating)) · \(performance.line)",
+                    key: String(localized: "내 선수 \(name)"),
+                    value: String(localized: "평점 \(String(format: "%.1f", performance.rating)) · \(performance.line)"),
                     valueColor: .accentColor)
             } else {
-                KeyValueRow(key: "내 선수 \(name)", value: waiting)
+                KeyValueRow(key: String(localized: "내 선수 \(name)"), value: waiting)
             }
         }
     }
@@ -49,7 +49,7 @@ struct OtherMatchesCard: View {
 
     var body: some View {
         if !rows.isEmpty {
-            Card("타 구장 소식") {
+            Card(String(localized: "타 구장 소식")) {
                 ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
                     KeyValueRow(key: row.score, value: row.status)
                 }
@@ -63,10 +63,10 @@ struct LastResultCard: View {
     let result: LastResult
 
     var body: some View {
-        Card("지난 경기", trailing: result.kind.label) {
+        Card(String(localized: "지난 경기"), trailing: result.kind.label) {
             HStack {
                 Text(result.label).font(.title3.bold()).foregroundStyle(color)
-                Text("\(result.wasHome ? "홈" : "원정") vs \(result.opponent)").font(.callout)
+                Text(result.wasHome ? "홈 vs \(result.opponent)" : "원정 vs \(result.opponent)").font(.callout)
             }
             ForEach(result.summary, id: \.self) { Text($0).note() }
         }
